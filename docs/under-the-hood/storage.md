@@ -4,7 +4,7 @@ sidebar_position: 1
 
 # Storage
 
-In the [getting started](../quickstart.md) section we introduced a simple application which synchronized the value of a counter between any number of tabs. If you close all the tabs and open a new one you will see that the value of the counter is persisted. How is this working? What's going on?
+In the [getting started](../quickstart) section we introduced a simple application which synchronized the value of a counter between any number of tabs. If you close all the tabs and open a new one you will see that the value of the counter is persisted. How is this working? What's going on?
 
 Before we dive into that, try this experiment. Modify the definition of the `repo` in `main.tsx` to look like this:
 

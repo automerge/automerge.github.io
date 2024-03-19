@@ -1,0 +1,412 @@
+---
+sidebar_position: 1
+
+
+---
+
+import Admonition from '@theme/Admonition';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# Meet Automerge: A Practical Tour
+
+Automerge is a suite of tools for building [local-first](https://www.inkandswitch.com/local-first) web applications with real-time synchronization that works on and offline. 
+
+In this tutorial, you'll build a local-first multiplayer app with TypeScript, React, [Vite](https://vite.dev), and Automerge. You'll discover how to:
+
+- Represent data as Automerge [Documents](../concepts/#documents)
+- [Change](../documents/conflicts/) documents' data and [merge](../documents/conflicts/) changes from different peers
+- Store & synchronize a set of documents in an Automerge [Repository](../concepts/#repositories) 
+- Build a multiplayer realtime web app client with Automerge's [React library](https://github.com/automerge/automerge-repo/tree/main/packages/automerge-repo-react-hooks)
+
+<figure style={ {margin: '0px auto', textAlign: 'center'} } >
+<video src={ require('../static/img/counter-sync-sm.mov').default } width={600} autoPlay loop />
+<figcaption>The local-first app in action</figcaption>
+</figure>
+
+## Setup
+
+<Admonition type="info">
+
+All the code here can be found at the [automerge-repo-quickstart](https://github.com/automerge/automerge-repo-quickstart) repo.
+
+</Admonition>
+
+To get started:
+- clone the tutorial project from [automerge-repo-quickstart](https://github.com/automerge/automerge-repo-quickstart)
+- in the `automerge-repo-quickstart` directory, install the project dependencies
+- start the local Vite development server 
+
+
+<Tabs>
+<TabItem value="npm" label="npm">
+
+```bash
+$ git clone https://github.com/automerge/automerge-repo-quickstart
+# Cloning into 'automerge-repo-quickstart'...
+$ cd automerge-repo-quickstart
+$ npm i
+# ...installing dependencies...
+$ npm run dev
+```
+
+</TabItem>
+<TabItem value="yarn" label="yarn">
+
+```bash
+$ git clone https://github.com/automerge/automerge-repo-quickstart
+# Cloning into 'automerge-repo-quickstart'...
+$ cd automerge-repo-quickstart
+$ yarn
+# ...installing dependencies...
+$ yarn dev
+```
+
+</TabItem>
+</Tabs>
+
+
+## Model Data as `Document`s
+
+[Documents](../concepts/#documents) are the central concept of Automerge. An Automerge document is a JSON-like data structure with superpowers, aka a Conflict-free Replicated Data Type, or [CRDT](http://crdt.tech).
+
+Each document is identified by a [Document URL](../concepts/#document-urls) that serves as its unique ID, e.g.: 
+
+`automerge:45NuQi1e45PKsemx8GhSCu62gyag`
+
+ Automerge documents support various [data types](../documents/), including builtin JS datatypes and `Date`, as well as Automerge-specific types including an incrementing integer known as a `Counter`.
+ 
+ 
+ You'll use the `@automerge/automerge` package to define document(s) that [model the data](../cookbook/modeling-data/) your app needs. 
+
+ ### Defining a Document's Shape
+
+In App.tsx, import the `@automerge/automerge` package, then use builtin JS data types combined with a few Automerge-specific data types exposed by this package to define the shape of the document(s) your app will need. 
+
+For example, for a simple app that counts how many times a button has been clicked, you might have a `CounterDoc` with a `counter` property storing a special numeric value `A.Counter`.
+
+
+```ts
+// App.tsx
+import { next as A } from '@automerge/automerge';
+
+interface CounterDoc {
+  counter: A.Counter;
+} 
+```
+
+### Changing Documents
+
+Although they might look like JSON objects, Automerge Documents are much more powerful.
+ 
+As changes are made to a Document's data, those changes are stored along with the data itself, and can be "undone", "replayed", and synchronized with other changes made to the same document.
+
+Instead of manipulating a `Document`'s values directly, in Automerge you'll write a callback function with the transformation you want to apply to the given doc. Pass the document & the callback function to the `A.change` method, and Automerge will return a new copy of the document with the callback's changes applied. 
+
+
+For example, to rename our counter doc we can set its `.name` property:
+
+```ts
+const renamedCounter = A.change(counter, d => d.name = 'button clicks');
+```
+
+And to increment the counter itself we can call `.counter.increment(1)`: 
+
+```ts
+const incrementedCounter = A.change(counter, d => d.counter.increment(1));
+```
+
+
+<Admonition type="info">
+
+Documents are [immutable](../hello/#design-principles), so each change creates a new document while the original document remains unaltered.
+
+
+```ts
+const renamedCounter = A.change(counter, d => d.name = 'button clicks');
+renamedCounter.name // 'button clicks'
+counter.name // 'clicks'
+```
+
+</Admonition>
+
+### Merging Changes
+
+As the name implies, one of the key powers of Automerge is its ability to [merge](../under-the-hood/merge_rules/) different changes to a given document, much like git lets you merge multiple edits to a given file. 
+
+Pass two documents with different changes to `A.merge`, and Automerge will return a new document that includes the changes from both:
+
+```ts
+const increased = A.change(A.clone(counter), d => d.counter.increment(10));
+const renamed = A.change(A.clone(counter), d => d.name = 'button clicks');
+const merged = A.merge(increased, renamed);
+console.log(merged.name); // 'button clicks'
+console.log(merged.counter.value) // 10
+```
+
+When merging two different changes to the same property, Automerge uses various strategies to avoid [conflicts](https://automerge.org/docs/documents/conflicts/) and ensure that the merged document will be identical for every user.
+
+## Manage Docs with a `Repo`
+
+As shown above, you can manipulate documents directly with `A`, which is useful for understanding Automerge and taking it for a spin. However, in a real app you will almost always interact with Documents within an Automerge [Repository](concepts/#repositories). 
+
+A Repository, or [Repo](../docs/repositories/), keeps track of all the documents you load and makes sure they're properly synchronized and stored. It provides an interface to create, modify, and manage documents locally, send & receive changes to/from others, and merge those changes as needed. 
+
+Repos are the second core concept you need to build apps with Automerge. The `@automerge/automerge-repo` package lets you create & configure a Repo for documents created with `@automerge/automerge`.
+
+
+### Initialize a repository
+
+Each Repo needs to know:
+- Where its documents should be saved, specified via a [`StorageAdapter`](../repositories/storage/)
+- How/Where to send, retrieve, and synchronize doc updates, specified via zero or more [`NetworkAdapter`](../repositories/networking/)s
+
+For this app, you can store documents in an IndexedDB in the browser, and send changes over a Broadcast Channel to keep tabs within the same browser (origin) in sync. 
+
+In `src/main.tsx`, import and instantiate the IndexedDB `StorageAdapter` and BroadcastChannel `NetworkAdapter` from their `@automerge` packages:
+
+```ts
+import { IndexedDBStorageAdapter } from "@automerge/automerge-repo-storage-indexeddb"
+import { BroadcastChannelNetworkAdapter } from '@automerge/automerge-repo-network-broadcastchannel'
+
+const broadcast = new BroadcastChannelNetworkAdapter();
+const indexedDB = new IndexedDBStorageAdapter();
+```
+
+Then, create a new `Repo` by passing in those adapters like so:
+
+```js
+const repo = new Repo({
+  storage: indexedDB,
+  network: [broadcast],
+})
+```
+
+<Admonition>
+
+If the Automerge project doesn't have a pre-built adapter that fits your needs, you can create [custom adapter(s)](../repositories/storage/#roll-your-own) as needed. 
+
+</Admonition>
+
+### Create or Find a Document
+
+To create a new document in a repo, you can call `repo.create()` and pass in the initial values of the document:
+
+```ts
+const counterHandle = repo.create<CounterDoc>({
+  name: 'clicks',
+  counter: new A.Counter(),
+})
+```
+
+This returns a [`DocHandle`](../repositories/dochandles/) object, which provides an interface for working with the document. 
+
+The `DocHandle` has a `.url` property with the document's unique ID: 
+
+```ts
+counterHandle.url // automerge:1234...
+``` 
+
+For this counter app, we want to either retrieve the existing counter document if it exists, or create a new document if we don't have one already. 
+
+It's common practice to pass document IDs around as URL hashes. In this case, you can check the URL hash for a document ID, and if none exists, we'll create a new document and set its ID in the URL hash. (In a production app you'd probably handle routing differently, but this is enough for our example.)
+
+
+```typescript
+const rootDocUrl = `${document.location.hash.substring(1)}`
+let handle
+if (isValidAutomergeUrl(rootDocUrl)) {
+    handle = repo.find(rootDocUrl)
+} else {
+    handle = repo.create<CounterDoc>({
+      name: 'clicks',
+      counter: new A.Counter();
+    })
+}
+const docUrl = document.location.hash = handle.url
+```
+
+### Read the document
+
+
+The handle's `doc` method asynchronously loads & returns the document's data from the `Repo`'s storage:
+
+```ts
+await counterHandle.doc()
+```
+
+(There is also a synchronous `.docSync()` method which returns undefined if the document is unavailable either because it is still loading, or because it can't be found.)
+
+<Admonition type="info">
+
+If you want to render loading states differently from an unavailable state, you can inspect `handle.state` and branch accordingly.
+
+</Admonition>
+
+
+### Manipulate the document
+
+
+A `DocHandle` also exposes a `.change` method allows you to modify the document. It accepts a callback function for updating the document's data, as we saw before:  
+
+```ts
+counterHandle.change(d => { d.counter.increment(10) })
+```
+
+The `.change` method takes care of storing new changes, and notifies any peers of new changes by emitting `"change"` events whenever the document changes -- either through local actions or over the network, as determined by the configuration of your `Repo`.
+
+
+## Automerge in React
+
+To make it easier to work with Automerge Repos and Documents in client-side React apps, the `@automerge/automerge-repo-react-hooks` package provides some React-specific conveniences.
+
+### `RepoContext` and `useRepo` hook
+
+A `RepoContext` lets you make your Repo available throughout your React application, via the corresponding `useRepo` hook which can be called in any client component.
+
+In `main.tsx`, modify the `React.render()` call to wrap the `App` component with a  `RepoContext.Provider`, passing in the given `repo` object:
+
+```tsx
+import { RepoContext } from '@automerge/automerge-repo-react-hooks'
+
+//...
+
+ReactDOM.createRoot(document.getElementById('root')!).render(
+  <React.StrictMode>
+    <RepoContext.Provider value={repo}>
+      <App docUrl={docUrl} />
+    </RepoContext.Provider>
+  </React.StrictMode>,
+)
+```
+
+
+### `useDocument` Hook
+
+Once you have the URL (ID) of the document you want to work with, you can access & modify it from your components with the `useDocument` hook:
+
+```tsx
+// App.tsx
+import {next as A} from "@automerge/automerge"
+import type {AutomergeUrl} from '@automerge/automerge-repo'
+import {useDocument} from '@automerge/automerge-repo-react-hooks'
+
+function App({ docUrl }: { docUrl: AutomergeUrl }) {
+  const [doc, changeDoc] = useDocument<CounterDoc>(docUrl);
+
+  // ...
+}
+```
+
+The `doc` value returned by the hook will initially be `undefined` while the document is loading. Once loaded, `doc` will have the shape of the Document you specified, and will update reactively every time the document changes.
+
+To display the current count, you can render `doc.counter.value` (just make sure to handle the `undefined` loading case):
+
+```tsx
+// App.tsx
+
+function App({ docUrl }: { docUrl: AutomergeUrl }) {
+  const [doc, changeDoc] = useDocument<CounterDoc>(docUrl);
+
+  return (//...
+  
+    <button>
+      count is {doc && doc.counter.value}
+    </button>
+
+    //...
+  )
+```  
+
+As you might expect, the `changeDoc` function returned by the `useDoc` hook allows us to change the given document as needed, usually in response to user action. Powered by `A.change` under the hood, `changeDoc` accepts an update callback representing the change to be applied to the existing document.
+
+To increment the counter every time a user clicks a button, we can use `changeDoc` in the button's `onClick` handler to increment the counter's value, like so:
+
+```tsx
+    <button onClick={() => changeDoc((d) => d.counter.increment(1))}>
+      count is {doc && doc.counter.value}
+    </button>
+```
+
+## Collaboration in Automerge
+
+### Collaborating Locally
+
+Since the Repo in this app uses a `BroadcastChannelNetworkAdapter`, any changes made to documents in that Repo immediately appear in any other clients with the same origin (i.e. tabs within the same browser).
+
+Go ahead and try this out. Open a second (or third) tab with the same URL and see how as you click the counter in any tab, the others update.
+
+If you close all the tabs and reopen them, the counter value is preserved.
+
+Congratulations! You have a working Automerge-backed React app with live local synchronization.
+
+### Collaborating over the internet
+
+In addition to syncing changes locally, changes to your Automerge Repo can be synced with any other user(s) of the same app. 
+
+A document's URL is the unique identifier that allows the Repo to sync the document with any peer who knows that URL. 
+
+Add a network adapter to the `Repo` which syncs to a sync server via a websocket. Add the following dependency to the web app we've been building:
+
+
+<Tabs>
+<TabItem value="npm" label="npm">
+
+```bash
+$ npm i @automerge/automerge-repo-network-websocket
+```
+
+</TabItem>
+<TabItem value="yarn" label="yarn">
+
+```bash
+$ yarn add @automerge/automerge-repo-network-websocket
+```
+
+</TabItem>
+</Tabs>
+
+Then add a network adapter connecting the repo to `sync.automerge.org`
+
+```tsx
+// main.tsx
+
+// Add this import:
+import { BrowserWebSocketClientAdapter } from "@automerge/automerge-repo-network-websocket";
+
+const repo = new Repo({
+    network: [
+        new BroadcastChannelNetworkAdapter(),
+        // Add this line:
+        new BrowserWebSocketClientAdapter('wss://sync.automerge.org')
+    ],
+    storage: new IndexedDBStorageAdapter(),
+})
+```
+
+Now, when the Repo sees any changes it will sync them not only locally via the BroadcastChannel, but also over a websocket connection to `sync.automerge.org`, and any other process can connect to that server and use the URL to get the changes we've made. 
+
+:::note
+
+The Automerge project provides a public sync server for you to experiment with, at `sync.automerge.org`. This is not a private instance, and as an experimental service has no reliability or data safety guarantees. Basically, it's good for demos and prototyping, but run your own sync server for production uses.
+
+:::
+
+To see this in action, open the same URL (including the document ID) in a different browser, or on a different device. Unlike the local-only version, you'll now see the counter updates synced across _all_ open clients.
+
+###  Network Not Required
+
+Now that the Repo is syncing changes remotely, what happens when the websocket connection is unavailable?
+
+Since the repo stores documents locally with the `IndexedDBStorageAdapter`,  methods like `Repo.find` will consult local storage to retrieve/modify documents, so clients can create new documents while disconnected, and any clients who've already loaded a given document will still be able to make changes to it while offline.
+
+Once connectivity has been re-established, the Repo will sync any local changes with those from remote peers, so everyone ultimately sees the same data. 
+
+## Next Steps
+
+Congratulations! You've built a local-first, offline-capable app that supports multiplayer collaboration locally and over the network.  
+
+If you're hungry for more:
+- Look at the [Cookbook](/docs/cookbook/modeling-data/) section for tips on how to model your app's data in Automerge
+- Dive deeper into how Automerge [stores](https://automerge.org/docs/under-the-hood/storage/) and [merges](https://automerge.org/docs/under-the-hood/merge_rules/) documents in the 'Under the Hood' section
+- Join the [Discord](https://discord.gg/zKGe4DCfgR) to ask questions, show off your Automerge apps, and connect with the Automerge team & community
