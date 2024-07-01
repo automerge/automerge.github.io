@@ -16,6 +16,7 @@
   "dependencies": {
     "@docusaurus/core": "3.2.1",
     "@docusaurus/preset-classic": "3.2.1",
+    "@docusaurus/theme-live-codeblock": "3.2.1",
     "@docusaurus/theme-mermaid": "3.2.1",
     "@fontsource/merriweather": "^5.0.12",
     "@fontsource/overpass": "^5.0.17",
