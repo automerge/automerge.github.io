@@ -1,0 +1,30 @@
+main {
+  max-width: var(--page-width);
+  margin-inline: auto;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  gap: 2rem 3rem;
+  margin-top: 3rem;
+}
+
+.grid h3 {
+  margin: 0;
+}
+
+.grid  h4 {
+  margin: 0;
+  font-weight: 300;
+  font-size: 14px;
+}
+
+.grid p {
+  margin: 0;
+}
+
+h3 {
+  max-width: max-content;
+  margin: 4rem auto 1rem;
+}

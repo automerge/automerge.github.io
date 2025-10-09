@@ -1,0 +1,16 @@
+#!/bin/sh
+# This shell script runs the build system CLI using bun, deno, or node (in that order of preference)
+
+SCRIPT_DIR=$(realpath "$(dirname "$0")") # dir containing this shell script
+SCRIPT_PATH="$SCRIPT_DIR/system/app.ts"
+
+if command -v bun >/dev/null 2>&1; then
+  exec bun "$SCRIPT_PATH" "$@"
+elif command -v deno >/dev/null 2>&1; then
+  exec deno run --allow-all "$SCRIPT_PATH" "$@"
+elif command -v node >/dev/null 2>&1; then
+  exec node --disable-warning=ExperimentalWarning "$SCRIPT_PATH" "$@"
+else
+  printf "Error: No suitable runtime found (bun, deno, node)\n" >&2
+  exit 1
+fi

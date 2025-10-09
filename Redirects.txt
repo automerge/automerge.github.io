@@ -1,0 +1,7 @@
+The old site had a mix of URL styles for blog posts.
+We'll switch to using a short version of the title as the slug.
+/blog/2023/11/06/automerge-repo/     /blog/automerge-repo/
+/blog/2023/12/21/merry-commitmas/    /blog/merry-commitmas/
+/blog/2024/04/06/richtext/           /blog/rich-text/
+/blog/2024/08/23/wasm-packaging/     /blog/automerge-anywhere/
+/blog/2025/05/13/automerge-repo-2/   /blog/automerge-repo-2/

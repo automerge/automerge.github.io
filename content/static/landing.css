@@ -1,0 +1,123 @@
+html {
+  --fg: light-dark(var(--slate), var(--yellow));
+  --bg: light-dark(var(--yellow), var(--slate));
+}
+
+aside {
+  position: relative;
+  display: flex;
+  align-items: baseline;
+  max-width: var(--page-width);
+  /* We can't just use margin-inline:auto because when scroll bars are visible,
+     it makes the logo visually shift between the home page and other pages. */
+  left: calc((100vw - var(--page-width)) / 2);
+  padding-bottom: 3rem;
+  font-weight: 600;
+}
+
+@media (width <= 72em) {
+  aside { left: unset; }
+}
+
+/* Bigger font on bigger screens */
+@media (width > 500px) { aside { font-size: 18px } }
+
+header {
+  flex: 1 1 auto;
+}
+
+nav {
+  display: flex;
+  align-items: baseline;
+}
+
+nav div {
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: baseline;
+  gap: 2rem;
+  left: 0;
+  right: 0;
+  top: calc(2rem + 2px);
+  width: max-content;
+  margin-inline: auto;
+}
+
+#theme-toggle {
+  margin-right: 1rem;
+  align-self: center;
+}
+
+.get-started {
+  padding: .3em .4em .1em;
+  border: 2px solid currentColor;
+  border-radius: 4px;
+  white-space: pre; /* don't wrap when narrow */
+  font-weight: 600;
+  text-decoration: none; /* override link hover style */
+}
+
+@media (max-width: 500px) {
+  .get-started { display: none; }
+}
+
+@media (max-width: 800px) {
+  aside {
+    flex-flow: row wrap;
+    gap: 2rem 1rem;
+  }
+
+  aside #theme-toggle {
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  aside .get-started {
+    margin-left: 0;
+  }
+
+  nav {
+    flex: 1 1 100%;
+    justify-content: center;
+    align-items: center;
+    gap: 2rem;
+  }
+
+  nav div {
+    position: static;
+    margin: 0;
+    gap: 2rem;
+    justify-content: end;
+  }
+}
+
+main {
+}
+
+h1 {
+  line-height: 1;
+  font: 200 48px / 1 Overpass;
+  text-align: center;
+}
+
+h2 {
+  max-width: 60rem;
+  font: 300 36px / 1.5 Overpass;
+  margin: 0 auto 2em;
+  text-align: center;
+}
+
+h3 {
+  margin-top: 3rem;
+  margin-bottom: 0;
+  font-weight: 800;
+}
+
+/* Pad the aside more when burger menu is open */
+@media (width <= 800px) {
+  #burger-state:checked + aside {
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+  }
+}

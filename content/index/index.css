@@ -1,0 +1,133 @@
+/* Note: the home page also uses landing.css and demo.css */
+
+h4 {
+  margin-block: 0;
+}
+
+h2 {
+  margin: 0 auto;
+}
+
+.demo-bg {
+  margin-bottom: 4em;
+  padding-top: 4em;
+  border-bottom: 2px solid var(--fg);
+  background-image: url("dots.png");
+  background-size: 3px;
+  background-position: bottom;
+  background-repeat: repeat-x;
+}
+
+.unit h4 {
+  font: 800 max(1vw, 16px) / 1.5 "Overpass";
+}
+
+.unit p {
+  font: 500 max(1vw, 16px) / 1.5 "Overpass";
+}
+
+#illustration {
+  position: relative;
+  font-size: 1vw;
+}
+
+#illustration > svg {
+  display: block;
+  margin-inline: auto;
+  width: 32vw;
+}
+
+#illustration .unit {
+  position: absolute;
+  width: 18em;
+}
+
+@media(width < 1500px) {
+  #illustration .unit br { display: none; }
+}
+
+#illustration .unit:nth-of-type(odd) {
+  right: 50%;
+  margin-right: 16em;
+}
+
+#illustration .unit:nth-of-type(even) {
+  left: 50%;
+  margin-left: 16em;
+}
+
+.multiplayer.unit { top: 6em; }
+.offline.unit { top: 24em; }
+.conflict.unit { top: 44em; }
+.versioned.unit { top: 76em; }
+.compact.unit { top: 94em; }
+.fast.unit { top: 108em; }
+
+.multiplayer.unit svg {
+  margin-bottom: 1em;
+  margin-left: -1em;
+}
+
+.offline.unit svg {
+  display: block;
+  margin-top: -1em;
+  margin-left: auto;
+}
+
+#devs {
+  margin-top: 6em;
+  padding-block: 6em;
+  --fg: var(--yellow);
+  --bg: var(--slate);
+  --bg: light-dark(var(--slate), var(--deep));
+  color: var(--fg);
+  background: var(--bg);
+}
+
+#devs h2 {
+  margin-bottom: 2em;
+}
+
+#devs .grid {
+  display: grid;
+  grid-template-columns: 28em 28em;
+  gap: 6em 8em;
+  justify-content: center;
+}
+
+#team {
+  display: flex;
+  justify-content: center;
+  gap: 6em;
+  padding-block: 6em;
+  --mid: #33322e;
+  --fg: var(--white);
+  --bg: var(--mid);
+  background: var(--bg);
+  color: var(--fg);
+}
+
+#team div:first-child {
+  flex: 0 1 32em;
+}
+
+#team img {
+  display: block;
+  margin-bottom: 1rem;
+  width: 400px;
+}
+
+#team div {
+  flex: 0 0 auto;
+}
+
+#team h2 {
+  text-align: left;
+  margin: 0 0 1rem;
+}
+
+footer {
+  padding-block: 3em;
+  color: var(--yellow);
+  background: var(--slate);
+}

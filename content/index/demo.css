@@ -1,0 +1,242 @@
+#demo {
+  position: relative;
+  display: flex;
+  gap: clamp(20px, 10vw, 150px);
+  align-items: start;
+  width: max-content;
+  margin-inline: auto;
+}
+
+#demo .client {
+  flex: 0 0 auto;
+  background-color: var(--bg);
+}
+
+#demo canvas {
+  position: absolute;
+  inset: 0;
+  width: calc(100% - 8px); /* Cut the canvas just shy of the phone border, so we don't draw particles past the phone screen */
+  height: 100%;
+  pointer-events: none;
+  z-index: 10;
+}
+
+#demo h3 {
+  font: 100 21px "Overpass Mono";
+}
+
+/* Desktop */
+
+#demo .desktop {
+  border: 2px solid var(--fg);
+  border-radius: 8px;
+  contain: paint; /* contain dots */
+}
+
+#demo .desktop .title {
+  display: flex;
+  padding: 6px;
+  border-bottom: 2px solid var(--fg);
+}
+
+#demo .desktop .title::before {
+  content: "";
+  height: 15px;
+  width: 45px;
+  background: radial-gradient(var(--bg) 3px, var(--fg) 3.25px, var(--fg) 5px, transparent 5.25px);
+  background-size: 15px;
+}
+
+#demo .desktop .inner {
+  display: flex;
+}
+
+#demo .desktop .users {
+  flex: 0 0 auto;
+  padding: 10px;
+  border-right: 2px solid var(--fg);
+}
+
+#demo .desktop .users h4 {
+  margin-bottom: 10px;
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+#demo .desktop .users h4.offline {
+  margin-top: 15px;
+}
+
+#demo .desktop .users > div {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+  gap: 4px;
+}
+
+#demo .desktop .users svg {
+  width: 34px;
+}
+
+/* Phone */
+
+#demo .phone {
+  margin-inline: auto;
+  padding: 6px 6px 0;
+  border: 2px solid var(--fg);
+  border-bottom: 0;
+  border-radius: 48px 48px 0 0;
+}
+
+#demo .phone .inner {
+  height: 320px;
+  border: 2px solid var(--fg);
+  border-bottom: 0;
+  border-radius: 40px 40px 0 0;
+  color: var(--fg);
+  background: var(--bg);
+}
+
+#demo .phone .speaker {
+  width: 48px;
+  height: 12px;
+  margin: 8px auto 8px;
+  border: 2px solid var(--fg);
+  border-radius: 8px;
+}
+
+#demo .phone .users {
+  display: flex;
+  justify-content: end;
+  align-items: center;
+  gap: 4px;
+  padding: 0 10px;
+}
+
+#demo .phone .users svg {
+  flex: 0 0 auto;
+  width: 34px;
+}
+
+/* CLIENT TODO LISTS */
+
+#demo h3 {
+  margin: 10px;
+}
+
+#demo [js-client] {
+  position: relative;
+}
+
+#demo .entry {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin: 0 0 4px 10px;
+}
+
+#demo .entry .plus {
+  flex: 0 0 auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 1rem;
+  height: 1rem;
+  padding-top: 2px;
+  border: 2px solid transparent;
+}
+
+#demo .entry .field {
+  flex: 1 1 auto;
+}
+
+#demo .entry .field input.text:not(:focus) {
+  font-weight: 100;
+}
+
+#demo .list {
+  position: relative;
+  width: 280px;
+  height: 180px;
+  overflow: hidden;
+}
+
+#demo .item {
+  position: absolute;
+  left: 0px;
+  top: 0;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding-left: 10px;
+}
+
+#demo input {
+  flex: 0 0 auto;
+  margin: 0;
+  border: 0;
+  outline: 0;
+  color: inherit;
+}
+
+#demo input.checkbox {
+  appearance: none;
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid currentColor;
+  border-radius: 2px;
+  cursor: pointer;
+}
+
+#demo input.checkbox.hide {
+  visibility: hidden;
+}
+
+#demo input.checkbox:focus-within {
+  outline: 2px solid var(--fg);
+}
+
+#demo input.checkbox:checked {
+  background: currentColor;
+}
+
+/* Also applies to the new task entry field */
+#demo input.text {
+  display: inline-block;
+  width: 100%;
+  padding: 4px 4px 2px;
+  border-bottom: 2px solid transparent;
+  /* Must match dots.ts */
+  font: 500 16px / 1 "Overpass Mono";
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  background: transparent;
+  overflow: hidden;
+}
+
+#demo input::placeholder {
+  color: var(--fg);
+}
+
+#demo input.text:focus-within {
+  border-bottom: 2px solid var(--fg);
+}
+
+#demo .hidden {
+  display: none;
+}
+
+#demo .todo-overflow {
+  position: absolute;
+  bottom: 5px;
+  left: 13px;
+}
+
+#demo .dottts {
+  background-image: url('data:image/svg+xml,<svg fill="%23222" xmlns="http://www.w3.org/2000/svg"><rect x="0.5" y="0.5" width="1" height="1" /><rect x="2.5" y="2.5" width="1" height="1" /></svg>');
+  background-size: 4px 4px;
+}
+
+html[theme="dark"] #demo .dottts {
+  background-image: url('data:image/svg+xml,<svg fill="%23fc3" xmlns="http://www.w3.org/2000/svg"><rect x="0.5" y="0.5" width="1" height="1" /><rect x="2.5" y="2.5" width="1" height="1" /></svg>');
+}

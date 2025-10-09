@@ -1,0 +1,17 @@
+---
+# This template is used when no template is specified.
+# You can also use it deliberately if you want. `template: default`
+# It's the most unopinionated template — just the base stylesheet.
+# If you want even more control, make an html page with no frontmatter at all.
+---
+
+<!doctype html>
+<html lang="en">
+<head>{{include:head-stuff}}</head>
+<body>
+  <main>
+    <h1>{{title?}}</h1>
+    {{content}}
+  </main>
+</body>
+</html>

@@ -1,0 +1,409 @@
+/*
+  Hello! Welcome to the base CSS file used by every page on the Automerge website.
+  Here are a few initial notes to get you started.
+
+  1. Please don't use a formatter (like Prettier). The file has been laid out by hand, with
+     intentional use of whitespace and occasional one-lining to aid readability.
+  2. The focus is on maintainability over elegance or performance. We're hand-authoring this site,
+     so if we end up shipping a few dozen extra bytes on each page, that's okay.
+*/
+
+/* COLORS & THEMES *******************************************************************************/
+
+html {
+  --page-width: 72rem;
+
+  /* These are all the colors we use across the site */
+  --white: #fcfcfc;
+  --silver: #ddd;
+  --yellow: #fc3;
+  --grey: #888;
+  --smoke: #555;
+  --slate: #222;
+  --deep: #111;
+  --black: #000;
+
+  /* This enables the new light-dark() function in modern browsers */
+  color-scheme: light dark;
+
+  /* Fallback colors for old browsers that don't support light-dark() */
+  --bg: var(--yellow);
+  --fg: var(--slate);
+  --hover-bg: var(--white);
+  --inactive: var(--grey);
+  --separator: var(--silver);
+  --footer-fg: var(--white);
+  --footer-bg: var(--slate);
+  --stark-bg: #fff;
+  --stark-shadow: var(--silver);
+
+  /* And, somewhat redundantly (sigh), here are the colors for light and dark themes. */
+  --bg: light-dark(var(--white), var(--slate));
+  --fg: light-dark(var(--slate), var(--white));
+  --hover-bg: light-dark(var(--slate), var(--yellow));
+  --inactive: light-dark(var(--grey), var(--grey));
+  --separator: light-dark(var(--silver), var(--grey));
+  --footer-fg: light-dark(var(--white), var(--yellow));
+  --footer-bg: light-dark(var(--slate), var(--black));
+  --stark-bg: light-dark(#fff, #111);
+  --stark-shadow: light-dark(var(--silver), #000);
+
+  /* Use these colors */
+  background: var(--bg);
+  color: var(--fg);
+}
+
+/* In supported browsers, when the dark theme is selected, use it! */
+html[theme="light"] { color-scheme: light; }
+html[theme="dark"] { color-scheme: dark; }
+
+/* TYPOGRAPHIC HIERARCHY *************************************************************************/
+
+h1   { font: 600 32px / 36px "Overpass", sans-serif; }
+h2   { font: 600 24px / 32px "Overpass", sans-serif; }
+h3   { font: 600 20px / 24px "Overpass", sans-serif; }
+h4   { font: 600 16px / 24px "Overpass", sans-serif; }
+body { font: 400 16px / 24px "Overpass", sans-serif; }
+code { font-family: "Overpass Mono", monospace; }
+
+/* Specify all fonts here. Remember, the browser will only load the ones actually used on each page. */
+/* When adding/changing fonts, see the docs for instructions on our automatic font subsetting system. */
+@font-face { font-family: "Overpass"; src: url("/static/fonts/overpass.woff2") format("woff2-variations"); font-weight: 100 900; }
+@font-face { font-family: "Overpass Mono"; src: url("/static/fonts/overpass-mono.woff2") format("woff2-variations"); font-weight: 100 900; }
+
+/* ELEMENTS **************************************************************************************/
+
+/* Box sizing reset */
+*, *:before, *:after { box-sizing: border-box; }
+
+/* MAJOR LAYOUT ELEMENTS */
+
+html {
+  /* Long words may be broken and wrapped. (NB: this doesn't affect min-content lengths) */
+  overflow-wrap: break-word;
+
+  /* Prevent iPhone Safari and Android Firefox from inflating text when the phone is landscape. */
+  -webkit-text-size-adjust: none;
+  -moz-text-size-adjust: none;
+  text-size-adjust: none;
+
+  /* Reserve space for a scroll bar */
+  scrollbar-gutter: stable;
+}
+
+body {
+  position: relative;
+  margin: 0;
+}
+
+main {
+}
+
+/* This is the sidebar on most pages, *and* the header on the home page. */
+/* The styling is quite contextual, so there's very little here. */
+aside {
+  padding: 1rem;
+}
+
+/* Hide the nav when burger menu is closed */
+@media (width <= 800px) {
+  #burger-state:not(:checked) + aside nav { display: none }
+}
+
+/* Child of <aside>, contains the AM logo and burger */
+header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  font-weight: 600;
+}
+
+/* Bigger font on bigger screens */
+@media (width > 500px) { header { font-size: 18px } }
+
+footer {
+  text-align: center;
+  padding: 1rem 1rem 2rem;
+}
+
+/* BLOCK-LEVEL TEXT ELEMENTS */
+
+h1, h2, h3, h4 {
+  margin: 0 0 1rem;
+}
+
+p {
+  margin: 0 0 1rem;
+}
+
+blockquote {
+  margin: 0 0 1rem;
+  border-left: 3px solid #ddd;
+  padding-left: .5rem;
+}
+
+figure {
+  position: relative;
+  margin: 0 0 1rem;
+}
+
+/* LISTS */
+
+ul, ol {
+  margin-block: 0 1rem;
+  margin-left: 1.3em;
+  padding: 0;
+}
+
+li {
+  margin-top: .5em;
+}
+
+/* LINKS */
+
+a {
+  color: inherit;
+  outline: 0;
+}
+
+a:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 1px;
+  border-radius: 4px;
+  text-decoration: none;
+}
+
+a.plain {
+  text-decoration: none;
+}
+
+aside a {
+  text-decoration: none;
+}
+
+aside a:hover {
+  text-decoration: underline;
+}
+
+
+/* MEDIA & REPLACED ELEMENTS */
+
+img,
+svg,
+video,
+iframe {
+  /*
+    To make your element responsive while avoiding layout shift:
+    a) set width and height attributes on the tag, or
+    b) set width and aspect-ratio properties in CSS.
+    (There are other more advanced options, but the above are the simplest best practice.)
+    The following rules make (a) and (b) do the right thing.
+  */
+  max-width: 100%;
+  height: auto;
+
+  /* Removes a tiny bit of added space at the bottom of images */
+  vertical-align: middle;
+}
+
+video,
+iframe {
+  width: 100%;
+}
+
+/* MISC ELEMENTS */
+
+hr {
+  margin: 1rem 0;
+  border: 0;
+  border-top: 2px solid var(--separator);
+}
+
+/* MISC */
+
+.caution {
+  background: #fff8e6;
+  padding: 1em;
+  margin-bottom: 1em;
+}
+
+.caution p:last-child {
+  margin-bottom: 0;
+}
+
+.dots {
+  position: relative;
+}
+
+.dots::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  mask-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 4 4" xmlns="http://www.w3.org/2000/svg"><circle cx="1" cy="1" r=".6"/><circle cx="3" cy="3" r=".6"/></svg>');
+  mask-size: 4px 4px;
+  background: currentColor;
+  z-index: -1;
+}
+
+/* HEADER LOGO */
+
+.logo svg {
+  width: 60px;
+  height: auto;
+  margin-right: .5em;
+  margin-top: -1px;
+}
+
+.logo:focus-visible { outline: 0; }
+.logo:focus-visible span {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+@media (max-width: 500px) {
+  .logo svg { width: 40px; }
+}
+
+/* BURGER MENU */
+
+/* Checkbox that stores whether the burger menu is open */
+#burger-state {
+  display: none;
+}
+
+/* <label> that toggles the burger state checkbox */
+#burger {
+  border-radius: 24px;
+  stroke: var(--fg);
+  cursor: pointer;
+}
+
+/* Only show when narrow */
+@media (width > 800px) {
+  #burger { display: none; }
+}
+
+#burger:hover {
+  stroke: var(--bg);
+  background: var(--fg);
+}
+
+#burger svg {
+  width: 30px;
+  padding: 5px;
+}
+
+/* Toggle between the show (burg) and hide (X) icons */
+#burger-state:checked       + * .show { display: none }
+#burger-state:not(:checked) + * .hide { display: none }
+
+/* THEME TOGGLE */
+
+#theme-toggle {
+  padding: 4px;
+  border: 0;
+  border-radius: 24px;
+  color: inherit;
+  outline: 0;
+  background: none;
+  cursor: pointer;
+}
+
+@supports not (color: light-dark(#fff, #000)) {
+  #theme-toggle { display: none }
+}
+
+#theme-toggle:hover,
+#theme-toggle:focus-visible {
+  background: var(--fg);
+  color: var(--bg);
+}
+
+#theme-toggle .dark { display: none; }
+html[theme="dark"] #theme-toggle .dark { display: inherit; }
+html[theme="dark"] #theme-toggle .light { display: none; }
+
+
+
+
+pre, .code-title {
+  overflow: auto;
+  border-radius: 6px;
+  background: var(--stark-bg);
+  box-shadow: 0 2px 4px var(--stark-shadow);
+  padding-block: 1rem;
+}
+
+.code-title {
+  padding: .5rem 1rem;
+  border-radius: 6px 6px 0 0;
+  border-bottom: 1px solid var(--separator);
+}
+
+.code-title + pre {
+  margin-top: 0;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
+pre code[class*="language-"] {
+  font-size: 0.9em;
+  line-height: 1.5;
+}
+
+pre code > * {
+  padding-inline: 1rem;
+}
+
+.token.comment       { color: light-dark(#6a737d, #6a9955) }
+.token.keyword       { color: light-dark(#d73a49, #569cd6) }
+.token.string        { color: light-dark(#22863a, #ce9178) }
+.token.number        { color: light-dark(#005cc5, #b5cea8) }
+.token.function      { color: light-dark(#6f42c1, #dcdcaa) }
+.token.class-name    { color: light-dark(#6f42c1, #4ec9b0) }
+.token.operator      { color: light-dark(#24292e, #d4d4d4) }
+.token.variable      { color: light-dark(#e36209, #9cdcfe) }
+.token.tag,
+.token.selector      { color: light-dark(#005cc5, #d7ba7d) }
+.token.attr-name     { color: light-dark(#6f42c1, #9cdcfe) }
+.token.attr-value    { color: light-dark(#22863a, #ce9178) }
+.token.inserted      { color: light-dark(#22863a, #81b88b); background: light-dark(#e6ffed, transparent) }
+.token.deleted       { color: light-dark(#d73a49, #c24038); background: light-dark(#ffeef0, transparent) }
+
+.highlighted-line {
+  background: #00f1;
+}
+
+:not(pre) > code {
+  border: 1px solid var(--stark-shadow);
+  padding: .1em .2em 0em;
+  border-radius: .2em;
+  background: var(--stark-bg);
+}
+
+a.blog-link {
+  display: flex; /* Remove tiny gap between text rows which causes the underline to flicker when mousing */
+  flex-flow: column;
+  max-width: max-content; /* Make :focus outlines look nicer */
+  margin-bottom: 1rem;
+}
+
+a.blog-link:hover {
+  text-decoration: none;
+}
+
+a.blog-link:hover .title {
+  text-decoration: underline;
+}
+
+.micro {
+  font-size: 12px;
+  line-height: 1.2;
+  color: var(--inactive);
+}
+
+[is-current] {
+  /* TODO: HERE */
+  /* background: #f00; */
+}
