@@ -127,7 +127,10 @@ h2 {
 }
 
 footer {
-  padding-block: 3em;
-  color: var(--yellow);
-  background: var(--slate);
+  padding-block: 0 3em;
+   --mid: #33322e;
+  --fg: var(--white);
+  --bg: var(--mid);
+  background: var(--bg);
+  color: var(--fg);
 }

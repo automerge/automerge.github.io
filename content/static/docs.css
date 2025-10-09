@@ -143,3 +143,10 @@ main {
 @media (width <= 500px) {
   main { padding-inline: 1rem }
 }
+
+
+
+footer {
+  padding-inline: 0;
+  text-align: left;
+}

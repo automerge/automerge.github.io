@@ -1,0 +1,11 @@
+{
+  "type": "module",
+  "dependencies": {
+    "@automerge/automerge": "3.1.2"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.2",
+    "vite-plugin-top-level-await": "^1.6.0",
+    "vite-plugin-wasm": "^3.5.0"
+  }
+}

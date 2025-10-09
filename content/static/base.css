@@ -123,7 +123,18 @@ header {
 
 footer {
   text-align: center;
-  padding: 1rem 1rem 2rem;
+  padding: 2rem 1rem 3rem;
+}
+
+footer .diamond {
+  display: block;
+  width: 1em;
+  height: 1em;
+  border-radius: 4px;
+  background-color: var(--fg);
+  rotate: 45deg;
+  margin-inline: auto;
+  margin-bottom: .5rem;
 }
 
 /* BLOCK-LEVEL TEXT ELEMENTS */

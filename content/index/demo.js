@@ -8,27 +8,6 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
 var require_stdin = __commonJS({
   "<stdin>"(exports, module) {
     (async () => {
-      (function() {
-        const e = document.createElement("link").relList;
-        if (e && e.supports && e.supports("modulepreload")) return;
-        for (const o of document.querySelectorAll('link[rel="modulepreload"]')) r(o);
-        new MutationObserver((o) => {
-          for (const s of o) if (s.type === "childList") for (const c of s.addedNodes) c.tagName === "LINK" && c.rel === "modulepreload" && r(c);
-        }).observe(document, {
-          childList: true,
-          subtree: true
-        });
-        function n(o) {
-          const s = {};
-          return o.integrity && (s.integrity = o.integrity), o.referrerPolicy && (s.referrerPolicy = o.referrerPolicy), o.crossOrigin === "use-credentials" ? s.credentials = "include" : o.crossOrigin === "anonymous" ? s.credentials = "omit" : s.credentials = "same-origin", s;
-        }
-        function r(o) {
-          if (o.ep) return;
-          o.ep = true;
-          const s = n(o);
-          fetch(o.href, s);
-        }
-      })();
       let Ne;
       const ie = typeof TextEncoder < "u" ? new TextEncoder("utf-8") : {
         encode: () => {
@@ -47,10 +26,10 @@ var require_stdin = __commonJS({
       typeof TextDecoder < "u" && Bn.decode();
       typeof FinalizationRegistry > "u" || new FinalizationRegistry((t) => Ne.__wbg_automerge_free(t >>> 0, 1));
       typeof FinalizationRegistry > "u" || new FinalizationRegistry((t) => Ne.__wbg_syncstate_free(t >>> 0, 1));
-      let Ln = [];
-      function Fn(t) {
+      let Fn = [];
+      function Ln(t) {
         for (const e in t) me[e] = t[e];
-        for (const e of Ln) e();
+        for (const e of Fn) e();
       }
       const me = {
         create(t) {
@@ -213,7 +192,7 @@ ${t.stack}` : r;
         const e = i.__wbindgen_export_4.get(t);
         return i.__externref_table_dealloc(t), e;
       }
-      function k(t, e) {
+      function D(t, e) {
         if (!(t instanceof e)) throw new Error(`expected instance of ${e.name}`);
       }
       function Vn(t) {
@@ -246,7 +225,7 @@ ${t.stack}` : r;
         return A.__wrap(e[0]);
       }
       function Gn(t) {
-        return k(t, A), i.exportSyncState(t.__wbg_ptr);
+        return D(t, A), i.exportSyncState(t.__wbg_ptr);
       }
       function Zn(t) {
         const e = i.encodeSyncMessage(t);
@@ -259,7 +238,7 @@ ${t.stack}` : r;
         return l(e[0]);
       }
       function er(t) {
-        return k(t, A), i.encodeSyncState(t.__wbg_ptr);
+        return D(t, A), i.encodeSyncState(t.__wbg_ptr);
       }
       function tr(t) {
         const e = i.decodeSyncState(t);
@@ -312,7 +291,7 @@ ${t.stack}` : r;
           return i.automerge_commit(this.__wbg_ptr, r, o, !b(n), b(n) ? 0 : n);
         }
         merge(e) {
-          k(e, R);
+          D(e, R);
           const n = i.automerge_merge(this.__wbg_ptr, e.__wbg_ptr);
           if (n[2]) throw l(n[1]);
           return l(n[0]);
@@ -538,7 +517,7 @@ ${t.stack}` : r;
           return l(n[0]);
         }
         getChangesAdded(e) {
-          return k(e, R), i.automerge_getChangesAdded(this.__wbg_ptr, e.__wbg_ptr);
+          return D(e, R), i.automerge_getChangesAdded(this.__wbg_ptr, e.__wbg_ptr);
         }
         getHeads() {
           return i.automerge_getHeads(this.__wbg_ptr);
@@ -564,12 +543,12 @@ ${t.stack}` : r;
           return l(n[0]);
         }
         receiveSyncMessage(e, n) {
-          k(e, A);
+          D(e, A);
           const r = i.automerge_receiveSyncMessage(this.__wbg_ptr, e.__wbg_ptr, n);
           if (r[1]) throw l(r[0]);
         }
         generateSyncMessage(e) {
-          return k(e, A), i.automerge_generateSyncMessage(this.__wbg_ptr, e.__wbg_ptr);
+          return D(e, A), i.automerge_generateSyncMessage(this.__wbg_ptr, e.__wbg_ptr);
         }
         toJS(e) {
           const n = i.automerge_toJS(this.__wbg_ptr, e);
@@ -620,7 +599,7 @@ ${t.stack}` : r;
           return l(o[0]);
         }
         hasOurChanges(e) {
-          return k(e, A), i.automerge_hasOurChanges(this.__wbg_ptr, e.__wbg_ptr) !== 0;
+          return D(e, A), i.automerge_hasOurChanges(this.__wbg_ptr, e.__wbg_ptr) !== 0;
         }
         topoHistoryTraversal() {
           return i.automerge_topoHistoryTraversal(this.__wbg_ptr);
@@ -629,7 +608,7 @@ ${t.stack}` : r;
           return i.automerge_stats(this.__wbg_ptr);
         }
       }
-      const De = typeof FinalizationRegistry > "u" ? {
+      const ke = typeof FinalizationRegistry > "u" ? {
         register: () => {
         },
         unregister: () => {
@@ -639,11 +618,11 @@ ${t.stack}` : r;
         static __wrap(e) {
           e = e >>> 0;
           const n = Object.create(A.prototype);
-          return n.__wbg_ptr = e, De.register(n, n.__wbg_ptr, n), n;
+          return n.__wbg_ptr = e, ke.register(n, n.__wbg_ptr, n), n;
         }
         __destroy_into_raw() {
           const e = this.__wbg_ptr;
-          return this.__wbg_ptr = 0, De.unregister(this), e;
+          return this.__wbg_ptr = 0, ke.unregister(this), e;
         }
         free() {
           const e = this.__destroy_into_raw();
@@ -835,12 +814,12 @@ ${t.stack}` : r;
           return t.next();
         }, arguments);
       }
-      function Dt() {
+      function kt() {
         return T(function(t) {
           return Reflect.ownKeys(t);
         }, arguments);
       }
-      function kt(t, e) {
+      function Dt(t, e) {
         return t.push(e);
       }
       function Pt(t, e, n) {
@@ -849,10 +828,10 @@ ${t.stack}` : r;
       function Bt(t, e, n) {
         t[e] = n;
       }
-      function Lt(t, e, n) {
+      function Ft(t, e, n) {
         t.set(e, n >>> 0);
       }
-      function Ft() {
+      function Lt() {
         return T(function(t, e, n) {
           return Reflect.set(t, e, n);
         }, arguments);
@@ -986,7 +965,7 @@ ${t.stack}` : r;
           __wbg_set_37837023f3d740e8: Pt,
           __wbg_from_2a5d3e218e67aa85: at,
           __wbg_isArray_a1eab7e0d067391b: ht,
-          __wbg_push_737cfc8c1432c2c6: kt,
+          __wbg_push_737cfc8c1432c2c6: Dt,
           __wbg_unshift_c290010f73f04fb1: Ut,
           __wbg_instanceof_ArrayBuffer_e14585432e3737fc: lt,
           __wbg_new_c68d7209be747379: Ot,
@@ -1004,8 +983,8 @@ ${t.stack}` : r;
           __wbg_new_1ab78df5e132f715: At,
           __wbg_apply_eb9e9b97497f91e4: qe,
           __wbg_deleteProperty_96363d4a1d977c97: et,
-          __wbg_ownKeys_3930041068756f1f: Dt,
-          __wbg_set_bb8cecf6a62b9f46: Ft,
+          __wbg_ownKeys_3930041068756f1f: kt,
+          __wbg_set_bb8cecf6a62b9f46: Lt,
           __wbg_buffer_609cc3eee51ed158: Ke,
           __wbg_concat_9de968491c4340cf: Ze,
           __wbg_slice_972c243648c9fd2e: Ht,
@@ -1013,7 +992,7 @@ ${t.stack}` : r;
           __wbg_toString_66ab719c2a98bdf1: $t,
           __wbg_newwithbyteoffsetandlength_d97e637ebe145a9a: It,
           __wbg_new_a12002a7f91c75be: Et,
-          __wbg_set_65595bdd868b3009: Lt,
+          __wbg_set_65595bdd868b3009: Ft,
           __wbg_length_a446193dc22c12f8: pt,
           __wbg_instanceof_Uint8Array_17156bcf118086a9: dt,
           __wbindgen_debug_string: Jt,
@@ -1021,7 +1000,7 @@ ${t.stack}` : r;
           __wbindgen_memory: sn,
           __wbindgen_init_externref_table: Xt
         }
-      }, Hn), nr = u.memory, rr = u.__wbg_syncstate_free, or = u.syncstate_sharedHeads, sr = u.syncstate_lastSentHeads, ar = u.syncstate_set_lastSentHeads, cr = u.syncstate_set_sentHashes, ir = u.syncstate_clone, _r = u.__wbg_automerge_free, ur = u.automerge_new, lr = u.automerge_clone, gr = u.automerge_fork, fr = u.automerge_pendingOps, dr = u.automerge_commit, hr = u.automerge_merge, br = u.automerge_rollback, mr = u.automerge_keys, pr = u.automerge_text, wr = u.automerge_spans, yr = u.automerge_splice, Sr = u.automerge_updateText, xr = u.automerge_updateSpans, Ar = u.automerge_push, Cr = u.automerge_pushObject, vr = u.automerge_insert, Rr = u.automerge_splitBlock, jr = u.automerge_joinBlock, Er = u.automerge_updateBlock, Or = u.automerge_getBlock, Ir = u.automerge_insertObject, Tr = u.automerge_put, Mr = u.automerge_putObject, Dr = u.automerge_increment, kr = u.automerge_get, Pr = u.automerge_getWithType, Br = u.automerge_objInfo, Lr = u.automerge_getAll, Fr = u.automerge_enableFreeze, Hr = u.automerge_registerDatatype, zr = u.automerge_applyPatches, $r = u.automerge_applyAndReturnPatches, Ur = u.automerge_diffIncremental, Nr = u.automerge_updateDiffCursor, Wr = u.automerge_resetDiffCursor, Vr = u.automerge_diff, Yr = u.automerge_isolate, qr = u.automerge_integrate, Jr = u.automerge_length, Kr = u.automerge_delete, Xr = u.automerge_save, Gr = u.automerge_saveIncremental, Zr = u.automerge_saveSince, Qr = u.automerge_saveNoCompress, eo = u.automerge_saveAndVerify, to = u.automerge_loadIncremental, no = u.automerge_applyChanges, ro = u.automerge_getChanges, oo = u.automerge_getChangesMeta, so = u.automerge_getChangeByHash, ao = u.automerge_getChangeMetaByHash, co = u.automerge_getDecodedChangeByHash, io = u.automerge_getChangesAdded, _o = u.automerge_getHeads, uo = u.automerge_getActorId, lo = u.automerge_getLastLocalChange, go = u.automerge_dump, fo = u.automerge_getMissingDeps, ho = u.automerge_receiveSyncMessage, bo = u.automerge_generateSyncMessage, mo = u.automerge_toJS, po = u.automerge_materialize, wo = u.automerge_getCursor, yo = u.automerge_getCursorPosition, So = u.automerge_emptyChange, xo = u.automerge_mark, Ao = u.automerge_unmark, Co = u.automerge_marks, vo = u.automerge_marksAt, Ro = u.automerge_hasOurChanges, jo = u.automerge_topoHistoryTraversal, Eo = u.automerge_stats, Oo = u.create, Io = u.load, To = u.encodeChange, Mo = u.decodeChange, Do = u.initSyncState, ko = u.importSyncState, Po = u.exportSyncState, Bo = u.encodeSyncMessage, Lo = u.decodeSyncMessage, Fo = u.encodeSyncState, Ho = u.decodeSyncState, zo = u.__wbindgen_malloc, $o = u.__wbindgen_realloc, Uo = u.__wbindgen_exn_store, No = u.__externref_table_alloc, Wo = u.__wbindgen_export_4, Vo = u.__wbindgen_free, Yo = u.__externref_table_dealloc, gn = u.__wbindgen_start, qo = Object.freeze(Object.defineProperty({
+      }, Hn), nr = u.memory, rr = u.__wbg_syncstate_free, or = u.syncstate_sharedHeads, sr = u.syncstate_lastSentHeads, ar = u.syncstate_set_lastSentHeads, cr = u.syncstate_set_sentHashes, ir = u.syncstate_clone, _r = u.__wbg_automerge_free, ur = u.automerge_new, lr = u.automerge_clone, gr = u.automerge_fork, fr = u.automerge_pendingOps, dr = u.automerge_commit, hr = u.automerge_merge, br = u.automerge_rollback, mr = u.automerge_keys, pr = u.automerge_text, wr = u.automerge_spans, yr = u.automerge_splice, Sr = u.automerge_updateText, xr = u.automerge_updateSpans, Ar = u.automerge_push, Cr = u.automerge_pushObject, vr = u.automerge_insert, Rr = u.automerge_splitBlock, jr = u.automerge_joinBlock, Er = u.automerge_updateBlock, Or = u.automerge_getBlock, Ir = u.automerge_insertObject, Tr = u.automerge_put, Mr = u.automerge_putObject, kr = u.automerge_increment, Dr = u.automerge_get, Pr = u.automerge_getWithType, Br = u.automerge_objInfo, Fr = u.automerge_getAll, Lr = u.automerge_enableFreeze, Hr = u.automerge_registerDatatype, zr = u.automerge_applyPatches, $r = u.automerge_applyAndReturnPatches, Ur = u.automerge_diffIncremental, Nr = u.automerge_updateDiffCursor, Wr = u.automerge_resetDiffCursor, Vr = u.automerge_diff, Yr = u.automerge_isolate, qr = u.automerge_integrate, Jr = u.automerge_length, Kr = u.automerge_delete, Xr = u.automerge_save, Gr = u.automerge_saveIncremental, Zr = u.automerge_saveSince, Qr = u.automerge_saveNoCompress, eo = u.automerge_saveAndVerify, to = u.automerge_loadIncremental, no = u.automerge_applyChanges, ro = u.automerge_getChanges, oo = u.automerge_getChangesMeta, so = u.automerge_getChangeByHash, ao = u.automerge_getChangeMetaByHash, co = u.automerge_getDecodedChangeByHash, io = u.automerge_getChangesAdded, _o = u.automerge_getHeads, uo = u.automerge_getActorId, lo = u.automerge_getLastLocalChange, go = u.automerge_dump, fo = u.automerge_getMissingDeps, ho = u.automerge_receiveSyncMessage, bo = u.automerge_generateSyncMessage, mo = u.automerge_toJS, po = u.automerge_materialize, wo = u.automerge_getCursor, yo = u.automerge_getCursorPosition, So = u.automerge_emptyChange, xo = u.automerge_mark, Ao = u.automerge_unmark, Co = u.automerge_marks, vo = u.automerge_marksAt, Ro = u.automerge_hasOurChanges, jo = u.automerge_topoHistoryTraversal, Eo = u.automerge_stats, Oo = u.create, Io = u.load, To = u.encodeChange, Mo = u.decodeChange, ko = u.initSyncState, Do = u.importSyncState, Po = u.exportSyncState, Bo = u.encodeSyncMessage, Fo = u.decodeSyncMessage, Lo = u.encodeSyncState, Ho = u.decodeSyncState, zo = u.__wbindgen_malloc, $o = u.__wbindgen_realloc, Uo = u.__wbindgen_exn_store, No = u.__externref_table_alloc, Wo = u.__wbindgen_export_4, Vo = u.__wbindgen_free, Yo = u.__externref_table_dealloc, gn = u.__wbindgen_start, qo = Object.freeze(Object.defineProperty({
         __proto__: null,
         __externref_table_alloc: No,
         __externref_table_dealloc: Yo,
@@ -1043,12 +1022,12 @@ ${t.stack}` : r;
         automerge_diffIncremental: Ur,
         automerge_dump: go,
         automerge_emptyChange: So,
-        automerge_enableFreeze: Fr,
+        automerge_enableFreeze: Lr,
         automerge_fork: gr,
         automerge_generateSyncMessage: bo,
-        automerge_get: kr,
+        automerge_get: Dr,
         automerge_getActorId: uo,
-        automerge_getAll: Lr,
+        automerge_getAll: Fr,
         automerge_getBlock: Or,
         automerge_getChangeByHash: so,
         automerge_getChangeMetaByHash: ao,
@@ -1063,7 +1042,7 @@ ${t.stack}` : r;
         automerge_getMissingDeps: fo,
         automerge_getWithType: Pr,
         automerge_hasOurChanges: Ro,
-        automerge_increment: Dr,
+        automerge_increment: kr,
         automerge_insert: vr,
         automerge_insertObject: Ir,
         automerge_integrate: qr,
@@ -1107,14 +1086,14 @@ ${t.stack}` : r;
         automerge_updateText: Sr,
         create: Oo,
         decodeChange: Mo,
-        decodeSyncMessage: Lo,
+        decodeSyncMessage: Fo,
         decodeSyncState: Ho,
         encodeChange: To,
         encodeSyncMessage: Bo,
-        encodeSyncState: Fo,
+        encodeSyncState: Lo,
         exportSyncState: Po,
-        importSyncState: ko,
-        initSyncState: Do,
+        importSyncState: Do,
+        initSyncState: ko,
         load: Io,
         memory: nr,
         syncstate_clone: ir,
@@ -1172,12 +1151,12 @@ ${t.stack}` : r;
         __wbg_newwithbyteoffsetandlength_d97e637ebe145a9a: It,
         __wbg_next_25feadfc0913fea9: Tt,
         __wbg_next_6574e1a8a62d1055: Mt,
-        __wbg_ownKeys_3930041068756f1f: Dt,
-        __wbg_push_737cfc8c1432c2c6: kt,
+        __wbg_ownKeys_3930041068756f1f: kt,
+        __wbg_push_737cfc8c1432c2c6: Dt,
         __wbg_set_37837023f3d740e8: Pt,
         __wbg_set_3f1d0b984ed272ed: Bt,
-        __wbg_set_65595bdd868b3009: Lt,
-        __wbg_set_bb8cecf6a62b9f46: Ft,
+        __wbg_set_65595bdd868b3009: Ft,
+        __wbg_set_bb8cecf6a62b9f46: Lt,
         __wbg_set_wasm: We,
         __wbg_slice_972c243648c9fd2e: Ht,
         __wbg_stack_0ed75d68575b0f3c: zt,
@@ -1379,14 +1358,14 @@ ${t.stack}` : r;
             ];
           case "undefined":
             throw new RangeError([
-              `Cannot assign undefined value at ${ke(e)}, `,
+              `Cannot assign undefined value at ${De(e)}, `,
               "because `undefined` is not a valid JSON data type. ",
               "You might consider setting the property's value to `null`, ",
               "or using `delete` to remove it altogether."
             ].join(""));
           default:
             throw new RangeError([
-              `Cannot assign ${r} value at ${ke(e)}. `,
+              `Cannot assign ${r} value at ${De(e)}. `,
               "All JSON primitive datatypes (object, array, string, number, boolean, null) ",
               `are supported in an Automerge document; ${r} values are not. `
             ].join(""));
@@ -1793,7 +1772,7 @@ ${t.stack}` : r;
           }
         };
       }
-      function ke(t) {
+      function De(t) {
         const e = t.map((n) => {
           if (typeof n == "number") return n.toString();
           if (typeof n == "string") return n.replace(/~/g, "~0").replace(/\//g, "~1");
@@ -1857,7 +1836,7 @@ ${t.stack}` : r;
           handle: s
         }));
       }
-      function L(t, e, n) {
+      function F(t, e, n) {
         if (typeof e == "function") return is(t, "change", {}, e).newDoc;
         throw RangeError("Invalid args for change");
       }
@@ -1930,7 +1909,7 @@ ${t.stack}` : r;
         if (!Array.isArray(t)) throw new Error(`${e} must be an array`);
       }
       function de(t, e) {
-        if (!Le(t) || !Le(e)) return t === e;
+        if (!Fe(t) || !Fe(e)) return t === e;
         const n = Object.keys(t).sort(), r = Object.keys(e).sort();
         if (n.length !== r.length) return false;
         for (let o = 0; o < n.length; o++) if (n[o] !== r[o] || !de(t[n[o]], e[r[o]])) return false;
@@ -1939,7 +1918,7 @@ ${t.stack}` : r;
       function ls(t) {
         return me.decodeChange(t);
       }
-      function Le(t) {
+      function Fe(t) {
         return typeof t == "object" && t !== null;
       }
       function gs(t) {
@@ -1966,8 +1945,8 @@ ${t.stack}` : r;
         if (!r) throw new RangeError(`invalid object for ${n}`);
         return e.unshift(r), e.join("/");
       }
-      Fn(Jo);
-      const he = Math.PI, Fe = he * 2, hs = (t, e = 0, n = 1) => Math.min(Math.max(t, e), n), be = (t = 0, e = -1, n = 1, r = false) => {
+      Ln(Jo);
+      const he = Math.PI, Le = he * 2, hs = (t, e = 0, n = 1) => Math.min(Math.max(t, e), n), be = (t = 0, e = -1, n = 1, r = false) => {
         let o = n === e ? e : (t - e) / (n - e);
         return r ? hs(o) : o;
       }, Se = (t = 0, e = -1, n = 1) => t * (n - e) + e, q = (t = 0, e = -1, n = 1, r = 0, o = 1, s = false, c = 1) => {
@@ -2169,7 +2148,7 @@ void main() {
       function Es(t, e) {
         const n = [];
         for (let r = 0; r < t; r++) {
-          const o = r / t * Fe + he / 4, s = (r + 1) / t * Fe + he / 4;
+          const o = r / t * Le + he / 4, s = (r + 1) / t * Le + he / 4;
           n.push(0, 0, e * Math.cos(o), e * Math.sin(o), e * Math.cos(s), e * Math.sin(s));
         }
         return n;
@@ -2185,8 +2164,8 @@ void main() {
       f.linkProgram(M);
       const Ts = f.getUniformLocation(M, "u_resolution"), Cn = f.createVertexArray();
       f.bindVertexArray(Cn);
-      const vn = Es(As, Cs), Ms = vn.length / 2, Ds = f.createBuffer();
-      f.bindBuffer(f.ARRAY_BUFFER, Ds);
+      const vn = Es(As, Cs), Ms = vn.length / 2, ks = f.createBuffer();
+      f.bindBuffer(f.ARRAY_BUFFER, ks);
       f.bufferData(f.ARRAY_BUFFER, new Float32Array(vn), f.STATIC_DRAW);
       const Rn = f.getAttribLocation(M, "a_position");
       f.enableVertexAttribArray(Rn);
@@ -2209,15 +2188,14 @@ void main() {
       f.enableVertexAttribArray(Re);
       f.vertexAttribPointer(Re, 3, f.FLOAT, false, 0, 0);
       f.vertexAttribDivisor(Re, 1);
-      function ks(t) {
+      function Ds(t) {
         f.viewport(0, 0, te * ee, ne * ee), f.clearColor(0, 0, 0, 0), f.clear(f.COLOR_BUFFER_BIT), f.useProgram(M), f.uniform2f(Ts, te, ne), f.bindVertexArray(Cn);
-        const e = new Float32Array(t.length * 2), n = new Float32Array(t.length), r = new Float32Array(t.length * 3);
-        for (let o = 0; o < t.length; o++) {
-          e[o * 2] = t[o].x, e[o * 2 + 1] = t[o].y;
-          const [s, c, _, g] = t[o].color;
-          r[o * 3] = s, r[o * 3 + 1] = c, r[o * 3 + 2] = _, n[o] = g;
-        }
-        f.bindBuffer(f.ARRAY_BUFFER, jn), f.bufferData(f.ARRAY_BUFFER, e, f.DYNAMIC_DRAW), f.bindBuffer(f.ARRAY_BUFFER, En), f.bufferData(f.ARRAY_BUFFER, n, f.DYNAMIC_DRAW), f.bindBuffer(f.ARRAY_BUFFER, On), f.bufferData(f.ARRAY_BUFFER, r, f.DYNAMIC_DRAW), f.drawArraysInstanced(f.TRIANGLES, 0, Ms, t.length);
+        let e = 0;
+        for (let c of t) e += c.dots.length;
+        const n = new Float32Array(e * 2), r = new Float32Array(e), o = new Float32Array(e * 3);
+        let s = 0;
+        for (let c of t) for (let _ of c.dots) n[s * 2] = _.springPos.x, n[s * 2 + 1] = _.springPos.y, o[s * 3] = _.color[0], o[s * 3 + 1] = _.color[1], o[s * 3 + 2] = _.color[2], r[s] = _.color[3], s++;
+        f.bindBuffer(f.ARRAY_BUFFER, jn), f.bufferData(f.ARRAY_BUFFER, n, f.DYNAMIC_DRAW), f.bindBuffer(f.ARRAY_BUFFER, En), f.bufferData(f.ARRAY_BUFFER, r, f.DYNAMIC_DRAW), f.bindBuffer(f.ARRAY_BUFFER, On), f.bufferData(f.ARRAY_BUFFER, o, f.DYNAMIC_DRAW), f.drawArraysInstanced(f.TRIANGLES, 0, Ms, e);
       }
       const _j = class _j {
         constructor(e, n, r, o) {
@@ -2230,10 +2208,7 @@ void main() {
           this.sourceInfo = e, this.source = n, this.target = r, this.isDelete = o, e.edits.some((c) => c.type == "add") && (this.applyEarly = true), this.dots = xs(e, He(n, e.todoIndex)), _j.all.add(this);
         }
         static update(e) {
-          _j.all.forEach((n) => n.physics(e)), ks(Array.from(_j.all).flatMap((n) => n.dots.map(({ springPos: r, color: o }) => ({
-            ...r,
-            color: o
-          }))));
+          _j.all.forEach((n) => n.physics(e)), document.hidden || Ds(_j.all);
         }
         static recalc() {
           let e = /* @__PURE__ */ new Map();
@@ -2273,7 +2248,7 @@ void main() {
         return a.sub(n, js());
       }
       const ue = 5;
-      const _F = class _F {
+      const _L = class _L {
         constructor(e, n) {
           __publicField(this, "spec");
           __publicField(this, "nextTodoId", 0);
@@ -2291,11 +2266,11 @@ void main() {
             s.key == "Enter" && o.blur();
           }, o.onblur = () => {
             o.value.length <= 0 || (this.add(o.value, 0), o.value = "");
-          }, this.listElm = r.querySelector(".list"), this.overflowElm = r.querySelector(".todo-overflow"), _F.all.push(this), this.render();
+          }, this.listElm = r.querySelector(".list"), this.overflowElm = r.querySelector(".todo-overflow"), _L.all.push(this), this.render();
         }
         add(e, n) {
           const r = this.name + this.nextTodoId++;
-          return this.doc = L(this.doc, (o) => o.todos.splice(n ?? o.todos.length, 0, {
+          return this.doc = F(this.doc, (o) => o.todos.splice(n ?? o.todos.length, 0, {
             id: r,
             text: e,
             done: false
@@ -2305,7 +2280,7 @@ void main() {
           const r = this.getIndex(e);
           if (r < 0) return console.log(`Couldn't edit todo ${e} on client ${this.name}`);
           let o = n.length < this.doc.todos[r].text.length;
-          this.doc = L(this.doc, (s) => fs(s, [
+          this.doc = F(this.doc, (s) => fs(s, [
             "todos",
             r,
             "text"
@@ -2314,15 +2289,15 @@ void main() {
         toggle(e, n) {
           const r = this.getIndex(e);
           if (r < 0) return console.log(`Couldn't toggle todo ${e} on client ${this.name}`);
-          this.doc = L(this.doc, (o) => o.todos[r].done = n ?? !o.todos[r].done), this.broadcast();
+          this.doc = F(this.doc, (o) => o.todos[r].done = n ?? !o.todos[r].done), this.broadcast();
         }
         clear(e) {
           const n = this.getIndex(e);
           if (n < 0) return console.log(`Couldn't clear todo ${e} on client ${this.name}`);
-          this.doc = L(this.doc, (r) => r.todos.splice(n, 1)), this.broadcast(true, true);
+          this.doc = F(this.doc, (r) => r.todos.splice(n, 1)), this.broadcast(true, true);
         }
         clearAll() {
-          for (; this.doc.todos.length > 0; ) this.doc = L(this.doc, (e) => e.todos.pop()), this.broadcast(true, true);
+          for (; this.doc.todos.length > 0; ) this.doc = F(this.doc, (e) => e.todos.pop()), this.broadcast(true, true);
         }
         getIndex(e) {
           return this.doc.todos.findIndex((n) => n.id == e);
@@ -2332,8 +2307,8 @@ void main() {
           let r = _s(this.doc);
           if (!r) throw new Error("Couldn't get change?!");
           let o = Ps(this.doc, r, true);
-          for (let s of _F.all) s != this && new j(o, this, s, n);
-          for (let s of _F.all) s.resetSpec();
+          for (let s of _L.all) s != this && new j(o, this, s, n);
+          for (let s of _L.all) s.resetSpec();
           j.recalc();
         }
         applyChange(e) {
@@ -2387,8 +2362,8 @@ void main() {
           return this.elements.set(e, s), s;
         }
       };
-      __publicField(_F, "all", []);
-      let F = _F;
+      __publicField(_L, "all", []);
+      let L = _L;
       function In(t, e, n) {
         const r = document.createElement(t);
         return r.className = e, n == null ? void 0 : n.appendChild(r), r;
@@ -2463,9 +2438,9 @@ void main() {
           todoIndex: r
         };
       }
-      let Tn = L(as(), (t) => t.todos = []), N = new F("a", Q(Tn, {
+      let Tn = F(as(), (t) => t.todos = []), N = new L("a", Q(Tn, {
         actor: "01"
-      })), re = new F("b", Q(Tn, {
+      })), re = new L("b", Q(Tn, {
         actor: "00"
       }));
       window.desktop = N;
@@ -2479,7 +2454,7 @@ void main() {
       window.onresize = () => {
         N.resize(), re.resize();
       };
-      let Ls = [
+      let Fs = [
         [
           "Align dilithium matrix",
           "Charge AT field",
@@ -2505,9 +2480,9 @@ void main() {
           "Open the pod bay doors",
           "Experience Bij"
         ]
-      ], Fs = 0, ce = [], Dn = () => ce = ws(ys(Ls, Fs++));
-      Dn();
-      let kn = (t) => t.doc.todos.filter((e) => e.done), je = (t) => t.doc.todos.filter((e) => !e.done);
+      ], Ls = 0, ce = [], kn = () => ce = ws(ys(Fs, Ls++));
+      kn();
+      let Dn = (t) => t.doc.todos.filter((e) => e.done), je = (t) => t.doc.todos.filter((e) => !e.done);
       function Ee(t, e) {
         let n = t.add("");
         Pn(t, e, n);
@@ -2539,25 +2514,25 @@ void main() {
         let e = je(t);
         e.length > 0 && t.toggle(xe(e).id, true);
       }, $s = (t) => {
-        let e = kn(t);
+        let e = Dn(t);
         e.length > 0 && t.clear(xe(e).id);
       }, Us = (t) => t.clearAll();
-      function D(t, e) {
+      function k(t, e) {
         t(e), setTimeout(Oe, 1e3 * 9);
       }
       function Oe() {
         if (N.editing != null || re.editing != null) return setTimeout(Oe, 3e3);
-        let t = _e() ? N : re, e = t.doc.todos.length, n = je(t), r = kn(t);
+        let t = _e() ? N : re, e = t.doc.todos.length, n = je(t), r = Dn(t);
         if (ce.length == 0) {
-          n.length > 0 ? D(Ue, t) : (D(Us, t), Dn());
+          n.length > 0 ? k(Ue, t) : (k(Us, t), kn());
           return;
         }
-        if (e < 2) return D(le, N);
-        if (_e(0.33) && e < 4) return D(le, t);
-        if (_e(0.5)) return D(zs, t);
-        if (n.length > 0) return D(Ue, t);
-        if (r.length > 0) return D($s, t);
-        D(le, t);
+        if (e < 2) return k(le, N);
+        if (_e(0.33) && e < 4) return k(le, t);
+        if (_e(0.5)) return k(zs, t);
+        if (n.length > 0) return k(Ue, t);
+        if (r.length > 0) return k($s, t);
+        k(le, t);
       }
       Oe();
     })();
