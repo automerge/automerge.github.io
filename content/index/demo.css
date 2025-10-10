@@ -1,10 +1,17 @@
 #demo {
   position: relative;
   display: flex;
-  gap: clamp(20px, 10vw, 150px);
-  align-items: start;
+  gap: 5rem clamp(20px, 10vw, 150px);
+  align-items: end;
   width: max-content;
   margin-inline: auto;
+}
+
+@media (width <= 1024px) {
+  #demo {
+    flex-direction: column;
+    align-items: center;
+  }
 }
 
 #demo .client {
@@ -22,7 +29,7 @@
 }
 
 #demo h3 {
-  font: 100 21px "Overpass Mono";
+  font: 100 24px "Overpass Mono";
 }
 
 /* Desktop */
@@ -33,9 +40,17 @@
   contain: paint; /* contain dots */
 }
 
+@media (width > 1024px) {
+  #demo .desktop {
+    border-bottom: 0;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+}
+
 #demo .desktop .title {
   display: flex;
-  padding: 6px;
+  padding: 8px;
   border-bottom: 2px solid var(--fg);
 }
 
@@ -51,31 +66,64 @@
   display: flex;
 }
 
+@media( width <= 600px) {
+  #demo .desktop .inner {
+    flex-flow: column;
+  }
+}
+
 #demo .desktop .users {
   flex: 0 0 auto;
-  padding: 10px;
+  padding: 17px 24px;
   border-right: 2px solid var(--fg);
+  font: 500 16px / 1 "Overpass Mono";
+}
+
+@media( width <= 600px) {
+  #demo .desktop .users {
+    display: flex;
+    flex-flow: row wrap;
+    align-items: start;
+    justify-content: space-between;
+    gap: 20px;
+    border-right: 0;
+    border-bottom: 2px solid var(--fg);
+  }
 }
 
 #demo .desktop .users h4 {
-  margin-bottom: 10px;
-  font-size: 12px;
+  margin-block: 15px 18px; /* Tuned to match text in the todo list */
+  font: 600 12px / 1 "Overpass Mono";
   text-transform: uppercase;
 }
 
 #demo .desktop .users h4.offline {
-  margin-top: 15px;
+  margin-block: 22px 20px;
 }
 
-#demo .desktop .users > div {
+@media( width <= 600px) {
+  #demo .desktop .users h4,
+  #demo .desktop .users h4.offline {
+    margin-block: 0 10px;
+  }
+}
+
+#demo .desktop .user {
   display: flex;
   align-items: center;
-  margin-bottom: 8px;
-  gap: 4px;
+  margin-bottom: 12px;
+  gap: 7px;
 }
 
-#demo .desktop .users svg {
+@media( width <= 600px) {
+  #demo .desktop .user:last-of-type {
+    margin-bottom: 0;
+  }
+}
+
+#demo .desktop .user svg {
   width: 34px;
+  margin-top: -4px;
 }
 
 /* Phone */
@@ -86,10 +134,15 @@
   border: 2px solid var(--fg);
   border-bottom: 0;
   border-radius: 48px 48px 0 0;
+
+  background-image: url("autodots-phone.png");
+  background-size: auto 350px;
+  background-position: top;
+  background-repeat: repeat-x;
+  image-rendering: pixelated;
 }
 
 #demo .phone .inner {
-  height: 320px;
   border: 2px solid var(--fg);
   border-bottom: 0;
   border-radius: 40px 40px 0 0;
@@ -121,7 +174,7 @@
 /* CLIENT TODO LISTS */
 
 #demo h3 {
-  margin: 10px;
+  margin: 20px 20px 4px;
 }
 
 #demo [js-client] {
@@ -132,43 +185,39 @@
   display: flex;
   align-items: center;
   gap: 2px;
-  margin: 0 0 4px 10px;
+  margin: 0;
+  padding-left: 20px;
 }
 
 #demo .entry .plus {
   flex: 0 0 auto;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 1rem;
-  height: 1rem;
-  padding-top: 2px;
-  border: 2px solid transparent;
+  stroke: currentColor;
 }
 
 #demo .entry .field {
   flex: 1 1 auto;
 }
 
-#demo .entry .field input.text:not(:focus) {
-  font-weight: 100;
-}
-
 #demo .list {
   position: relative;
-  width: 280px;
-  height: 180px;
+  height: 260px;
   overflow: hidden;
 }
 
 #demo .item {
   position: absolute;
-  left: 0px;
   top: 0;
+  left: 0;
+  width: 100%;
   display: flex;
   align-items: center;
   gap: 2px;
-  padding-left: 10px;
+  padding-left: 20px;
+  animation: fade-in 1s linear both;
+}
+
+@keyframes fade-in {
+  from { opacity: 0 }
 }
 
 #demo input {
@@ -180,9 +229,10 @@
 }
 
 #demo input.checkbox {
+  position: relative;
   appearance: none;
-  width: 1rem;
-  height: 1rem;
+  width: 18px;
+  height: 18px;
   border: 2px solid currentColor;
   border-radius: 2px;
   cursor: pointer;
@@ -192,19 +242,23 @@
   visibility: hidden;
 }
 
-#demo input.checkbox:focus-within {
-  outline: 2px solid var(--fg);
-}
-
-#demo input.checkbox:checked {
-  background: currentColor;
+#demo input.checkbox:checked::after {
+  content: "";
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  top: 4px;
+  left: 4px;
+  background: var(--fg);
+  z-index: 2;
 }
 
 /* Also applies to the new task entry field */
 #demo input.text {
   display: inline-block;
-  width: 100%;
-  padding: 4px 4px 2px;
+  width: 260px;
+  max-width: 70vw;
+  padding: 13px 0 7px 10px;
   border-bottom: 2px solid transparent;
   /* Must match dots.ts */
   font: 500 16px / 1 "Overpass Mono";
@@ -214,12 +268,22 @@
   overflow: hidden;
 }
 
-#demo input::placeholder {
-  color: var(--fg);
+#demo input.checkbox:focus-within {
+  outline: 2px solid currentColor;
 }
 
-#demo input.text:focus-within {
-  border-bottom: 2px solid var(--fg);
+#demo .entry:focus-within,
+#demo .item:focus-within {
+  color: var(--bg);
+  background: var(--fg);
+}
+
+#demo .desktop input.text {
+  width: 340px;
+}
+
+#demo input::placeholder {
+  color: currentColor;
 }
 
 #demo .hidden {
@@ -228,15 +292,16 @@
 
 #demo .todo-overflow {
   position: absolute;
-  bottom: 5px;
-  left: 13px;
+  bottom: 20px;
+  left: 20px;
 }
 
-#demo .dottts {
-  background-image: url('data:image/svg+xml,<svg fill="%23222" xmlns="http://www.w3.org/2000/svg"><rect x="0.5" y="0.5" width="1" height="1" /><rect x="2.5" y="2.5" width="1" height="1" /></svg>');
+#demo .svg-dots {
+  background-image: url('data:image/svg+xml,<svg fill="%23222" xmlns="http://www.w3.org/2000/svg"><circle cx="1" cy="1" r=".5"/><circle cx="3" cy="3" r=".5"/></svg>');
   background-size: 4px 4px;
+  background-repeat: repeat;
 }
 
-html[theme="dark"] #demo .dottts {
+html[theme="dark"] #demo .svg-dots {
   background-image: url('data:image/svg+xml,<svg fill="%23fc3" xmlns="http://www.w3.org/2000/svg"><rect x="0.5" y="0.5" width="1" height="1" /><rect x="2.5" y="2.5" width="1" height="1" /></svg>');
 }

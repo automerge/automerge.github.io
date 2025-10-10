@@ -3,7 +3,19 @@ import { Color, Position } from "./types.ts"
 import { PI, TAU } from "./util.ts"
 
 const sides = 4
-const radius = 0.8
+const radius = 1.2
+
+const canvas = document.querySelector("#demo canvas") as HTMLCanvasElement
+const dpr = window.devicePixelRatio
+
+const gl = canvas.getContext("webgl2", { antialias: false })!
+
+gl.enable(gl.BLEND)
+gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
+
+let width = 0
+let height = 0
+let bounds: DOMRect
 
 export type RenderDot = Position & { color: Color }
 
@@ -34,15 +46,8 @@ void main() {
 }
 `
 
-const canvas = document.querySelector("#demo canvas") as HTMLCanvasElement
-const dpr = window.devicePixelRatio
-
-let width = 0
-let height = 0
-let bounds: DOMRect
-
 const resize = () => {
-  bounds = canvas.getBoundingClientRect()
+  bounds = getCanvasRect()
   width = bounds.width
   height = bounds.height
   canvas.width = width * dpr
@@ -52,7 +57,12 @@ resize()
 window.onresize = resize
 
 export function getCanvasRect() {
-  return (bounds ??= canvas.getBoundingClientRect())
+  if (bounds) return bounds
+  bounds = canvas.getBoundingClientRect()
+  let body = document.body.getBoundingClientRect()
+  bounds.x -= body.x
+  bounds.y -= body.y
+  return bounds
 }
 
 function compileShader(gl: WebGL2RenderingContext, type: number, source: string): WebGLShader {
@@ -71,11 +81,6 @@ function makePolygon(sides: number, radius: number): number[] {
   }
   return vertices
 }
-
-const gl = canvas.getContext("webgl2", { antialias: true })!
-
-gl.enable(gl.BLEND)
-gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
 
 const vertShader = compileShader(gl, gl.VERTEX_SHADER, vertexShaderSource)
 const fragShader = compileShader(gl, gl.FRAGMENT_SHADER, fragmentShaderSource)

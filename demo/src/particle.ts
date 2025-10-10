@@ -5,12 +5,44 @@ import { ChangeInfo, Id, Position } from "./types.ts"
 import { de, no, re } from "./util.ts"
 import Vec from "./vec.ts"
 
+let r1 = 0.166
+let g1 = 0.166
+let b1 = 0.166
+let r2 = 0.8 * 1
+let g2 = 0.8 * 0.8
+let b2 = 0.8 * 0.2
+
+type Theme = "light" | "dark"
+window.addEventListener("set-theme", (e) => {
+  setTheme((e as CustomEvent).detail as Theme)
+})
+
+function setTheme(theme: Theme) {
+  if (theme == "dark") {
+    r1 = 1
+    g1 = 0.8
+    b1 = 0.2
+    r2 = 0.2
+    g2 = 0.2
+    b2 = 0.2
+  } else {
+    r1 = 0.166
+    g1 = 0.166
+    b1 = 0.166
+    r2 = 0.8 * 1
+    g2 = 0.8 * 0.8
+    b2 = 0.8 * 0.2
+  }
+}
+
+setTheme(document.documentElement.getAttribute("theme") as Theme)
+
 export class Particle {
   static all: Set<Particle> = new Set()
 
   static update(dt: number) {
     Particle.all.forEach((p) => p.physics(dt))
-    if (!document.hidden) render(Particle.all)
+    render(Particle.all)
   }
 
   static recalc() {
@@ -47,8 +79,6 @@ export class Particle {
     let allComplete = true
 
     for (const dot of this.dots) {
-      if (dot.isComplete) continue
-
       let destPos = Vec.add(this.dest, dot.local)
       let springDist = Vec.len(Vec.sub(destPos, dot.springPos))
 
@@ -57,24 +87,19 @@ export class Particle {
         this.target.applyChange(this.sourceInfo.change)
       }
 
-      if (springDist < 0.1) {
-        if (!this.isDelete) dot.color[3] = 0.7
-        dot.isComplete = true
-        continue
-      }
-
-      allComplete = false
+      dot.isComplete = springDist < 0.2
+      allComplete &&= dot.isComplete
 
       dot.age += dt
 
       // move slowly for the first few seconds
       let rampStart = no(dot.age, 0, 4, true) ** 1.5
-      let maxAccel = 0.02 * rampStart // per second
+      let maxAccel = 0.05 * rampStart // per second
       let accel = Vec.renormalize(Vec.sub(destPos, dot.pos), maxAccel)
 
       // slow down as we approach
-      let approach = no(springDist, 120, 0, true)
-      let damping = de(approach, 0.99, 0.88) ** (dt * 60)
+      let approach = no(springDist, 180, 80, true)
+      let damping = de(approach, 0.99, 0.9) ** (dt * 60)
 
       dot.vel = Vec.add(dot.vel, Vec.Smul(120 * dt, accel))
       dot.vel = Vec.mulS(dot.vel, damping)
@@ -89,11 +114,15 @@ export class Particle {
 
       // Color
       if (this.isDelete) {
-        dot.color[0] = re(springDist, 500, 0, 0.133, 0.8 * 1)
-        dot.color[1] = re(springDist, 500, 0, 0.133, 0.8 * 0.8)
-        dot.color[2] = re(springDist, 500, 0, 0.133, 0.8 * 0.2)
+        dot.color[0] = re(springDist, 500, 0, 0.133, r2)
+        dot.color[1] = re(springDist, 500, 0, 0.133, g2)
+        dot.color[2] = re(springDist, 500, 0, 0.133, b2)
+        dot.color[3] = 1
       } else {
-        dot.color[3] = re(dot.age, 0, 3, 0, 1)
+        dot.color[0] = r1
+        dot.color[1] = g1
+        dot.color[2] = b1
+        dot.color[3] = dot.age < 1.5 ? 0 : 1
       }
     }
 
@@ -105,7 +134,7 @@ export class Particle {
 }
 
 function getPos(client: Client, todoIndex: number) {
-  let p = Vec.add(client.cachedListElmPos, Vec(10, 5.5 + todoIndex * 28))
+  let p = Vec.add(client.cachedListElmPos, Vec(20.5, 12.5 + todoIndex * 42))
   // As of this point, all position math is done relative to the canvas, which we call "world space"
   return Vec.sub(p, getCanvasRect())
 }

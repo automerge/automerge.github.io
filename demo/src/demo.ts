@@ -14,18 +14,41 @@ let phone = new Client("b", Automerge.clone(rootDoc, { actor: "00" }))
 ;(window as any).desktop = desktop
 ;(window as any).phone = phone
 
-// TODO: We should pause this update loop when the demo is scrolled out of view, or when switching to a different tab
-// TODO: all uses of setTimeout should actually be triggered by the update loop! (so that they pause / skew / etc correctly)
+type QueuedAction = { time: number; action: () => void }
+let queuedActions: Set<QueuedAction> = new Set()
+let enqueue = (action: () => void, delay: number) => queuedActions.add({ action, time: (performance.now() + delay) / 1000 })
+let timeSinceAction = 0
 
 let s = performance.now() / 1000
 function update(ms: number) {
   let t = ms / 1000
   let dt = Math.min(t - s, 1 / 20) // longest frame time before skewing is 1/20th of a second
   s = t
-  Particle.update(dt)
   requestAnimationFrame(update)
+  if (!running || document.hidden) return
+
+  if (queuedActions.size == 0) {
+    timeSinceAction += dt
+    if (timeSinceAction > 10) {
+      timeSinceAction = 0
+      nextAction()
+    }
+  } else {
+    for (let qa of queuedActions) {
+      if (qa.time < t) {
+        queuedActions.delete(qa)
+        qa.action()
+      }
+    }
+  }
+
+  Particle.update(dt)
 }
 requestAnimationFrame(update)
+
+let running = false
+let observer = new IntersectionObserver(([entry]) => (running = entry.isIntersecting))
+observer.observe(document.querySelector("#demo")!)
 
 window.onresize = () => {
   desktop.resize()
@@ -68,7 +91,7 @@ function populateTodo(client: Client, text: string, id: Id) {
     let oldText = client.doc.todos[idx].text
     let newText = oldText + charsToAdd.shift()
     client.edit(id, newText)
-    setTimeout(addNextChar, 50)
+    enqueue(addNextChar, 50)
   }
   addNextChar()
 }
@@ -78,12 +101,22 @@ let editTodo = (client: Client, text: string, id: Id) => {
     let idx = client.getIndex(id)
     if (idx < 0) return addTodo(client, text) // If at any point the todo we're editing doesn't exist, just add the text as a new todo
     let oldText = client.doc.todos[idx].text
-    if (oldText.length <= 0) return setTimeout(() => populateTodo(client, text, id), 2000) // After the todo is empty, fill it with the new text
+    if (oldText.length <= 0) return enqueue(() => populateTodo(client, text, id), 2000) // After the todo is empty, fill it with the new text
     let newText = oldText.slice(0, -1)
     client.edit(id, newText)
-    setTimeout(removeNextChar, 50)
+    enqueue(removeNextChar, 50)
   }
   removeNextChar()
+}
+
+let clearAll = (client: Client) => {
+  let clearNextTodo = () => {
+    let todo = getIsDone(client).at(-1)
+    if (!todo) return
+    client.clear(todo.id)
+    enqueue(clearNextTodo, 200)
+  }
+  clearNextTodo()
 }
 
 // ACTIONS
@@ -107,18 +140,17 @@ let doClear = (client: Client) => {
   if (isDone.length > 0) client.clear(arrRnd(isDone).id)
 }
 
-let doClearAll = (client: Client) => client.clearAll()
+let doClearAll = (client: Client) => clearAll(client)
 
 function runAction(action: (client: Client) => void, client: Client) {
   action(client)
-  setTimeout(nextAction, 1000 * 9)
 }
 
-function nextAction() {
+function nextAction(client?: Client) {
   // If the user is editing, wait until they stop before resuming the demo
-  if (desktop.editing != null || phone.editing != null) return setTimeout(nextAction, 3000)
+  if (desktop.editing != null || phone.editing != null) return
 
-  let client = chance() ? desktop : phone
+  client ??= chance() ? desktop : phone
   let todoCount = client.doc.todos.length
   let notDone = getNotDone(client)
   let isDone = getIsDone(client)
@@ -138,7 +170,10 @@ function nextAction() {
   // From here on down, we know we have todos left to add
 
   // Whenever we have no todos, add more
-  if (todoCount < 2) return runAction(addNextTodo, desktop)
+  if (todoCount < 2) return runAction(addNextTodo, client)
+
+  // Whenever we have too many done todos, clear them
+  if (isDone.length > 4) return runAction(clearAll, client)
 
   // From here, we know we have todos to add and a few todos that exist
 
@@ -160,4 +195,4 @@ function nextAction() {
   runAction(addNextTodo, client)
 }
 
-nextAction()
+nextAction(desktop)

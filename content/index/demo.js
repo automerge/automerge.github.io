@@ -8,14 +8,23 @@ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "sy
 var require_stdin = __commonJS({
   "<stdin>"(exports, module) {
     (async () => {
-      let Ne;
-      const ie = typeof TextEncoder < "u" ? new TextEncoder("utf-8") : {
+      let wasm$2;
+      const cachedTextEncoder$1 = typeof TextEncoder !== "undefined" ? new TextEncoder("utf-8") : {
         encode: () => {
           throw Error("TextEncoder not available");
         }
       };
-      ie.encodeInto;
-      const Bn = typeof TextDecoder < "u" ? new TextDecoder("utf-8", {
+      typeof cachedTextEncoder$1.encodeInto === "function" ? function(arg, view) {
+        return cachedTextEncoder$1.encodeInto(arg, view);
+      } : function(arg, view) {
+        const buf = cachedTextEncoder$1.encode(arg);
+        view.set(buf);
+        return {
+          read: arg.length,
+          written: buf.length
+        };
+      };
+      const cachedTextDecoder$1 = typeof TextDecoder !== "undefined" ? new TextDecoder("utf-8", {
         ignoreBOM: true,
         fatal: true
       }) : {
@@ -23,1184 +32,1632 @@ var require_stdin = __commonJS({
           throw Error("TextDecoder not available");
         }
       };
-      typeof TextDecoder < "u" && Bn.decode();
-      typeof FinalizationRegistry > "u" || new FinalizationRegistry((t) => Ne.__wbg_automerge_free(t >>> 0, 1));
-      typeof FinalizationRegistry > "u" || new FinalizationRegistry((t) => Ne.__wbg_syncstate_free(t >>> 0, 1));
-      let Fn = [];
-      function Ln(t) {
-        for (const e in t) me[e] = t[e];
-        for (const e of Fn) e();
+      if (typeof TextDecoder !== "undefined") {
+        cachedTextDecoder$1.decode();
       }
-      const me = {
-        create(t) {
+      typeof FinalizationRegistry === "undefined" ? {} : new FinalizationRegistry((ptr) => wasm$2.__wbg_automerge_free(ptr >>> 0, 1));
+      typeof FinalizationRegistry === "undefined" ? {} : new FinalizationRegistry((ptr) => wasm$2.__wbg_syncstate_free(ptr >>> 0, 1));
+      let _initializeListeners = [];
+      function UseApi(api2) {
+        for (const k in api2) {
+          ApiHandler[k] = api2[k];
+        }
+        for (const listener of _initializeListeners) {
+          listener();
+        }
+      }
+      const ApiHandler = {
+        create(options) {
           throw new RangeError("Automerge.use() not called");
         },
-        load(t, e) {
+        load(data, options) {
           throw new RangeError("Automerge.use() not called (load)");
         },
-        encodeChange(t) {
+        encodeChange(change2) {
           throw new RangeError("Automerge.use() not called (encodeChange)");
         },
-        decodeChange(t) {
+        decodeChange(change2) {
           throw new RangeError("Automerge.use() not called (decodeChange)");
         },
         initSyncState() {
           throw new RangeError("Automerge.use() not called (initSyncState)");
         },
-        encodeSyncMessage(t) {
+        encodeSyncMessage(message) {
           throw new RangeError("Automerge.use() not called (encodeSyncMessage)");
         },
-        decodeSyncMessage(t) {
+        decodeSyncMessage(msg) {
           throw new RangeError("Automerge.use() not called (decodeSyncMessage)");
         },
-        encodeSyncState(t) {
+        encodeSyncState(state) {
           throw new RangeError("Automerge.use() not called (encodeSyncState)");
         },
-        decodeSyncState(t) {
+        decodeSyncState(data) {
           throw new RangeError("Automerge.use() not called (decodeSyncState)");
         },
-        exportSyncState(t) {
+        exportSyncState(state) {
           throw new RangeError("Automerge.use() not called (exportSyncState)");
         },
-        importSyncState(t) {
+        importSyncState(state) {
           throw new RangeError("Automerge.use() not called (importSyncState)");
         }
-      }, Hn = "/index/automerge_wasm_bg.wasm", zn = async (t = {}, e) => {
-        let n;
-        if (e.startsWith("data:")) {
-          const r = e.replace(/^data:.*?base64,/, "");
-          let o;
-          if (typeof Buffer == "function" && typeof Buffer.from == "function") o = Buffer.from(r, "base64");
-          else if (typeof atob == "function") {
-            const s = atob(r);
-            o = new Uint8Array(s.length);
-            for (let c = 0; c < s.length; c++) o[c] = s.charCodeAt(c);
-          } else throw new Error("Cannot decode base64-encoded data URL");
-          n = await WebAssembly.instantiate(o, t);
+      };
+      const __vite__wasmUrl = "/index/automerge_wasm_bg.wasm";
+      const __vite__initWasm = async (opts = {}, url) => {
+        let result;
+        if (url.startsWith("data:")) {
+          const urlContent = url.replace(/^data:.*?base64,/, "");
+          let bytes;
+          if (typeof Buffer === "function" && typeof Buffer.from === "function") {
+            bytes = Buffer.from(urlContent, "base64");
+          } else if (typeof atob === "function") {
+            const binaryString = atob(urlContent);
+            bytes = new Uint8Array(binaryString.length);
+            for (let i = 0; i < binaryString.length; i++) {
+              bytes[i] = binaryString.charCodeAt(i);
+            }
+          } else {
+            throw new Error("Cannot decode base64-encoded data URL");
+          }
+          result = await WebAssembly.instantiate(bytes, opts);
         } else {
-          const r = await fetch(e), o = r.headers.get("Content-Type") || "";
-          if ("instantiateStreaming" in WebAssembly && o.startsWith("application/wasm")) n = await WebAssembly.instantiateStreaming(r, t);
-          else {
-            const s = await r.arrayBuffer();
-            n = await WebAssembly.instantiate(s, t);
+          const response = await fetch(url);
+          const contentType = response.headers.get("Content-Type") || "";
+          if ("instantiateStreaming" in WebAssembly && contentType.startsWith("application/wasm")) {
+            result = await WebAssembly.instantiateStreaming(response, opts);
+          } else {
+            const buffer = await response.arrayBuffer();
+            result = await WebAssembly.instantiate(buffer, opts);
           }
         }
-        return n.instance.exports;
+        return result.instance.exports;
       };
-      let i;
-      function We(t) {
-        i = t;
+      let wasm$1;
+      function __wbg_set_wasm(val) {
+        wasm$1 = val;
       }
-      let S = 0, Y = null;
-      function z() {
-        return (Y === null || Y.byteLength === 0) && (Y = new Uint8Array(i.memory.buffer)), Y;
+      let WASM_VECTOR_LEN = 0;
+      let cachedUint8ArrayMemory0 = null;
+      function getUint8ArrayMemory0() {
+        if (cachedUint8ArrayMemory0 === null || cachedUint8ArrayMemory0.byteLength === 0) {
+          cachedUint8ArrayMemory0 = new Uint8Array(wasm$1.memory.buffer);
+        }
+        return cachedUint8ArrayMemory0;
       }
-      const $n = typeof TextEncoder > "u" ? (0, module.require)("util").TextEncoder : TextEncoder;
-      let K = new $n("utf-8");
-      const Un = typeof K.encodeInto == "function" ? function(t, e) {
-        return K.encodeInto(t, e);
-      } : function(t, e) {
-        const n = K.encode(t);
-        return e.set(n), {
-          read: t.length,
-          written: n.length
+      const lTextEncoder = typeof TextEncoder === "undefined" ? (0, module.require)("util").TextEncoder : TextEncoder;
+      let cachedTextEncoder = new lTextEncoder("utf-8");
+      const encodeString = typeof cachedTextEncoder.encodeInto === "function" ? function(arg, view) {
+        return cachedTextEncoder.encodeInto(arg, view);
+      } : function(arg, view) {
+        const buf = cachedTextEncoder.encode(arg);
+        view.set(buf);
+        return {
+          read: arg.length,
+          written: buf.length
         };
       };
-      function E(t, e, n) {
-        if (n === void 0) {
-          const _ = K.encode(t), g = e(_.length, 1) >>> 0;
-          return z().subarray(g, g + _.length).set(_), S = _.length, g;
+      function passStringToWasm0(arg, malloc, realloc) {
+        if (realloc === void 0) {
+          const buf = cachedTextEncoder.encode(arg);
+          const ptr2 = malloc(buf.length, 1) >>> 0;
+          getUint8ArrayMemory0().subarray(ptr2, ptr2 + buf.length).set(buf);
+          WASM_VECTOR_LEN = buf.length;
+          return ptr2;
         }
-        let r = t.length, o = e(r, 1) >>> 0;
-        const s = z();
-        let c = 0;
-        for (; c < r; c++) {
-          const _ = t.charCodeAt(c);
-          if (_ > 127) break;
-          s[o + c] = _;
+        let len = arg.length;
+        let ptr = malloc(len, 1) >>> 0;
+        const mem = getUint8ArrayMemory0();
+        let offset = 0;
+        for (; offset < len; offset++) {
+          const code = arg.charCodeAt(offset);
+          if (code > 127) break;
+          mem[ptr + offset] = code;
         }
-        if (c !== r) {
-          c !== 0 && (t = t.slice(c)), o = n(o, r, r = c + t.length * 3, 1) >>> 0;
-          const _ = z().subarray(o + c, o + r), g = Un(t, _);
-          c += g.written, o = n(o, r, c, 1) >>> 0;
+        if (offset !== len) {
+          if (offset !== 0) {
+            arg = arg.slice(offset);
+          }
+          ptr = realloc(ptr, len, len = offset + arg.length * 3, 1) >>> 0;
+          const view = getUint8ArrayMemory0().subarray(ptr + offset, ptr + len);
+          const ret = encodeString(arg, view);
+          offset += ret.written;
+          ptr = realloc(ptr, len, offset, 1) >>> 0;
         }
-        return S = c, o;
+        WASM_VECTOR_LEN = offset;
+        return ptr;
       }
-      let B = null;
-      function C() {
-        return (B === null || B.buffer.detached === true || B.buffer.detached === void 0 && B.buffer !== i.memory.buffer) && (B = new DataView(i.memory.buffer)), B;
+      let cachedDataViewMemory0 = null;
+      function getDataViewMemory0() {
+        if (cachedDataViewMemory0 === null || cachedDataViewMemory0.buffer.detached === true || cachedDataViewMemory0.buffer.detached === void 0 && cachedDataViewMemory0.buffer !== wasm$1.memory.buffer) {
+          cachedDataViewMemory0 = new DataView(wasm$1.memory.buffer);
+        }
+        return cachedDataViewMemory0;
       }
-      function p(t) {
-        const e = i.__externref_table_alloc();
-        return i.__wbindgen_export_4.set(e, t), e;
+      function addToExternrefTable0(obj) {
+        const idx = wasm$1.__externref_table_alloc();
+        wasm$1.__wbindgen_export_4.set(idx, obj);
+        return idx;
       }
-      function T(t, e) {
+      function handleError(f, args) {
         try {
-          return t.apply(this, e);
-        } catch (n) {
-          const r = p(n);
-          i.__wbindgen_exn_store(r);
+          return f.apply(this, args);
+        } catch (e) {
+          const idx = addToExternrefTable0(e);
+          wasm$1.__wbindgen_exn_store(idx);
         }
       }
-      const Nn = typeof TextDecoder > "u" ? (0, module.require)("util").TextDecoder : TextDecoder;
-      let Ve = new Nn("utf-8", {
+      const lTextDecoder = typeof TextDecoder === "undefined" ? (0, module.require)("util").TextDecoder : TextDecoder;
+      let cachedTextDecoder = new lTextDecoder("utf-8", {
         ignoreBOM: true,
         fatal: true
       });
-      Ve.decode();
-      function x(t, e) {
-        return t = t >>> 0, Ve.decode(z().subarray(t, t + e));
+      cachedTextDecoder.decode();
+      function getStringFromWasm0(ptr, len) {
+        ptr = ptr >>> 0;
+        return cachedTextDecoder.decode(getUint8ArrayMemory0().subarray(ptr, ptr + len));
       }
-      function Wn(t, e) {
-        return t = t >>> 0, z().subarray(t / 1, t / 1 + e);
+      function getArrayU8FromWasm0(ptr, len) {
+        ptr = ptr >>> 0;
+        return getUint8ArrayMemory0().subarray(ptr / 1, ptr / 1 + len);
       }
-      function ge(t) {
-        const e = typeof t;
-        if (e == "number" || e == "boolean" || t == null) return `${t}`;
-        if (e == "string") return `"${t}"`;
-        if (e == "symbol") {
-          const o = t.description;
-          return o == null ? "Symbol" : `Symbol(${o})`;
+      function debugString(val) {
+        const type = typeof val;
+        if (type == "number" || type == "boolean" || val == null) {
+          return `${val}`;
         }
-        if (e == "function") {
-          const o = t.name;
-          return typeof o == "string" && o.length > 0 ? `Function(${o})` : "Function";
+        if (type == "string") {
+          return `"${val}"`;
         }
-        if (Array.isArray(t)) {
-          const o = t.length;
-          let s = "[";
-          o > 0 && (s += ge(t[0]));
-          for (let c = 1; c < o; c++) s += ", " + ge(t[c]);
-          return s += "]", s;
+        if (type == "symbol") {
+          const description = val.description;
+          if (description == null) {
+            return "Symbol";
+          } else {
+            return `Symbol(${description})`;
+          }
         }
-        const n = /\[object ([^\]]+)\]/.exec(toString.call(t));
-        let r;
-        if (n && n.length > 1) r = n[1];
-        else return toString.call(t);
-        if (r == "Object") try {
-          return "Object(" + JSON.stringify(t) + ")";
-        } catch {
-          return "Object";
+        if (type == "function") {
+          const name = val.name;
+          if (typeof name == "string" && name.length > 0) {
+            return `Function(${name})`;
+          } else {
+            return "Function";
+          }
         }
-        return t instanceof Error ? `${t.name}: ${t.message}
-${t.stack}` : r;
+        if (Array.isArray(val)) {
+          const length = val.length;
+          let debug = "[";
+          if (length > 0) {
+            debug += debugString(val[0]);
+          }
+          for (let i = 1; i < length; i++) {
+            debug += ", " + debugString(val[i]);
+          }
+          debug += "]";
+          return debug;
+        }
+        const builtInMatches = /\[object ([^\]]+)\]/.exec(toString.call(val));
+        let className;
+        if (builtInMatches && builtInMatches.length > 1) {
+          className = builtInMatches[1];
+        } else {
+          return toString.call(val);
+        }
+        if (className == "Object") {
+          try {
+            return "Object(" + JSON.stringify(val) + ")";
+          } catch (_) {
+            return "Object";
+          }
+        }
+        if (val instanceof Error) {
+          return `${val.name}: ${val.message}
+${val.stack}`;
+        }
+        return className;
       }
-      function b(t) {
-        return t == null;
+      function isLikeNone(x) {
+        return x === void 0 || x === null;
       }
-      function l(t) {
-        const e = i.__wbindgen_export_4.get(t);
-        return i.__externref_table_dealloc(t), e;
+      function takeFromExternrefTable0(idx) {
+        const value = wasm$1.__wbindgen_export_4.get(idx);
+        wasm$1.__externref_table_dealloc(idx);
+        return value;
       }
-      function D(t, e) {
-        if (!(t instanceof e)) throw new Error(`expected instance of ${e.name}`);
+      function _assertClass(instance, klass) {
+        if (!(instance instanceof klass)) {
+          throw new Error(`expected instance of ${klass.name}`);
+        }
       }
-      function Vn(t) {
-        const e = i.create(t);
-        if (e[2]) throw l(e[1]);
-        return R.__wrap(e[0]);
+      function create$1(options) {
+        const ret = wasm$1.create(options);
+        if (ret[2]) {
+          throw takeFromExternrefTable0(ret[1]);
+        }
+        return Automerge.__wrap(ret[0]);
       }
-      function Yn(t, e) {
-        const n = i.load(t, e);
-        if (n[2]) throw l(n[1]);
-        return R.__wrap(n[0]);
+      function load$1(data, options) {
+        const ret = wasm$1.load(data, options);
+        if (ret[2]) {
+          throw takeFromExternrefTable0(ret[1]);
+        }
+        return Automerge.__wrap(ret[0]);
       }
-      function qn(t) {
-        const e = i.encodeChange(t);
-        if (e[2]) throw l(e[1]);
-        return l(e[0]);
+      function encodeChange$1(change2) {
+        const ret = wasm$1.encodeChange(change2);
+        if (ret[2]) {
+          throw takeFromExternrefTable0(ret[1]);
+        }
+        return takeFromExternrefTable0(ret[0]);
       }
-      function Jn(t) {
-        const e = i.decodeChange(t);
-        if (e[2]) throw l(e[1]);
-        return l(e[0]);
+      function decodeChange$2(change2) {
+        const ret = wasm$1.decodeChange(change2);
+        if (ret[2]) {
+          throw takeFromExternrefTable0(ret[1]);
+        }
+        return takeFromExternrefTable0(ret[0]);
       }
-      function Kn() {
-        const t = i.initSyncState();
-        return A.__wrap(t);
+      function initSyncState$1() {
+        const ret = wasm$1.initSyncState();
+        return SyncState.__wrap(ret);
       }
-      function Xn(t) {
-        const e = i.importSyncState(t);
-        if (e[2]) throw l(e[1]);
-        return A.__wrap(e[0]);
+      function importSyncState$1(state) {
+        const ret = wasm$1.importSyncState(state);
+        if (ret[2]) {
+          throw takeFromExternrefTable0(ret[1]);
+        }
+        return SyncState.__wrap(ret[0]);
       }
-      function Gn(t) {
-        return D(t, A), i.exportSyncState(t.__wbg_ptr);
+      function exportSyncState$1(state) {
+        _assertClass(state, SyncState);
+        const ret = wasm$1.exportSyncState(state.__wbg_ptr);
+        return ret;
       }
-      function Zn(t) {
-        const e = i.encodeSyncMessage(t);
-        if (e[2]) throw l(e[1]);
-        return l(e[0]);
+      function encodeSyncMessage$1(message) {
+        const ret = wasm$1.encodeSyncMessage(message);
+        if (ret[2]) {
+          throw takeFromExternrefTable0(ret[1]);
+        }
+        return takeFromExternrefTable0(ret[0]);
       }
-      function Qn(t) {
-        const e = i.decodeSyncMessage(t);
-        if (e[2]) throw l(e[1]);
-        return l(e[0]);
+      function decodeSyncMessage$1(msg) {
+        const ret = wasm$1.decodeSyncMessage(msg);
+        if (ret[2]) {
+          throw takeFromExternrefTable0(ret[1]);
+        }
+        return takeFromExternrefTable0(ret[0]);
       }
-      function er(t) {
-        return D(t, A), i.encodeSyncState(t.__wbg_ptr);
+      function encodeSyncState$1(state) {
+        _assertClass(state, SyncState);
+        const ret = wasm$1.encodeSyncState(state.__wbg_ptr);
+        return ret;
       }
-      function tr(t) {
-        const e = i.decodeSyncState(t);
-        if (e[2]) throw l(e[1]);
-        return A.__wrap(e[0]);
+      function decodeSyncState$1(data) {
+        const ret = wasm$1.decodeSyncState(data);
+        if (ret[2]) {
+          throw takeFromExternrefTable0(ret[1]);
+        }
+        return SyncState.__wrap(ret[0]);
       }
-      const Me = typeof FinalizationRegistry > "u" ? {
+      const AutomergeFinalization = typeof FinalizationRegistry === "undefined" ? {
         register: () => {
         },
         unregister: () => {
         }
-      } : new FinalizationRegistry((t) => i.__wbg_automerge_free(t >>> 0, 1));
-      class R {
-        static __wrap(e) {
-          e = e >>> 0;
-          const n = Object.create(R.prototype);
-          return n.__wbg_ptr = e, Me.register(n, n.__wbg_ptr, n), n;
+      } : new FinalizationRegistry((ptr) => wasm$1.__wbg_automerge_free(ptr >>> 0, 1));
+      class Automerge {
+        static __wrap(ptr) {
+          ptr = ptr >>> 0;
+          const obj = Object.create(Automerge.prototype);
+          obj.__wbg_ptr = ptr;
+          AutomergeFinalization.register(obj, obj.__wbg_ptr, obj);
+          return obj;
         }
         __destroy_into_raw() {
-          const e = this.__wbg_ptr;
-          return this.__wbg_ptr = 0, Me.unregister(this), e;
+          const ptr = this.__wbg_ptr;
+          this.__wbg_ptr = 0;
+          AutomergeFinalization.unregister(this);
+          return ptr;
         }
         free() {
-          const e = this.__destroy_into_raw();
-          i.__wbg_automerge_free(e, 0);
+          const ptr = this.__destroy_into_raw();
+          wasm$1.__wbg_automerge_free(ptr, 0);
         }
-        static new(e) {
-          var n = b(e) ? 0 : E(e, i.__wbindgen_malloc, i.__wbindgen_realloc), r = S;
-          const o = i.automerge_new(n, r);
-          if (o[2]) throw l(o[1]);
-          return R.__wrap(o[0]);
+        static new(actor) {
+          var ptr0 = isLikeNone(actor) ? 0 : passStringToWasm0(actor, wasm$1.__wbindgen_malloc, wasm$1.__wbindgen_realloc);
+          var len0 = WASM_VECTOR_LEN;
+          const ret = wasm$1.automerge_new(ptr0, len0);
+          if (ret[2]) {
+            throw takeFromExternrefTable0(ret[1]);
+          }
+          return Automerge.__wrap(ret[0]);
         }
-        clone(e) {
-          var n = b(e) ? 0 : E(e, i.__wbindgen_malloc, i.__wbindgen_realloc), r = S;
-          const o = i.automerge_clone(this.__wbg_ptr, n, r);
-          if (o[2]) throw l(o[1]);
-          return R.__wrap(o[0]);
+        clone(actor) {
+          var ptr0 = isLikeNone(actor) ? 0 : passStringToWasm0(actor, wasm$1.__wbindgen_malloc, wasm$1.__wbindgen_realloc);
+          var len0 = WASM_VECTOR_LEN;
+          const ret = wasm$1.automerge_clone(this.__wbg_ptr, ptr0, len0);
+          if (ret[2]) {
+            throw takeFromExternrefTable0(ret[1]);
+          }
+          return Automerge.__wrap(ret[0]);
         }
-        fork(e, n) {
-          var r = b(e) ? 0 : E(e, i.__wbindgen_malloc, i.__wbindgen_realloc), o = S;
-          const s = i.automerge_fork(this.__wbg_ptr, r, o, n);
-          if (s[2]) throw l(s[1]);
-          return R.__wrap(s[0]);
+        fork(actor, heads) {
+          var ptr0 = isLikeNone(actor) ? 0 : passStringToWasm0(actor, wasm$1.__wbindgen_malloc, wasm$1.__wbindgen_realloc);
+          var len0 = WASM_VECTOR_LEN;
+          const ret = wasm$1.automerge_fork(this.__wbg_ptr, ptr0, len0, heads);
+          if (ret[2]) {
+            throw takeFromExternrefTable0(ret[1]);
+          }
+          return Automerge.__wrap(ret[0]);
         }
         pendingOps() {
-          return i.automerge_pendingOps(this.__wbg_ptr);
+          const ret = wasm$1.automerge_pendingOps(this.__wbg_ptr);
+          return ret;
         }
-        commit(e, n) {
-          var r = b(e) ? 0 : E(e, i.__wbindgen_malloc, i.__wbindgen_realloc), o = S;
-          return i.automerge_commit(this.__wbg_ptr, r, o, !b(n), b(n) ? 0 : n);
+        commit(message, time) {
+          var ptr0 = isLikeNone(message) ? 0 : passStringToWasm0(message, wasm$1.__wbindgen_malloc, wasm$1.__wbindgen_realloc);
+          var len0 = WASM_VECTOR_LEN;
+          const ret = wasm$1.automerge_commit(this.__wbg_ptr, ptr0, len0, !isLikeNone(time), isLikeNone(time) ? 0 : time);
+          return ret;
         }
-        merge(e) {
-          D(e, R);
-          const n = i.automerge_merge(this.__wbg_ptr, e.__wbg_ptr);
-          if (n[2]) throw l(n[1]);
-          return l(n[0]);
+        merge(other) {
+          _assertClass(other, Automerge);
+          const ret = wasm$1.automerge_merge(this.__wbg_ptr, other.__wbg_ptr);
+          if (ret[2]) {
+            throw takeFromExternrefTable0(ret[1]);
+          }
+          return takeFromExternrefTable0(ret[0]);
         }
         rollback() {
-          return i.automerge_rollback(this.__wbg_ptr);
+          const ret = wasm$1.automerge_rollback(this.__wbg_ptr);
+          return ret;
         }
-        keys(e, n) {
-          const r = i.automerge_keys(this.__wbg_ptr, e, b(n) ? 0 : p(n));
-          if (r[2]) throw l(r[1]);
-          return l(r[0]);
+        keys(obj, heads) {
+          const ret = wasm$1.automerge_keys(this.__wbg_ptr, obj, isLikeNone(heads) ? 0 : addToExternrefTable0(heads));
+          if (ret[2]) {
+            throw takeFromExternrefTable0(ret[1]);
+          }
+          return takeFromExternrefTable0(ret[0]);
         }
-        text(e, n) {
-          let r, o;
+        text(obj, heads) {
+          let deferred2_0;
+          let deferred2_1;
           try {
-            const _ = i.automerge_text(this.__wbg_ptr, e, b(n) ? 0 : p(n));
-            var s = _[0], c = _[1];
-            if (_[3]) throw s = 0, c = 0, l(_[2]);
-            return r = s, o = c, x(s, c);
+            const ret = wasm$1.automerge_text(this.__wbg_ptr, obj, isLikeNone(heads) ? 0 : addToExternrefTable0(heads));
+            var ptr1 = ret[0];
+            var len1 = ret[1];
+            if (ret[3]) {
+              ptr1 = 0;
+              len1 = 0;
+              throw takeFromExternrefTable0(ret[2]);
+            }
+            deferred2_0 = ptr1;
+            deferred2_1 = len1;
+            return getStringFromWasm0(ptr1, len1);
           } finally {
-            i.__wbindgen_free(r, o, 1);
+            wasm$1.__wbindgen_free(deferred2_0, deferred2_1, 1);
           }
         }
-        spans(e, n) {
-          const r = i.automerge_spans(this.__wbg_ptr, e, b(n) ? 0 : p(n));
-          if (r[2]) throw l(r[1]);
-          return l(r[0]);
+        spans(obj, heads) {
+          const ret = wasm$1.automerge_spans(this.__wbg_ptr, obj, isLikeNone(heads) ? 0 : addToExternrefTable0(heads));
+          if (ret[2]) {
+            throw takeFromExternrefTable0(ret[1]);
+          }
+          return takeFromExternrefTable0(ret[0]);
         }
-        splice(e, n, r, o) {
-          const s = i.automerge_splice(this.__wbg_ptr, e, n, r, o);
-          if (s[1]) throw l(s[0]);
-        }
-        updateText(e, n) {
-          const r = i.automerge_updateText(this.__wbg_ptr, e, n);
-          if (r[1]) throw l(r[0]);
-        }
-        updateSpans(e, n, r) {
-          const o = i.automerge_updateSpans(this.__wbg_ptr, e, n, r);
-          if (o[1]) throw l(o[0]);
-        }
-        push(e, n, r) {
-          const o = i.automerge_push(this.__wbg_ptr, e, n, r);
-          if (o[1]) throw l(o[0]);
-        }
-        pushObject(e, n) {
-          let r, o;
-          try {
-            const _ = i.automerge_pushObject(this.__wbg_ptr, e, n);
-            var s = _[0], c = _[1];
-            if (_[3]) throw s = 0, c = 0, l(_[2]);
-            return r = s, o = c, x(s, c);
-          } finally {
-            i.__wbindgen_free(r, o, 1);
+        splice(obj, start, delete_count, text) {
+          const ret = wasm$1.automerge_splice(this.__wbg_ptr, obj, start, delete_count, text);
+          if (ret[1]) {
+            throw takeFromExternrefTable0(ret[0]);
           }
         }
-        insert(e, n, r, o) {
-          const s = i.automerge_insert(this.__wbg_ptr, e, n, r, o);
-          if (s[1]) throw l(s[0]);
-        }
-        splitBlock(e, n, r) {
-          const o = i.automerge_splitBlock(this.__wbg_ptr, e, n, r);
-          if (o[1]) throw l(o[0]);
-        }
-        joinBlock(e, n) {
-          const r = i.automerge_joinBlock(this.__wbg_ptr, e, n);
-          if (r[1]) throw l(r[0]);
-        }
-        updateBlock(e, n, r) {
-          const o = i.automerge_updateBlock(this.__wbg_ptr, e, n, r);
-          if (o[1]) throw l(o[0]);
-        }
-        getBlock(e, n, r) {
-          const o = i.automerge_getBlock(this.__wbg_ptr, e, n, b(r) ? 0 : p(r));
-          if (o[2]) throw l(o[1]);
-          return l(o[0]);
-        }
-        insertObject(e, n, r) {
-          let o, s;
-          try {
-            const g = i.automerge_insertObject(this.__wbg_ptr, e, n, r);
-            var c = g[0], _ = g[1];
-            if (g[3]) throw c = 0, _ = 0, l(g[2]);
-            return o = c, s = _, x(c, _);
-          } finally {
-            i.__wbindgen_free(o, s, 1);
+        updateText(obj, new_text) {
+          const ret = wasm$1.automerge_updateText(this.__wbg_ptr, obj, new_text);
+          if (ret[1]) {
+            throw takeFromExternrefTable0(ret[0]);
           }
         }
-        put(e, n, r, o) {
-          const s = i.automerge_put(this.__wbg_ptr, e, n, r, o);
-          if (s[1]) throw l(s[0]);
+        updateSpans(obj, args, config) {
+          const ret = wasm$1.automerge_updateSpans(this.__wbg_ptr, obj, args, config);
+          if (ret[1]) {
+            throw takeFromExternrefTable0(ret[0]);
+          }
         }
-        putObject(e, n, r) {
-          const o = i.automerge_putObject(this.__wbg_ptr, e, n, r);
-          if (o[2]) throw l(o[1]);
-          return l(o[0]);
+        push(obj, value, datatype) {
+          const ret = wasm$1.automerge_push(this.__wbg_ptr, obj, value, datatype);
+          if (ret[1]) {
+            throw takeFromExternrefTable0(ret[0]);
+          }
         }
-        increment(e, n, r) {
-          const o = i.automerge_increment(this.__wbg_ptr, e, n, r);
-          if (o[1]) throw l(o[0]);
+        pushObject(obj, value) {
+          let deferred2_0;
+          let deferred2_1;
+          try {
+            const ret = wasm$1.automerge_pushObject(this.__wbg_ptr, obj, value);
+            var ptr1 = ret[0];
+            var len1 = ret[1];
+            if (ret[3]) {
+              ptr1 = 0;
+              len1 = 0;
+              throw takeFromExternrefTable0(ret[2]);
+            }
+            deferred2_0 = ptr1;
+            deferred2_1 = len1;
+            return getStringFromWasm0(ptr1, len1);
+          } finally {
+            wasm$1.__wbindgen_free(deferred2_0, deferred2_1, 1);
+          }
         }
-        get(e, n, r) {
-          const o = i.automerge_get(this.__wbg_ptr, e, n, b(r) ? 0 : p(r));
-          if (o[2]) throw l(o[1]);
-          return l(o[0]);
+        insert(obj, index, value, datatype) {
+          const ret = wasm$1.automerge_insert(this.__wbg_ptr, obj, index, value, datatype);
+          if (ret[1]) {
+            throw takeFromExternrefTable0(ret[0]);
+          }
         }
-        getWithType(e, n, r) {
-          const o = i.automerge_getWithType(this.__wbg_ptr, e, n, b(r) ? 0 : p(r));
-          if (o[2]) throw l(o[1]);
-          return l(o[0]);
+        splitBlock(obj, index, block) {
+          const ret = wasm$1.automerge_splitBlock(this.__wbg_ptr, obj, index, block);
+          if (ret[1]) {
+            throw takeFromExternrefTable0(ret[0]);
+          }
         }
-        objInfo(e, n) {
-          const r = i.automerge_objInfo(this.__wbg_ptr, e, b(n) ? 0 : p(n));
-          if (r[2]) throw l(r[1]);
-          return l(r[0]);
+        joinBlock(obj, index) {
+          const ret = wasm$1.automerge_joinBlock(this.__wbg_ptr, obj, index);
+          if (ret[1]) {
+            throw takeFromExternrefTable0(ret[0]);
+          }
         }
-        getAll(e, n, r) {
-          const o = i.automerge_getAll(this.__wbg_ptr, e, n, b(r) ? 0 : p(r));
-          if (o[2]) throw l(o[1]);
-          return l(o[0]);
+        updateBlock(obj, index, block) {
+          const ret = wasm$1.automerge_updateBlock(this.__wbg_ptr, obj, index, block);
+          if (ret[1]) {
+            throw takeFromExternrefTable0(ret[0]);
+          }
         }
-        enableFreeze(e) {
-          const n = i.automerge_enableFreeze(this.__wbg_ptr, e);
-          if (n[2]) throw l(n[1]);
-          return n[0] !== 0;
+        getBlock(text, index, heads) {
+          const ret = wasm$1.automerge_getBlock(this.__wbg_ptr, text, index, isLikeNone(heads) ? 0 : addToExternrefTable0(heads));
+          if (ret[2]) {
+            throw takeFromExternrefTable0(ret[1]);
+          }
+          return takeFromExternrefTable0(ret[0]);
         }
-        registerDatatype(e, n, r) {
-          const o = i.automerge_registerDatatype(this.__wbg_ptr, e, n, r);
-          if (o[1]) throw l(o[0]);
+        insertObject(obj, index, value) {
+          let deferred2_0;
+          let deferred2_1;
+          try {
+            const ret = wasm$1.automerge_insertObject(this.__wbg_ptr, obj, index, value);
+            var ptr1 = ret[0];
+            var len1 = ret[1];
+            if (ret[3]) {
+              ptr1 = 0;
+              len1 = 0;
+              throw takeFromExternrefTable0(ret[2]);
+            }
+            deferred2_0 = ptr1;
+            deferred2_1 = len1;
+            return getStringFromWasm0(ptr1, len1);
+          } finally {
+            wasm$1.__wbindgen_free(deferred2_0, deferred2_1, 1);
+          }
         }
-        applyPatches(e, n) {
-          const r = i.automerge_applyPatches(this.__wbg_ptr, e, n);
-          if (r[2]) throw l(r[1]);
-          return l(r[0]);
+        put(obj, prop, value, datatype) {
+          const ret = wasm$1.automerge_put(this.__wbg_ptr, obj, prop, value, datatype);
+          if (ret[1]) {
+            throw takeFromExternrefTable0(ret[0]);
+          }
         }
-        applyAndReturnPatches(e, n) {
-          const r = i.automerge_applyAndReturnPatches(this.__wbg_ptr, e, n);
-          if (r[2]) throw l(r[1]);
-          return l(r[0]);
+        putObject(obj, prop, value) {
+          const ret = wasm$1.automerge_putObject(this.__wbg_ptr, obj, prop, value);
+          if (ret[2]) {
+            throw takeFromExternrefTable0(ret[1]);
+          }
+          return takeFromExternrefTable0(ret[0]);
+        }
+        increment(obj, prop, value) {
+          const ret = wasm$1.automerge_increment(this.__wbg_ptr, obj, prop, value);
+          if (ret[1]) {
+            throw takeFromExternrefTable0(ret[0]);
+          }
+        }
+        get(obj, prop, heads) {
+          const ret = wasm$1.automerge_get(this.__wbg_ptr, obj, prop, isLikeNone(heads) ? 0 : addToExternrefTable0(heads));
+          if (ret[2]) {
+            throw takeFromExternrefTable0(ret[1]);
+          }
+          return takeFromExternrefTable0(ret[0]);
+        }
+        getWithType(obj, prop, heads) {
+          const ret = wasm$1.automerge_getWithType(this.__wbg_ptr, obj, prop, isLikeNone(heads) ? 0 : addToExternrefTable0(heads));
+          if (ret[2]) {
+            throw takeFromExternrefTable0(ret[1]);
+          }
+          return takeFromExternrefTable0(ret[0]);
+        }
+        objInfo(obj, heads) {
+          const ret = wasm$1.automerge_objInfo(this.__wbg_ptr, obj, isLikeNone(heads) ? 0 : addToExternrefTable0(heads));
+          if (ret[2]) {
+            throw takeFromExternrefTable0(ret[1]);
+          }
+          return takeFromExternrefTable0(ret[0]);
+        }
+        getAll(obj, arg, heads) {
+          const ret = wasm$1.automerge_getAll(this.__wbg_ptr, obj, arg, isLikeNone(heads) ? 0 : addToExternrefTable0(heads));
+          if (ret[2]) {
+            throw takeFromExternrefTable0(ret[1]);
+          }
+          return takeFromExternrefTable0(ret[0]);
+        }
+        enableFreeze(enable) {
+          const ret = wasm$1.automerge_enableFreeze(this.__wbg_ptr, enable);
+          if (ret[2]) {
+            throw takeFromExternrefTable0(ret[1]);
+          }
+          return ret[0] !== 0;
+        }
+        registerDatatype(datatype, construct, deconstruct) {
+          const ret = wasm$1.automerge_registerDatatype(this.__wbg_ptr, datatype, construct, deconstruct);
+          if (ret[1]) {
+            throw takeFromExternrefTable0(ret[0]);
+          }
+        }
+        applyPatches(object, meta) {
+          const ret = wasm$1.automerge_applyPatches(this.__wbg_ptr, object, meta);
+          if (ret[2]) {
+            throw takeFromExternrefTable0(ret[1]);
+          }
+          return takeFromExternrefTable0(ret[0]);
+        }
+        applyAndReturnPatches(object, meta) {
+          const ret = wasm$1.automerge_applyAndReturnPatches(this.__wbg_ptr, object, meta);
+          if (ret[2]) {
+            throw takeFromExternrefTable0(ret[1]);
+          }
+          return takeFromExternrefTable0(ret[0]);
         }
         diffIncremental() {
-          const e = i.automerge_diffIncremental(this.__wbg_ptr);
-          if (e[2]) throw l(e[1]);
-          return l(e[0]);
+          const ret = wasm$1.automerge_diffIncremental(this.__wbg_ptr);
+          if (ret[2]) {
+            throw takeFromExternrefTable0(ret[1]);
+          }
+          return takeFromExternrefTable0(ret[0]);
         }
         updateDiffCursor() {
-          i.automerge_updateDiffCursor(this.__wbg_ptr);
+          wasm$1.automerge_updateDiffCursor(this.__wbg_ptr);
         }
         resetDiffCursor() {
-          i.automerge_resetDiffCursor(this.__wbg_ptr);
+          wasm$1.automerge_resetDiffCursor(this.__wbg_ptr);
         }
-        diff(e, n) {
-          const r = i.automerge_diff(this.__wbg_ptr, e, n);
-          if (r[2]) throw l(r[1]);
-          return l(r[0]);
+        diff(before, after) {
+          const ret = wasm$1.automerge_diff(this.__wbg_ptr, before, after);
+          if (ret[2]) {
+            throw takeFromExternrefTable0(ret[1]);
+          }
+          return takeFromExternrefTable0(ret[0]);
         }
-        isolate(e) {
-          const n = i.automerge_isolate(this.__wbg_ptr, e);
-          if (n[1]) throw l(n[0]);
+        isolate(heads) {
+          const ret = wasm$1.automerge_isolate(this.__wbg_ptr, heads);
+          if (ret[1]) {
+            throw takeFromExternrefTable0(ret[0]);
+          }
         }
         integrate() {
-          i.automerge_integrate(this.__wbg_ptr);
+          wasm$1.automerge_integrate(this.__wbg_ptr);
         }
-        length(e, n) {
-          const r = i.automerge_length(this.__wbg_ptr, e, b(n) ? 0 : p(n));
-          if (r[2]) throw l(r[1]);
-          return r[0];
+        length(obj, heads) {
+          const ret = wasm$1.automerge_length(this.__wbg_ptr, obj, isLikeNone(heads) ? 0 : addToExternrefTable0(heads));
+          if (ret[2]) {
+            throw takeFromExternrefTable0(ret[1]);
+          }
+          return ret[0];
         }
-        delete(e, n) {
-          const r = i.automerge_delete(this.__wbg_ptr, e, n);
-          if (r[1]) throw l(r[0]);
+        delete(obj, prop) {
+          const ret = wasm$1.automerge_delete(this.__wbg_ptr, obj, prop);
+          if (ret[1]) {
+            throw takeFromExternrefTable0(ret[0]);
+          }
         }
         save() {
-          return i.automerge_save(this.__wbg_ptr);
+          const ret = wasm$1.automerge_save(this.__wbg_ptr);
+          return ret;
         }
         saveIncremental() {
-          return i.automerge_saveIncremental(this.__wbg_ptr);
+          const ret = wasm$1.automerge_saveIncremental(this.__wbg_ptr);
+          return ret;
         }
-        saveSince(e) {
-          const n = i.automerge_saveSince(this.__wbg_ptr, e);
-          if (n[2]) throw l(n[1]);
-          return l(n[0]);
+        saveSince(heads) {
+          const ret = wasm$1.automerge_saveSince(this.__wbg_ptr, heads);
+          if (ret[2]) {
+            throw takeFromExternrefTable0(ret[1]);
+          }
+          return takeFromExternrefTable0(ret[0]);
         }
         saveNoCompress() {
-          return i.automerge_saveNoCompress(this.__wbg_ptr);
+          const ret = wasm$1.automerge_saveNoCompress(this.__wbg_ptr);
+          return ret;
         }
         saveAndVerify() {
-          const e = i.automerge_saveAndVerify(this.__wbg_ptr);
-          if (e[2]) throw l(e[1]);
-          return l(e[0]);
+          const ret = wasm$1.automerge_saveAndVerify(this.__wbg_ptr);
+          if (ret[2]) {
+            throw takeFromExternrefTable0(ret[1]);
+          }
+          return takeFromExternrefTable0(ret[0]);
         }
-        loadIncremental(e) {
-          const n = i.automerge_loadIncremental(this.__wbg_ptr, e);
-          if (n[2]) throw l(n[1]);
-          return n[0];
+        loadIncremental(data) {
+          const ret = wasm$1.automerge_loadIncremental(this.__wbg_ptr, data);
+          if (ret[2]) {
+            throw takeFromExternrefTable0(ret[1]);
+          }
+          return ret[0];
         }
-        applyChanges(e) {
-          const n = i.automerge_applyChanges(this.__wbg_ptr, e);
-          if (n[1]) throw l(n[0]);
+        applyChanges(changes) {
+          const ret = wasm$1.automerge_applyChanges(this.__wbg_ptr, changes);
+          if (ret[1]) {
+            throw takeFromExternrefTable0(ret[0]);
+          }
         }
-        getChanges(e) {
-          const n = i.automerge_getChanges(this.__wbg_ptr, e);
-          if (n[2]) throw l(n[1]);
-          return l(n[0]);
+        getChanges(have_deps) {
+          const ret = wasm$1.automerge_getChanges(this.__wbg_ptr, have_deps);
+          if (ret[2]) {
+            throw takeFromExternrefTable0(ret[1]);
+          }
+          return takeFromExternrefTable0(ret[0]);
         }
-        getChangesMeta(e) {
-          const n = i.automerge_getChangesMeta(this.__wbg_ptr, e);
-          if (n[2]) throw l(n[1]);
-          return l(n[0]);
+        getChangesMeta(have_deps) {
+          const ret = wasm$1.automerge_getChangesMeta(this.__wbg_ptr, have_deps);
+          if (ret[2]) {
+            throw takeFromExternrefTable0(ret[1]);
+          }
+          return takeFromExternrefTable0(ret[0]);
         }
-        getChangeByHash(e) {
-          const n = i.automerge_getChangeByHash(this.__wbg_ptr, e);
-          if (n[2]) throw l(n[1]);
-          return l(n[0]);
+        getChangeByHash(hash) {
+          const ret = wasm$1.automerge_getChangeByHash(this.__wbg_ptr, hash);
+          if (ret[2]) {
+            throw takeFromExternrefTable0(ret[1]);
+          }
+          return takeFromExternrefTable0(ret[0]);
         }
-        getChangeMetaByHash(e) {
-          const n = i.automerge_getChangeMetaByHash(this.__wbg_ptr, e);
-          if (n[2]) throw l(n[1]);
-          return l(n[0]);
+        getChangeMetaByHash(hash) {
+          const ret = wasm$1.automerge_getChangeMetaByHash(this.__wbg_ptr, hash);
+          if (ret[2]) {
+            throw takeFromExternrefTable0(ret[1]);
+          }
+          return takeFromExternrefTable0(ret[0]);
         }
-        getDecodedChangeByHash(e) {
-          const n = i.automerge_getDecodedChangeByHash(this.__wbg_ptr, e);
-          if (n[2]) throw l(n[1]);
-          return l(n[0]);
+        getDecodedChangeByHash(hash) {
+          const ret = wasm$1.automerge_getDecodedChangeByHash(this.__wbg_ptr, hash);
+          if (ret[2]) {
+            throw takeFromExternrefTable0(ret[1]);
+          }
+          return takeFromExternrefTable0(ret[0]);
         }
-        getChangesAdded(e) {
-          return D(e, R), i.automerge_getChangesAdded(this.__wbg_ptr, e.__wbg_ptr);
+        getChangesAdded(other) {
+          _assertClass(other, Automerge);
+          const ret = wasm$1.automerge_getChangesAdded(this.__wbg_ptr, other.__wbg_ptr);
+          return ret;
         }
         getHeads() {
-          return i.automerge_getHeads(this.__wbg_ptr);
+          const ret = wasm$1.automerge_getHeads(this.__wbg_ptr);
+          return ret;
         }
         getActorId() {
-          let e, n;
+          let deferred1_0;
+          let deferred1_1;
           try {
-            const r = i.automerge_getActorId(this.__wbg_ptr);
-            return e = r[0], n = r[1], x(r[0], r[1]);
+            const ret = wasm$1.automerge_getActorId(this.__wbg_ptr);
+            deferred1_0 = ret[0];
+            deferred1_1 = ret[1];
+            return getStringFromWasm0(ret[0], ret[1]);
           } finally {
-            i.__wbindgen_free(e, n, 1);
+            wasm$1.__wbindgen_free(deferred1_0, deferred1_1, 1);
           }
         }
         getLastLocalChange() {
-          return i.automerge_getLastLocalChange(this.__wbg_ptr);
+          const ret = wasm$1.automerge_getLastLocalChange(this.__wbg_ptr);
+          return ret;
         }
         dump() {
-          i.automerge_dump(this.__wbg_ptr);
+          wasm$1.automerge_dump(this.__wbg_ptr);
         }
-        getMissingDeps(e) {
-          const n = i.automerge_getMissingDeps(this.__wbg_ptr, b(e) ? 0 : p(e));
-          if (n[2]) throw l(n[1]);
-          return l(n[0]);
+        getMissingDeps(heads) {
+          const ret = wasm$1.automerge_getMissingDeps(this.__wbg_ptr, isLikeNone(heads) ? 0 : addToExternrefTable0(heads));
+          if (ret[2]) {
+            throw takeFromExternrefTable0(ret[1]);
+          }
+          return takeFromExternrefTable0(ret[0]);
         }
-        receiveSyncMessage(e, n) {
-          D(e, A);
-          const r = i.automerge_receiveSyncMessage(this.__wbg_ptr, e.__wbg_ptr, n);
-          if (r[1]) throw l(r[0]);
-        }
-        generateSyncMessage(e) {
-          return D(e, A), i.automerge_generateSyncMessage(this.__wbg_ptr, e.__wbg_ptr);
-        }
-        toJS(e) {
-          const n = i.automerge_toJS(this.__wbg_ptr, e);
-          if (n[2]) throw l(n[1]);
-          return l(n[0]);
-        }
-        materialize(e, n, r) {
-          const o = i.automerge_materialize(this.__wbg_ptr, e, b(n) ? 0 : p(n), r);
-          if (o[2]) throw l(o[1]);
-          return l(o[0]);
-        }
-        getCursor(e, n, r, o) {
-          let s, c;
-          try {
-            const d = i.automerge_getCursor(this.__wbg_ptr, e, n, b(r) ? 0 : p(r), o);
-            var _ = d[0], g = d[1];
-            if (d[3]) throw _ = 0, g = 0, l(d[2]);
-            return s = _, c = g, x(_, g);
-          } finally {
-            i.__wbindgen_free(s, c, 1);
+        receiveSyncMessage(state, message) {
+          _assertClass(state, SyncState);
+          const ret = wasm$1.automerge_receiveSyncMessage(this.__wbg_ptr, state.__wbg_ptr, message);
+          if (ret[1]) {
+            throw takeFromExternrefTable0(ret[0]);
           }
         }
-        getCursorPosition(e, n, r) {
-          const o = i.automerge_getCursorPosition(this.__wbg_ptr, e, n, b(r) ? 0 : p(r));
-          if (o[2]) throw l(o[1]);
-          return o[0];
+        generateSyncMessage(state) {
+          _assertClass(state, SyncState);
+          const ret = wasm$1.automerge_generateSyncMessage(this.__wbg_ptr, state.__wbg_ptr);
+          return ret;
         }
-        emptyChange(e, n) {
-          var r = b(e) ? 0 : E(e, i.__wbindgen_malloc, i.__wbindgen_realloc), o = S;
-          return i.automerge_emptyChange(this.__wbg_ptr, r, o, !b(n), b(n) ? 0 : n);
+        toJS(meta) {
+          const ret = wasm$1.automerge_toJS(this.__wbg_ptr, meta);
+          if (ret[2]) {
+            throw takeFromExternrefTable0(ret[1]);
+          }
+          return takeFromExternrefTable0(ret[0]);
         }
-        mark(e, n, r, o, s) {
-          const c = i.automerge_mark(this.__wbg_ptr, e, n, r, o, s);
-          if (c[1]) throw l(c[0]);
+        materialize(obj, heads, meta) {
+          const ret = wasm$1.automerge_materialize(this.__wbg_ptr, obj, isLikeNone(heads) ? 0 : addToExternrefTable0(heads), meta);
+          if (ret[2]) {
+            throw takeFromExternrefTable0(ret[1]);
+          }
+          return takeFromExternrefTable0(ret[0]);
         }
-        unmark(e, n, r) {
-          const o = i.automerge_unmark(this.__wbg_ptr, e, n, r);
-          if (o[1]) throw l(o[0]);
+        getCursor(obj, position, heads, move_cursor) {
+          let deferred2_0;
+          let deferred2_1;
+          try {
+            const ret = wasm$1.automerge_getCursor(this.__wbg_ptr, obj, position, isLikeNone(heads) ? 0 : addToExternrefTable0(heads), move_cursor);
+            var ptr1 = ret[0];
+            var len1 = ret[1];
+            if (ret[3]) {
+              ptr1 = 0;
+              len1 = 0;
+              throw takeFromExternrefTable0(ret[2]);
+            }
+            deferred2_0 = ptr1;
+            deferred2_1 = len1;
+            return getStringFromWasm0(ptr1, len1);
+          } finally {
+            wasm$1.__wbindgen_free(deferred2_0, deferred2_1, 1);
+          }
         }
-        marks(e, n) {
-          const r = i.automerge_marks(this.__wbg_ptr, e, b(n) ? 0 : p(n));
-          if (r[2]) throw l(r[1]);
-          return l(r[0]);
+        getCursorPosition(obj, cursor, heads) {
+          const ret = wasm$1.automerge_getCursorPosition(this.__wbg_ptr, obj, cursor, isLikeNone(heads) ? 0 : addToExternrefTable0(heads));
+          if (ret[2]) {
+            throw takeFromExternrefTable0(ret[1]);
+          }
+          return ret[0];
         }
-        marksAt(e, n, r) {
-          const o = i.automerge_marksAt(this.__wbg_ptr, e, n, b(r) ? 0 : p(r));
-          if (o[2]) throw l(o[1]);
-          return l(o[0]);
+        emptyChange(message, time) {
+          var ptr0 = isLikeNone(message) ? 0 : passStringToWasm0(message, wasm$1.__wbindgen_malloc, wasm$1.__wbindgen_realloc);
+          var len0 = WASM_VECTOR_LEN;
+          const ret = wasm$1.automerge_emptyChange(this.__wbg_ptr, ptr0, len0, !isLikeNone(time), isLikeNone(time) ? 0 : time);
+          return ret;
         }
-        hasOurChanges(e) {
-          return D(e, A), i.automerge_hasOurChanges(this.__wbg_ptr, e.__wbg_ptr) !== 0;
+        mark(obj, range, name, value, datatype) {
+          const ret = wasm$1.automerge_mark(this.__wbg_ptr, obj, range, name, value, datatype);
+          if (ret[1]) {
+            throw takeFromExternrefTable0(ret[0]);
+          }
+        }
+        unmark(obj, range, name) {
+          const ret = wasm$1.automerge_unmark(this.__wbg_ptr, obj, range, name);
+          if (ret[1]) {
+            throw takeFromExternrefTable0(ret[0]);
+          }
+        }
+        marks(obj, heads) {
+          const ret = wasm$1.automerge_marks(this.__wbg_ptr, obj, isLikeNone(heads) ? 0 : addToExternrefTable0(heads));
+          if (ret[2]) {
+            throw takeFromExternrefTable0(ret[1]);
+          }
+          return takeFromExternrefTable0(ret[0]);
+        }
+        marksAt(obj, index, heads) {
+          const ret = wasm$1.automerge_marksAt(this.__wbg_ptr, obj, index, isLikeNone(heads) ? 0 : addToExternrefTable0(heads));
+          if (ret[2]) {
+            throw takeFromExternrefTable0(ret[1]);
+          }
+          return takeFromExternrefTable0(ret[0]);
+        }
+        hasOurChanges(state) {
+          _assertClass(state, SyncState);
+          const ret = wasm$1.automerge_hasOurChanges(this.__wbg_ptr, state.__wbg_ptr);
+          return ret !== 0;
         }
         topoHistoryTraversal() {
-          return i.automerge_topoHistoryTraversal(this.__wbg_ptr);
+          const ret = wasm$1.automerge_topoHistoryTraversal(this.__wbg_ptr);
+          return ret;
         }
         stats() {
-          return i.automerge_stats(this.__wbg_ptr);
+          const ret = wasm$1.automerge_stats(this.__wbg_ptr);
+          return ret;
         }
       }
-      const ke = typeof FinalizationRegistry > "u" ? {
+      const SyncStateFinalization = typeof FinalizationRegistry === "undefined" ? {
         register: () => {
         },
         unregister: () => {
         }
-      } : new FinalizationRegistry((t) => i.__wbg_syncstate_free(t >>> 0, 1));
-      class A {
-        static __wrap(e) {
-          e = e >>> 0;
-          const n = Object.create(A.prototype);
-          return n.__wbg_ptr = e, ke.register(n, n.__wbg_ptr, n), n;
+      } : new FinalizationRegistry((ptr) => wasm$1.__wbg_syncstate_free(ptr >>> 0, 1));
+      class SyncState {
+        static __wrap(ptr) {
+          ptr = ptr >>> 0;
+          const obj = Object.create(SyncState.prototype);
+          obj.__wbg_ptr = ptr;
+          SyncStateFinalization.register(obj, obj.__wbg_ptr, obj);
+          return obj;
         }
         __destroy_into_raw() {
-          const e = this.__wbg_ptr;
-          return this.__wbg_ptr = 0, ke.unregister(this), e;
+          const ptr = this.__wbg_ptr;
+          this.__wbg_ptr = 0;
+          SyncStateFinalization.unregister(this);
+          return ptr;
         }
         free() {
-          const e = this.__destroy_into_raw();
-          i.__wbg_syncstate_free(e, 0);
+          const ptr = this.__destroy_into_raw();
+          wasm$1.__wbg_syncstate_free(ptr, 0);
         }
         get sharedHeads() {
-          return i.syncstate_sharedHeads(this.__wbg_ptr);
+          const ret = wasm$1.syncstate_sharedHeads(this.__wbg_ptr);
+          return ret;
         }
         get lastSentHeads() {
-          return i.syncstate_lastSentHeads(this.__wbg_ptr);
+          const ret = wasm$1.syncstate_lastSentHeads(this.__wbg_ptr);
+          return ret;
         }
-        set lastSentHeads(e) {
-          const n = i.syncstate_set_lastSentHeads(this.__wbg_ptr, e);
-          if (n[1]) throw l(n[0]);
+        set lastSentHeads(heads) {
+          const ret = wasm$1.syncstate_set_lastSentHeads(this.__wbg_ptr, heads);
+          if (ret[1]) {
+            throw takeFromExternrefTable0(ret[0]);
+          }
         }
-        set sentHashes(e) {
-          const n = i.syncstate_set_sentHashes(this.__wbg_ptr, e);
-          if (n[1]) throw l(n[0]);
+        set sentHashes(hashes) {
+          const ret = wasm$1.syncstate_set_sentHashes(this.__wbg_ptr, hashes);
+          if (ret[1]) {
+            throw takeFromExternrefTable0(ret[0]);
+          }
         }
         clone() {
-          const e = i.syncstate_clone(this.__wbg_ptr);
-          return A.__wrap(e);
+          const ret = wasm$1.syncstate_clone(this.__wbg_ptr);
+          return SyncState.__wrap(ret);
         }
       }
-      function Ye(t, e) {
-        const n = String(e), r = E(n, i.__wbindgen_malloc, i.__wbindgen_realloc), o = S;
-        C().setInt32(t + 4 * 1, o, true), C().setInt32(t + 4 * 0, r, true);
+      function __wbg_String_8f0eb39a4a4c2f66(arg0, arg1) {
+        const ret = String(arg1);
+        const ptr1 = passStringToWasm0(ret, wasm$1.__wbindgen_malloc, wasm$1.__wbindgen_realloc);
+        const len1 = WASM_VECTOR_LEN;
+        getDataViewMemory0().setInt32(arg0 + 4 * 1, len1, true);
+        getDataViewMemory0().setInt32(arg0 + 4 * 0, ptr1, true);
       }
-      function qe() {
-        return T(function(t, e, n) {
-          return Reflect.apply(t, e, n);
+      function __wbg_apply_eb9e9b97497f91e4() {
+        return handleError(function(arg0, arg1, arg2) {
+          const ret = Reflect.apply(arg0, arg1, arg2);
+          return ret;
         }, arguments);
       }
-      function Je(t, e) {
-        return Object.assign(t, e);
+      function __wbg_assign_3627b8559449930a(arg0, arg1) {
+        const ret = Object.assign(arg0, arg1);
+        return ret;
       }
-      function Ke(t) {
-        return t.buffer;
+      function __wbg_buffer_609cc3eee51ed158(arg0) {
+        const ret = arg0.buffer;
+        return ret;
       }
-      function Xe() {
-        return T(function(t, e) {
-          return t.call(e);
+      function __wbg_call_672a4d21634d4a24() {
+        return handleError(function(arg0, arg1) {
+          const ret = arg0.call(arg1);
+          return ret;
         }, arguments);
       }
-      function Ge() {
-        return T(function(t, e, n) {
-          return t.call(e, n);
+      function __wbg_call_7cccdd69e0791ae2() {
+        return handleError(function(arg0, arg1, arg2) {
+          const ret = arg0.call(arg1, arg2);
+          return ret;
         }, arguments);
       }
-      function Ze(t, e) {
-        return t.concat(e);
+      function __wbg_concat_9de968491c4340cf(arg0, arg1) {
+        const ret = arg0.concat(arg1);
+        return ret;
       }
-      function Qe(t, e, n) {
-        return Object.defineProperty(t, e, n);
+      function __wbg_defineProperty_a3ddad9901e2d29e(arg0, arg1, arg2) {
+        const ret = Object.defineProperty(arg0, arg1, arg2);
+        return ret;
       }
-      function et() {
-        return T(function(t, e) {
-          return Reflect.deleteProperty(t, e);
+      function __wbg_deleteProperty_96363d4a1d977c97() {
+        return handleError(function(arg0, arg1) {
+          const ret = Reflect.deleteProperty(arg0, arg1);
+          return ret;
         }, arguments);
       }
-      function tt(t) {
-        return t.done;
+      function __wbg_done_769e5ede4b31c67b(arg0) {
+        const ret = arg0.done;
+        return ret;
       }
-      function nt(t) {
-        return Object.entries(t);
+      function __wbg_entries_3265d4158b33e5dc(arg0) {
+        const ret = Object.entries(arg0);
+        return ret;
       }
-      function rt(t, e) {
-        let n, r;
+      function __wbg_error_7534b8e9a36f1ab4(arg0, arg1) {
+        let deferred0_0;
+        let deferred0_1;
         try {
-          n = t, r = e, console.error(x(t, e));
+          deferred0_0 = arg0;
+          deferred0_1 = arg1;
+          console.error(getStringFromWasm0(arg0, arg1));
         } finally {
-          i.__wbindgen_free(n, r, 1);
+          wasm$1.__wbindgen_free(deferred0_0, deferred0_1, 1);
         }
       }
-      function ot(t, e) {
-        return Symbol.for(x(t, e));
+      function __wbg_for_4ff07bddd743c5e7(arg0, arg1) {
+        const ret = Symbol.for(getStringFromWasm0(arg0, arg1));
+        return ret;
       }
-      function st(t) {
-        return Object.freeze(t);
+      function __wbg_freeze_ef6d70cf38e8d948(arg0) {
+        const ret = Object.freeze(arg0);
+        return ret;
       }
-      function at(t) {
-        return Array.from(t);
+      function __wbg_from_2a5d3e218e67aa85(arg0) {
+        const ret = Array.from(arg0);
+        return ret;
       }
-      function ct() {
-        return T(function(t, e) {
-          globalThis.crypto.getRandomValues(Wn(t, e));
+      function __wbg_getRandomValues_3c9c0d586e575a16() {
+        return handleError(function(arg0, arg1) {
+          globalThis.crypto.getRandomValues(getArrayU8FromWasm0(arg0, arg1));
         }, arguments);
       }
-      function it(t) {
-        return t.getTime();
+      function __wbg_getTime_46267b1c24877e30(arg0) {
+        const ret = arg0.getTime();
+        return ret;
       }
-      function _t() {
-        return T(function(t, e) {
-          return Reflect.get(t, e);
+      function __wbg_get_67b2ba62fc30de12() {
+        return handleError(function(arg0, arg1) {
+          const ret = Reflect.get(arg0, arg1);
+          return ret;
         }, arguments);
       }
-      function ut(t, e) {
-        return t[e >>> 0];
+      function __wbg_get_b9b93047fe3cf45b(arg0, arg1) {
+        const ret = arg0[arg1 >>> 0];
+        return ret;
       }
-      function lt(t) {
-        let e;
+      function __wbg_instanceof_ArrayBuffer_e14585432e3737fc(arg0) {
+        let result;
         try {
-          e = t instanceof ArrayBuffer;
-        } catch {
-          e = false;
+          result = arg0 instanceof ArrayBuffer;
+        } catch (_) {
+          result = false;
         }
-        return e;
+        const ret = result;
+        return ret;
       }
-      function gt(t) {
-        let e;
+      function __wbg_instanceof_Date_e9a9be8b9cea7890(arg0) {
+        let result;
         try {
-          e = t instanceof Date;
-        } catch {
-          e = false;
+          result = arg0 instanceof Date;
+        } catch (_) {
+          result = false;
         }
-        return e;
+        const ret = result;
+        return ret;
       }
-      function ft(t) {
-        let e;
+      function __wbg_instanceof_Object_7f2dcef8f78644a4(arg0) {
+        let result;
         try {
-          e = t instanceof Object;
-        } catch {
-          e = false;
+          result = arg0 instanceof Object;
+        } catch (_) {
+          result = false;
         }
-        return e;
+        const ret = result;
+        return ret;
       }
-      function dt(t) {
-        let e;
+      function __wbg_instanceof_Uint8Array_17156bcf118086a9(arg0) {
+        let result;
         try {
-          e = t instanceof Uint8Array;
-        } catch {
-          e = false;
+          result = arg0 instanceof Uint8Array;
+        } catch (_) {
+          result = false;
         }
-        return e;
+        const ret = result;
+        return ret;
       }
-      function ht(t) {
-        return Array.isArray(t);
+      function __wbg_isArray_a1eab7e0d067391b(arg0) {
+        const ret = Array.isArray(arg0);
+        return ret;
       }
-      function bt() {
-        return Symbol.iterator;
+      function __wbg_iterator_9a24c88df860dc65() {
+        const ret = Symbol.iterator;
+        return ret;
       }
-      function mt(t) {
-        return Object.keys(t);
+      function __wbg_keys_5c77a08ddc2fb8a6(arg0) {
+        const ret = Object.keys(arg0);
+        return ret;
       }
-      function pt(t) {
-        return t.length;
+      function __wbg_length_a446193dc22c12f8(arg0) {
+        const ret = arg0.length;
+        return ret;
       }
-      function wt(t) {
-        return t.length;
+      function __wbg_length_d56737991078581b(arg0) {
+        const ret = arg0.length;
+        return ret;
       }
-      function yt(t) {
-        return t.length;
+      function __wbg_length_e2d2a49132c1b256(arg0) {
+        const ret = arg0.length;
+        return ret;
       }
-      function St(t, e) {
-        console.log(t, e);
+      function __wbg_log_1ae1e9f741096e91(arg0, arg1) {
+        console.log(arg0, arg1);
       }
-      function xt(t) {
-        console.log(t);
+      function __wbg_log_c222819a41e063d3(arg0) {
+        console.log(arg0);
       }
-      function At(t, e) {
-        return new RangeError(x(t, e));
+      function __wbg_new_1ab78df5e132f715(arg0, arg1) {
+        const ret = new RangeError(getStringFromWasm0(arg0, arg1));
+        return ret;
       }
-      function Ct(t) {
-        return new Date(t);
+      function __wbg_new_31a97dac4f10fab7(arg0) {
+        const ret = new Date(arg0);
+        return ret;
       }
-      function vt() {
-        return new Object();
+      function __wbg_new_405e22f390576ce2() {
+        const ret = new Object();
+        return ret;
       }
-      function Rt() {
-        return new Array();
+      function __wbg_new_78feb108b6472713() {
+        const ret = new Array();
+        return ret;
       }
-      function jt() {
-        return new Error();
+      function __wbg_new_8a6f238a6ece86ea() {
+        const ret = new Error();
+        return ret;
       }
-      function Et(t) {
-        return new Uint8Array(t);
+      function __wbg_new_a12002a7f91c75be(arg0) {
+        const ret = new Uint8Array(arg0);
+        return ret;
       }
-      function Ot(t, e) {
-        return new Error(x(t, e));
+      function __wbg_new_c68d7209be747379(arg0, arg1) {
+        const ret = new Error(getStringFromWasm0(arg0, arg1));
+        return ret;
       }
-      function It(t, e, n) {
-        return new Uint8Array(t, e >>> 0, n >>> 0);
+      function __wbg_newwithbyteoffsetandlength_d97e637ebe145a9a(arg0, arg1, arg2) {
+        const ret = new Uint8Array(arg0, arg1 >>> 0, arg2 >>> 0);
+        return ret;
       }
-      function Tt(t) {
-        return t.next;
+      function __wbg_next_25feadfc0913fea9(arg0) {
+        const ret = arg0.next;
+        return ret;
       }
-      function Mt() {
-        return T(function(t) {
-          return t.next();
+      function __wbg_next_6574e1a8a62d1055() {
+        return handleError(function(arg0) {
+          const ret = arg0.next();
+          return ret;
         }, arguments);
       }
-      function kt() {
-        return T(function(t) {
-          return Reflect.ownKeys(t);
+      function __wbg_ownKeys_3930041068756f1f() {
+        return handleError(function(arg0) {
+          const ret = Reflect.ownKeys(arg0);
+          return ret;
         }, arguments);
       }
-      function Dt(t, e) {
-        return t.push(e);
+      function __wbg_push_737cfc8c1432c2c6(arg0, arg1) {
+        const ret = arg0.push(arg1);
+        return ret;
       }
-      function Pt(t, e, n) {
-        t[e >>> 0] = n;
+      function __wbg_set_37837023f3d740e8(arg0, arg1, arg2) {
+        arg0[arg1 >>> 0] = arg2;
       }
-      function Bt(t, e, n) {
-        t[e] = n;
+      function __wbg_set_3f1d0b984ed272ed(arg0, arg1, arg2) {
+        arg0[arg1] = arg2;
       }
-      function Ft(t, e, n) {
-        t.set(e, n >>> 0);
+      function __wbg_set_65595bdd868b3009(arg0, arg1, arg2) {
+        arg0.set(arg1, arg2 >>> 0);
       }
-      function Lt() {
-        return T(function(t, e, n) {
-          return Reflect.set(t, e, n);
+      function __wbg_set_bb8cecf6a62b9f46() {
+        return handleError(function(arg0, arg1, arg2) {
+          const ret = Reflect.set(arg0, arg1, arg2);
+          return ret;
         }, arguments);
       }
-      function Ht(t, e, n) {
-        return t.slice(e >>> 0, n >>> 0);
+      function __wbg_slice_972c243648c9fd2e(arg0, arg1, arg2) {
+        const ret = arg0.slice(arg1 >>> 0, arg2 >>> 0);
+        return ret;
       }
-      function zt(t, e) {
-        const n = e.stack, r = E(n, i.__wbindgen_malloc, i.__wbindgen_realloc), o = S;
-        C().setInt32(t + 4 * 1, o, true), C().setInt32(t + 4 * 0, r, true);
+      function __wbg_stack_0ed75d68575b0f3c(arg0, arg1) {
+        const ret = arg1.stack;
+        const ptr1 = passStringToWasm0(ret, wasm$1.__wbindgen_malloc, wasm$1.__wbindgen_realloc);
+        const len1 = WASM_VECTOR_LEN;
+        getDataViewMemory0().setInt32(arg0 + 4 * 1, len1, true);
+        getDataViewMemory0().setInt32(arg0 + 4 * 0, ptr1, true);
       }
-      function $t(t) {
-        return t.toString();
+      function __wbg_toString_66ab719c2a98bdf1(arg0) {
+        const ret = arg0.toString();
+        return ret;
       }
-      function Ut(t, e) {
-        return t.unshift(e);
+      function __wbg_unshift_c290010f73f04fb1(arg0, arg1) {
+        const ret = arg0.unshift(arg1);
+        return ret;
       }
-      function Nt(t) {
-        return t.value;
+      function __wbg_value_cd1ffa7b1ab794f1(arg0) {
+        const ret = arg0.value;
+        return ret;
       }
-      function Wt(t) {
-        return Object.values(t);
+      function __wbg_values_fcb8ba8c0aad8b58(arg0) {
+        const ret = Object.values(arg0);
+        return ret;
       }
-      function Vt(t) {
-        return t;
+      function __wbindgen_bigint_from_i64(arg0) {
+        const ret = arg0;
+        return ret;
       }
-      function Yt(t) {
-        return BigInt.asUintN(64, t);
+      function __wbindgen_bigint_from_u64(arg0) {
+        const ret = BigInt.asUintN(64, arg0);
+        return ret;
       }
-      function qt(t) {
-        const e = t;
-        return typeof e == "boolean" ? e ? 1 : 0 : 2;
+      function __wbindgen_boolean_get(arg0) {
+        const v = arg0;
+        const ret = typeof v === "boolean" ? v ? 1 : 0 : 2;
+        return ret;
       }
-      function Jt(t, e) {
-        const n = ge(e), r = E(n, i.__wbindgen_malloc, i.__wbindgen_realloc), o = S;
-        C().setInt32(t + 4 * 1, o, true), C().setInt32(t + 4 * 0, r, true);
+      function __wbindgen_debug_string(arg0, arg1) {
+        const ret = debugString(arg1);
+        const ptr1 = passStringToWasm0(ret, wasm$1.__wbindgen_malloc, wasm$1.__wbindgen_realloc);
+        const len1 = WASM_VECTOR_LEN;
+        getDataViewMemory0().setInt32(arg0 + 4 * 1, len1, true);
+        getDataViewMemory0().setInt32(arg0 + 4 * 0, ptr1, true);
       }
-      function Kt(t, e) {
-        return new Error(x(t, e));
+      function __wbindgen_error_new(arg0, arg1) {
+        const ret = new Error(getStringFromWasm0(arg0, arg1));
+        return ret;
       }
-      function Xt() {
-        const t = i.__wbindgen_export_4, e = t.grow(4);
-        t.set(0, void 0), t.set(e + 0, void 0), t.set(e + 1, null), t.set(e + 2, true), t.set(e + 3, false);
+      function __wbindgen_init_externref_table() {
+        const table = wasm$1.__wbindgen_export_4;
+        const offset = table.grow(4);
+        table.set(0, void 0);
+        table.set(offset + 0, void 0);
+        table.set(offset + 1, null);
+        table.set(offset + 2, true);
+        table.set(offset + 3, false);
       }
-      function Gt(t) {
-        return Array.isArray(t);
+      function __wbindgen_is_array(arg0) {
+        const ret = Array.isArray(arg0);
+        return ret;
       }
-      function Zt(t) {
-        return typeof t == "function";
+      function __wbindgen_is_function(arg0) {
+        const ret = typeof arg0 === "function";
+        return ret;
       }
-      function Qt(t) {
-        return t === null;
+      function __wbindgen_is_null(arg0) {
+        const ret = arg0 === null;
+        return ret;
       }
-      function en(t) {
-        const e = t;
-        return typeof e == "object" && e !== null;
+      function __wbindgen_is_object(arg0) {
+        const val = arg0;
+        const ret = typeof val === "object" && val !== null;
+        return ret;
       }
-      function tn(t) {
-        return typeof t == "string";
+      function __wbindgen_is_string(arg0) {
+        const ret = typeof arg0 === "string";
+        return ret;
       }
-      function nn(t) {
-        return t === void 0;
+      function __wbindgen_is_undefined(arg0) {
+        const ret = arg0 === void 0;
+        return ret;
       }
-      function rn(t, e) {
-        const n = e, r = JSON.stringify(n === void 0 ? null : n), o = E(r, i.__wbindgen_malloc, i.__wbindgen_realloc), s = S;
-        C().setInt32(t + 4 * 1, s, true), C().setInt32(t + 4 * 0, o, true);
+      function __wbindgen_json_serialize(arg0, arg1) {
+        const obj = arg1;
+        const ret = JSON.stringify(obj === void 0 ? null : obj);
+        const ptr1 = passStringToWasm0(ret, wasm$1.__wbindgen_malloc, wasm$1.__wbindgen_realloc);
+        const len1 = WASM_VECTOR_LEN;
+        getDataViewMemory0().setInt32(arg0 + 4 * 1, len1, true);
+        getDataViewMemory0().setInt32(arg0 + 4 * 0, ptr1, true);
       }
-      function on(t, e) {
-        return t == e;
+      function __wbindgen_jsval_loose_eq(arg0, arg1) {
+        const ret = arg0 == arg1;
+        return ret;
       }
-      function sn() {
-        return i.memory;
+      function __wbindgen_memory() {
+        const ret = wasm$1.memory;
+        return ret;
       }
-      function an(t, e) {
-        const n = e, r = typeof n == "number" ? n : void 0;
-        C().setFloat64(t + 8 * 1, b(r) ? 0 : r, true), C().setInt32(t + 4 * 0, !b(r), true);
+      function __wbindgen_number_get(arg0, arg1) {
+        const obj = arg1;
+        const ret = typeof obj === "number" ? obj : void 0;
+        getDataViewMemory0().setFloat64(arg0 + 8 * 1, isLikeNone(ret) ? 0 : ret, true);
+        getDataViewMemory0().setInt32(arg0 + 4 * 0, !isLikeNone(ret), true);
       }
-      function cn(t) {
-        return t;
+      function __wbindgen_number_new(arg0) {
+        const ret = arg0;
+        return ret;
       }
-      function _n(t, e) {
-        const n = e, r = typeof n == "string" ? n : void 0;
-        var o = b(r) ? 0 : E(r, i.__wbindgen_malloc, i.__wbindgen_realloc), s = S;
-        C().setInt32(t + 4 * 1, s, true), C().setInt32(t + 4 * 0, o, true);
+      function __wbindgen_string_get(arg0, arg1) {
+        const obj = arg1;
+        const ret = typeof obj === "string" ? obj : void 0;
+        var ptr1 = isLikeNone(ret) ? 0 : passStringToWasm0(ret, wasm$1.__wbindgen_malloc, wasm$1.__wbindgen_realloc);
+        var len1 = WASM_VECTOR_LEN;
+        getDataViewMemory0().setInt32(arg0 + 4 * 1, len1, true);
+        getDataViewMemory0().setInt32(arg0 + 4 * 0, ptr1, true);
       }
-      function un(t, e) {
-        return x(t, e);
+      function __wbindgen_string_new(arg0, arg1) {
+        const ret = getStringFromWasm0(arg0, arg1);
+        return ret;
       }
-      function ln(t, e) {
-        throw new Error(x(t, e));
+      function __wbindgen_throw(arg0, arg1) {
+        throw new Error(getStringFromWasm0(arg0, arg1));
       }
       URL = globalThis.URL;
-      const u = await zn({
+      const __vite__wasmModule = await __vite__initWasm({
         "./automerge_wasm_bg.js": {
-          __wbindgen_string_get: _n,
-          __wbindgen_error_new: Kt,
-          __wbindgen_string_new: un,
-          __wbindgen_number_new: cn,
-          __wbindgen_number_get: an,
-          __wbindgen_is_undefined: nn,
-          __wbindgen_boolean_get: qt,
-          __wbindgen_is_null: Qt,
-          __wbindgen_is_string: tn,
-          __wbindgen_is_function: Zt,
-          __wbindgen_is_object: en,
-          __wbindgen_is_array: Gt,
-          __wbindgen_json_serialize: rn,
-          __wbg_new_8a6f238a6ece86ea: jt,
-          __wbg_stack_0ed75d68575b0f3c: zt,
-          __wbg_error_7534b8e9a36f1ab4: rt,
-          __wbindgen_jsval_loose_eq: on,
-          __wbg_String_8f0eb39a4a4c2f66: Ye,
-          __wbindgen_bigint_from_i64: Vt,
-          __wbindgen_bigint_from_u64: Yt,
-          __wbg_set_3f1d0b984ed272ed: Bt,
-          __wbg_getRandomValues_3c9c0d586e575a16: ct,
-          __wbg_log_c222819a41e063d3: xt,
-          __wbg_log_1ae1e9f741096e91: St,
-          __wbg_get_b9b93047fe3cf45b: ut,
-          __wbg_length_e2d2a49132c1b256: yt,
-          __wbg_new_78feb108b6472713: Rt,
-          __wbg_next_25feadfc0913fea9: Tt,
-          __wbg_next_6574e1a8a62d1055: Mt,
-          __wbg_done_769e5ede4b31c67b: tt,
-          __wbg_value_cd1ffa7b1ab794f1: Nt,
-          __wbg_iterator_9a24c88df860dc65: bt,
-          __wbg_get_67b2ba62fc30de12: _t,
-          __wbg_call_672a4d21634d4a24: Xe,
-          __wbg_new_405e22f390576ce2: vt,
-          __wbg_length_d56737991078581b: wt,
-          __wbg_set_37837023f3d740e8: Pt,
-          __wbg_from_2a5d3e218e67aa85: at,
-          __wbg_isArray_a1eab7e0d067391b: ht,
-          __wbg_push_737cfc8c1432c2c6: Dt,
-          __wbg_unshift_c290010f73f04fb1: Ut,
-          __wbg_instanceof_ArrayBuffer_e14585432e3737fc: lt,
-          __wbg_new_c68d7209be747379: Ot,
-          __wbg_call_7cccdd69e0791ae2: Ge,
-          __wbg_instanceof_Date_e9a9be8b9cea7890: gt,
-          __wbg_getTime_46267b1c24877e30: it,
-          __wbg_new_31a97dac4f10fab7: Ct,
-          __wbg_instanceof_Object_7f2dcef8f78644a4: ft,
-          __wbg_assign_3627b8559449930a: Je,
-          __wbg_defineProperty_a3ddad9901e2d29e: Qe,
-          __wbg_entries_3265d4158b33e5dc: nt,
-          __wbg_freeze_ef6d70cf38e8d948: st,
-          __wbg_keys_5c77a08ddc2fb8a6: mt,
-          __wbg_values_fcb8ba8c0aad8b58: Wt,
-          __wbg_new_1ab78df5e132f715: At,
-          __wbg_apply_eb9e9b97497f91e4: qe,
-          __wbg_deleteProperty_96363d4a1d977c97: et,
-          __wbg_ownKeys_3930041068756f1f: kt,
-          __wbg_set_bb8cecf6a62b9f46: Lt,
-          __wbg_buffer_609cc3eee51ed158: Ke,
-          __wbg_concat_9de968491c4340cf: Ze,
-          __wbg_slice_972c243648c9fd2e: Ht,
-          __wbg_for_4ff07bddd743c5e7: ot,
-          __wbg_toString_66ab719c2a98bdf1: $t,
-          __wbg_newwithbyteoffsetandlength_d97e637ebe145a9a: It,
-          __wbg_new_a12002a7f91c75be: Et,
-          __wbg_set_65595bdd868b3009: Ft,
-          __wbg_length_a446193dc22c12f8: pt,
-          __wbg_instanceof_Uint8Array_17156bcf118086a9: dt,
-          __wbindgen_debug_string: Jt,
-          __wbindgen_throw: ln,
-          __wbindgen_memory: sn,
-          __wbindgen_init_externref_table: Xt
+          "__wbindgen_string_get": __wbindgen_string_get,
+          "__wbindgen_error_new": __wbindgen_error_new,
+          "__wbindgen_string_new": __wbindgen_string_new,
+          "__wbindgen_number_new": __wbindgen_number_new,
+          "__wbindgen_number_get": __wbindgen_number_get,
+          "__wbindgen_is_undefined": __wbindgen_is_undefined,
+          "__wbindgen_boolean_get": __wbindgen_boolean_get,
+          "__wbindgen_is_null": __wbindgen_is_null,
+          "__wbindgen_is_string": __wbindgen_is_string,
+          "__wbindgen_is_function": __wbindgen_is_function,
+          "__wbindgen_is_object": __wbindgen_is_object,
+          "__wbindgen_is_array": __wbindgen_is_array,
+          "__wbindgen_json_serialize": __wbindgen_json_serialize,
+          "__wbg_new_8a6f238a6ece86ea": __wbg_new_8a6f238a6ece86ea,
+          "__wbg_stack_0ed75d68575b0f3c": __wbg_stack_0ed75d68575b0f3c,
+          "__wbg_error_7534b8e9a36f1ab4": __wbg_error_7534b8e9a36f1ab4,
+          "__wbindgen_jsval_loose_eq": __wbindgen_jsval_loose_eq,
+          "__wbg_String_8f0eb39a4a4c2f66": __wbg_String_8f0eb39a4a4c2f66,
+          "__wbindgen_bigint_from_i64": __wbindgen_bigint_from_i64,
+          "__wbindgen_bigint_from_u64": __wbindgen_bigint_from_u64,
+          "__wbg_set_3f1d0b984ed272ed": __wbg_set_3f1d0b984ed272ed,
+          "__wbg_getRandomValues_3c9c0d586e575a16": __wbg_getRandomValues_3c9c0d586e575a16,
+          "__wbg_log_c222819a41e063d3": __wbg_log_c222819a41e063d3,
+          "__wbg_log_1ae1e9f741096e91": __wbg_log_1ae1e9f741096e91,
+          "__wbg_get_b9b93047fe3cf45b": __wbg_get_b9b93047fe3cf45b,
+          "__wbg_length_e2d2a49132c1b256": __wbg_length_e2d2a49132c1b256,
+          "__wbg_new_78feb108b6472713": __wbg_new_78feb108b6472713,
+          "__wbg_next_25feadfc0913fea9": __wbg_next_25feadfc0913fea9,
+          "__wbg_next_6574e1a8a62d1055": __wbg_next_6574e1a8a62d1055,
+          "__wbg_done_769e5ede4b31c67b": __wbg_done_769e5ede4b31c67b,
+          "__wbg_value_cd1ffa7b1ab794f1": __wbg_value_cd1ffa7b1ab794f1,
+          "__wbg_iterator_9a24c88df860dc65": __wbg_iterator_9a24c88df860dc65,
+          "__wbg_get_67b2ba62fc30de12": __wbg_get_67b2ba62fc30de12,
+          "__wbg_call_672a4d21634d4a24": __wbg_call_672a4d21634d4a24,
+          "__wbg_new_405e22f390576ce2": __wbg_new_405e22f390576ce2,
+          "__wbg_length_d56737991078581b": __wbg_length_d56737991078581b,
+          "__wbg_set_37837023f3d740e8": __wbg_set_37837023f3d740e8,
+          "__wbg_from_2a5d3e218e67aa85": __wbg_from_2a5d3e218e67aa85,
+          "__wbg_isArray_a1eab7e0d067391b": __wbg_isArray_a1eab7e0d067391b,
+          "__wbg_push_737cfc8c1432c2c6": __wbg_push_737cfc8c1432c2c6,
+          "__wbg_unshift_c290010f73f04fb1": __wbg_unshift_c290010f73f04fb1,
+          "__wbg_instanceof_ArrayBuffer_e14585432e3737fc": __wbg_instanceof_ArrayBuffer_e14585432e3737fc,
+          "__wbg_new_c68d7209be747379": __wbg_new_c68d7209be747379,
+          "__wbg_call_7cccdd69e0791ae2": __wbg_call_7cccdd69e0791ae2,
+          "__wbg_instanceof_Date_e9a9be8b9cea7890": __wbg_instanceof_Date_e9a9be8b9cea7890,
+          "__wbg_getTime_46267b1c24877e30": __wbg_getTime_46267b1c24877e30,
+          "__wbg_new_31a97dac4f10fab7": __wbg_new_31a97dac4f10fab7,
+          "__wbg_instanceof_Object_7f2dcef8f78644a4": __wbg_instanceof_Object_7f2dcef8f78644a4,
+          "__wbg_assign_3627b8559449930a": __wbg_assign_3627b8559449930a,
+          "__wbg_defineProperty_a3ddad9901e2d29e": __wbg_defineProperty_a3ddad9901e2d29e,
+          "__wbg_entries_3265d4158b33e5dc": __wbg_entries_3265d4158b33e5dc,
+          "__wbg_freeze_ef6d70cf38e8d948": __wbg_freeze_ef6d70cf38e8d948,
+          "__wbg_keys_5c77a08ddc2fb8a6": __wbg_keys_5c77a08ddc2fb8a6,
+          "__wbg_values_fcb8ba8c0aad8b58": __wbg_values_fcb8ba8c0aad8b58,
+          "__wbg_new_1ab78df5e132f715": __wbg_new_1ab78df5e132f715,
+          "__wbg_apply_eb9e9b97497f91e4": __wbg_apply_eb9e9b97497f91e4,
+          "__wbg_deleteProperty_96363d4a1d977c97": __wbg_deleteProperty_96363d4a1d977c97,
+          "__wbg_ownKeys_3930041068756f1f": __wbg_ownKeys_3930041068756f1f,
+          "__wbg_set_bb8cecf6a62b9f46": __wbg_set_bb8cecf6a62b9f46,
+          "__wbg_buffer_609cc3eee51ed158": __wbg_buffer_609cc3eee51ed158,
+          "__wbg_concat_9de968491c4340cf": __wbg_concat_9de968491c4340cf,
+          "__wbg_slice_972c243648c9fd2e": __wbg_slice_972c243648c9fd2e,
+          "__wbg_for_4ff07bddd743c5e7": __wbg_for_4ff07bddd743c5e7,
+          "__wbg_toString_66ab719c2a98bdf1": __wbg_toString_66ab719c2a98bdf1,
+          "__wbg_newwithbyteoffsetandlength_d97e637ebe145a9a": __wbg_newwithbyteoffsetandlength_d97e637ebe145a9a,
+          "__wbg_new_a12002a7f91c75be": __wbg_new_a12002a7f91c75be,
+          "__wbg_set_65595bdd868b3009": __wbg_set_65595bdd868b3009,
+          "__wbg_length_a446193dc22c12f8": __wbg_length_a446193dc22c12f8,
+          "__wbg_instanceof_Uint8Array_17156bcf118086a9": __wbg_instanceof_Uint8Array_17156bcf118086a9,
+          "__wbindgen_debug_string": __wbindgen_debug_string,
+          "__wbindgen_throw": __wbindgen_throw,
+          "__wbindgen_memory": __wbindgen_memory,
+          "__wbindgen_init_externref_table": __wbindgen_init_externref_table
         }
-      }, Hn), nr = u.memory, rr = u.__wbg_syncstate_free, or = u.syncstate_sharedHeads, sr = u.syncstate_lastSentHeads, ar = u.syncstate_set_lastSentHeads, cr = u.syncstate_set_sentHashes, ir = u.syncstate_clone, _r = u.__wbg_automerge_free, ur = u.automerge_new, lr = u.automerge_clone, gr = u.automerge_fork, fr = u.automerge_pendingOps, dr = u.automerge_commit, hr = u.automerge_merge, br = u.automerge_rollback, mr = u.automerge_keys, pr = u.automerge_text, wr = u.automerge_spans, yr = u.automerge_splice, Sr = u.automerge_updateText, xr = u.automerge_updateSpans, Ar = u.automerge_push, Cr = u.automerge_pushObject, vr = u.automerge_insert, Rr = u.automerge_splitBlock, jr = u.automerge_joinBlock, Er = u.automerge_updateBlock, Or = u.automerge_getBlock, Ir = u.automerge_insertObject, Tr = u.automerge_put, Mr = u.automerge_putObject, kr = u.automerge_increment, Dr = u.automerge_get, Pr = u.automerge_getWithType, Br = u.automerge_objInfo, Fr = u.automerge_getAll, Lr = u.automerge_enableFreeze, Hr = u.automerge_registerDatatype, zr = u.automerge_applyPatches, $r = u.automerge_applyAndReturnPatches, Ur = u.automerge_diffIncremental, Nr = u.automerge_updateDiffCursor, Wr = u.automerge_resetDiffCursor, Vr = u.automerge_diff, Yr = u.automerge_isolate, qr = u.automerge_integrate, Jr = u.automerge_length, Kr = u.automerge_delete, Xr = u.automerge_save, Gr = u.automerge_saveIncremental, Zr = u.automerge_saveSince, Qr = u.automerge_saveNoCompress, eo = u.automerge_saveAndVerify, to = u.automerge_loadIncremental, no = u.automerge_applyChanges, ro = u.automerge_getChanges, oo = u.automerge_getChangesMeta, so = u.automerge_getChangeByHash, ao = u.automerge_getChangeMetaByHash, co = u.automerge_getDecodedChangeByHash, io = u.automerge_getChangesAdded, _o = u.automerge_getHeads, uo = u.automerge_getActorId, lo = u.automerge_getLastLocalChange, go = u.automerge_dump, fo = u.automerge_getMissingDeps, ho = u.automerge_receiveSyncMessage, bo = u.automerge_generateSyncMessage, mo = u.automerge_toJS, po = u.automerge_materialize, wo = u.automerge_getCursor, yo = u.automerge_getCursorPosition, So = u.automerge_emptyChange, xo = u.automerge_mark, Ao = u.automerge_unmark, Co = u.automerge_marks, vo = u.automerge_marksAt, Ro = u.automerge_hasOurChanges, jo = u.automerge_topoHistoryTraversal, Eo = u.automerge_stats, Oo = u.create, Io = u.load, To = u.encodeChange, Mo = u.decodeChange, ko = u.initSyncState, Do = u.importSyncState, Po = u.exportSyncState, Bo = u.encodeSyncMessage, Fo = u.decodeSyncMessage, Lo = u.encodeSyncState, Ho = u.decodeSyncState, zo = u.__wbindgen_malloc, $o = u.__wbindgen_realloc, Uo = u.__wbindgen_exn_store, No = u.__externref_table_alloc, Wo = u.__wbindgen_export_4, Vo = u.__wbindgen_free, Yo = u.__externref_table_dealloc, gn = u.__wbindgen_start, qo = Object.freeze(Object.defineProperty({
+      }, __vite__wasmUrl);
+      const memory = __vite__wasmModule.memory;
+      const __wbg_syncstate_free = __vite__wasmModule.__wbg_syncstate_free;
+      const syncstate_sharedHeads = __vite__wasmModule.syncstate_sharedHeads;
+      const syncstate_lastSentHeads = __vite__wasmModule.syncstate_lastSentHeads;
+      const syncstate_set_lastSentHeads = __vite__wasmModule.syncstate_set_lastSentHeads;
+      const syncstate_set_sentHashes = __vite__wasmModule.syncstate_set_sentHashes;
+      const syncstate_clone = __vite__wasmModule.syncstate_clone;
+      const __wbg_automerge_free = __vite__wasmModule.__wbg_automerge_free;
+      const automerge_new = __vite__wasmModule.automerge_new;
+      const automerge_clone = __vite__wasmModule.automerge_clone;
+      const automerge_fork = __vite__wasmModule.automerge_fork;
+      const automerge_pendingOps = __vite__wasmModule.automerge_pendingOps;
+      const automerge_commit = __vite__wasmModule.automerge_commit;
+      const automerge_merge = __vite__wasmModule.automerge_merge;
+      const automerge_rollback = __vite__wasmModule.automerge_rollback;
+      const automerge_keys = __vite__wasmModule.automerge_keys;
+      const automerge_text = __vite__wasmModule.automerge_text;
+      const automerge_spans = __vite__wasmModule.automerge_spans;
+      const automerge_splice = __vite__wasmModule.automerge_splice;
+      const automerge_updateText = __vite__wasmModule.automerge_updateText;
+      const automerge_updateSpans = __vite__wasmModule.automerge_updateSpans;
+      const automerge_push = __vite__wasmModule.automerge_push;
+      const automerge_pushObject = __vite__wasmModule.automerge_pushObject;
+      const automerge_insert = __vite__wasmModule.automerge_insert;
+      const automerge_splitBlock = __vite__wasmModule.automerge_splitBlock;
+      const automerge_joinBlock = __vite__wasmModule.automerge_joinBlock;
+      const automerge_updateBlock = __vite__wasmModule.automerge_updateBlock;
+      const automerge_getBlock = __vite__wasmModule.automerge_getBlock;
+      const automerge_insertObject = __vite__wasmModule.automerge_insertObject;
+      const automerge_put = __vite__wasmModule.automerge_put;
+      const automerge_putObject = __vite__wasmModule.automerge_putObject;
+      const automerge_increment = __vite__wasmModule.automerge_increment;
+      const automerge_get = __vite__wasmModule.automerge_get;
+      const automerge_getWithType = __vite__wasmModule.automerge_getWithType;
+      const automerge_objInfo = __vite__wasmModule.automerge_objInfo;
+      const automerge_getAll = __vite__wasmModule.automerge_getAll;
+      const automerge_enableFreeze = __vite__wasmModule.automerge_enableFreeze;
+      const automerge_registerDatatype = __vite__wasmModule.automerge_registerDatatype;
+      const automerge_applyPatches = __vite__wasmModule.automerge_applyPatches;
+      const automerge_applyAndReturnPatches = __vite__wasmModule.automerge_applyAndReturnPatches;
+      const automerge_diffIncremental = __vite__wasmModule.automerge_diffIncremental;
+      const automerge_updateDiffCursor = __vite__wasmModule.automerge_updateDiffCursor;
+      const automerge_resetDiffCursor = __vite__wasmModule.automerge_resetDiffCursor;
+      const automerge_diff = __vite__wasmModule.automerge_diff;
+      const automerge_isolate = __vite__wasmModule.automerge_isolate;
+      const automerge_integrate = __vite__wasmModule.automerge_integrate;
+      const automerge_length = __vite__wasmModule.automerge_length;
+      const automerge_delete = __vite__wasmModule.automerge_delete;
+      const automerge_save = __vite__wasmModule.automerge_save;
+      const automerge_saveIncremental = __vite__wasmModule.automerge_saveIncremental;
+      const automerge_saveSince = __vite__wasmModule.automerge_saveSince;
+      const automerge_saveNoCompress = __vite__wasmModule.automerge_saveNoCompress;
+      const automerge_saveAndVerify = __vite__wasmModule.automerge_saveAndVerify;
+      const automerge_loadIncremental = __vite__wasmModule.automerge_loadIncremental;
+      const automerge_applyChanges = __vite__wasmModule.automerge_applyChanges;
+      const automerge_getChanges = __vite__wasmModule.automerge_getChanges;
+      const automerge_getChangesMeta = __vite__wasmModule.automerge_getChangesMeta;
+      const automerge_getChangeByHash = __vite__wasmModule.automerge_getChangeByHash;
+      const automerge_getChangeMetaByHash = __vite__wasmModule.automerge_getChangeMetaByHash;
+      const automerge_getDecodedChangeByHash = __vite__wasmModule.automerge_getDecodedChangeByHash;
+      const automerge_getChangesAdded = __vite__wasmModule.automerge_getChangesAdded;
+      const automerge_getHeads = __vite__wasmModule.automerge_getHeads;
+      const automerge_getActorId = __vite__wasmModule.automerge_getActorId;
+      const automerge_getLastLocalChange = __vite__wasmModule.automerge_getLastLocalChange;
+      const automerge_dump = __vite__wasmModule.automerge_dump;
+      const automerge_getMissingDeps = __vite__wasmModule.automerge_getMissingDeps;
+      const automerge_receiveSyncMessage = __vite__wasmModule.automerge_receiveSyncMessage;
+      const automerge_generateSyncMessage = __vite__wasmModule.automerge_generateSyncMessage;
+      const automerge_toJS = __vite__wasmModule.automerge_toJS;
+      const automerge_materialize = __vite__wasmModule.automerge_materialize;
+      const automerge_getCursor = __vite__wasmModule.automerge_getCursor;
+      const automerge_getCursorPosition = __vite__wasmModule.automerge_getCursorPosition;
+      const automerge_emptyChange = __vite__wasmModule.automerge_emptyChange;
+      const automerge_mark = __vite__wasmModule.automerge_mark;
+      const automerge_unmark = __vite__wasmModule.automerge_unmark;
+      const automerge_marks = __vite__wasmModule.automerge_marks;
+      const automerge_marksAt = __vite__wasmModule.automerge_marksAt;
+      const automerge_hasOurChanges = __vite__wasmModule.automerge_hasOurChanges;
+      const automerge_topoHistoryTraversal = __vite__wasmModule.automerge_topoHistoryTraversal;
+      const automerge_stats = __vite__wasmModule.automerge_stats;
+      const create = __vite__wasmModule.create;
+      const load = __vite__wasmModule.load;
+      const encodeChange = __vite__wasmModule.encodeChange;
+      const decodeChange$1 = __vite__wasmModule.decodeChange;
+      const initSyncState = __vite__wasmModule.initSyncState;
+      const importSyncState = __vite__wasmModule.importSyncState;
+      const exportSyncState = __vite__wasmModule.exportSyncState;
+      const encodeSyncMessage = __vite__wasmModule.encodeSyncMessage;
+      const decodeSyncMessage = __vite__wasmModule.decodeSyncMessage;
+      const encodeSyncState = __vite__wasmModule.encodeSyncState;
+      const decodeSyncState = __vite__wasmModule.decodeSyncState;
+      const __wbindgen_malloc = __vite__wasmModule.__wbindgen_malloc;
+      const __wbindgen_realloc = __vite__wasmModule.__wbindgen_realloc;
+      const __wbindgen_exn_store = __vite__wasmModule.__wbindgen_exn_store;
+      const __externref_table_alloc = __vite__wasmModule.__externref_table_alloc;
+      const __wbindgen_export_4 = __vite__wasmModule.__wbindgen_export_4;
+      const __wbindgen_free = __vite__wasmModule.__wbindgen_free;
+      const __externref_table_dealloc = __vite__wasmModule.__externref_table_dealloc;
+      const __wbindgen_start = __vite__wasmModule.__wbindgen_start;
+      const wasm = Object.freeze(Object.defineProperty({
         __proto__: null,
-        __externref_table_alloc: No,
-        __externref_table_dealloc: Yo,
-        __wbg_automerge_free: _r,
-        __wbg_syncstate_free: rr,
-        __wbindgen_exn_store: Uo,
-        __wbindgen_export_4: Wo,
-        __wbindgen_free: Vo,
-        __wbindgen_malloc: zo,
-        __wbindgen_realloc: $o,
-        __wbindgen_start: gn,
-        automerge_applyAndReturnPatches: $r,
-        automerge_applyChanges: no,
-        automerge_applyPatches: zr,
-        automerge_clone: lr,
-        automerge_commit: dr,
-        automerge_delete: Kr,
-        automerge_diff: Vr,
-        automerge_diffIncremental: Ur,
-        automerge_dump: go,
-        automerge_emptyChange: So,
-        automerge_enableFreeze: Lr,
-        automerge_fork: gr,
-        automerge_generateSyncMessage: bo,
-        automerge_get: Dr,
-        automerge_getActorId: uo,
-        automerge_getAll: Fr,
-        automerge_getBlock: Or,
-        automerge_getChangeByHash: so,
-        automerge_getChangeMetaByHash: ao,
-        automerge_getChanges: ro,
-        automerge_getChangesAdded: io,
-        automerge_getChangesMeta: oo,
-        automerge_getCursor: wo,
-        automerge_getCursorPosition: yo,
-        automerge_getDecodedChangeByHash: co,
-        automerge_getHeads: _o,
-        automerge_getLastLocalChange: lo,
-        automerge_getMissingDeps: fo,
-        automerge_getWithType: Pr,
-        automerge_hasOurChanges: Ro,
-        automerge_increment: kr,
-        automerge_insert: vr,
-        automerge_insertObject: Ir,
-        automerge_integrate: qr,
-        automerge_isolate: Yr,
-        automerge_joinBlock: jr,
-        automerge_keys: mr,
-        automerge_length: Jr,
-        automerge_loadIncremental: to,
-        automerge_mark: xo,
-        automerge_marks: Co,
-        automerge_marksAt: vo,
-        automerge_materialize: po,
-        automerge_merge: hr,
-        automerge_new: ur,
-        automerge_objInfo: Br,
-        automerge_pendingOps: fr,
-        automerge_push: Ar,
-        automerge_pushObject: Cr,
-        automerge_put: Tr,
-        automerge_putObject: Mr,
-        automerge_receiveSyncMessage: ho,
-        automerge_registerDatatype: Hr,
-        automerge_resetDiffCursor: Wr,
-        automerge_rollback: br,
-        automerge_save: Xr,
-        automerge_saveAndVerify: eo,
-        automerge_saveIncremental: Gr,
-        automerge_saveNoCompress: Qr,
-        automerge_saveSince: Zr,
-        automerge_spans: wr,
-        automerge_splice: yr,
-        automerge_splitBlock: Rr,
-        automerge_stats: Eo,
-        automerge_text: pr,
-        automerge_toJS: mo,
-        automerge_topoHistoryTraversal: jo,
-        automerge_unmark: Ao,
-        automerge_updateBlock: Er,
-        automerge_updateDiffCursor: Nr,
-        automerge_updateSpans: xr,
-        automerge_updateText: Sr,
-        create: Oo,
-        decodeChange: Mo,
-        decodeSyncMessage: Fo,
-        decodeSyncState: Ho,
-        encodeChange: To,
-        encodeSyncMessage: Bo,
-        encodeSyncState: Lo,
-        exportSyncState: Po,
-        importSyncState: Do,
-        initSyncState: ko,
-        load: Io,
-        memory: nr,
-        syncstate_clone: ir,
-        syncstate_lastSentHeads: sr,
-        syncstate_set_lastSentHeads: ar,
-        syncstate_set_sentHashes: cr,
-        syncstate_sharedHeads: or
+        __externref_table_alloc,
+        __externref_table_dealloc,
+        __wbg_automerge_free,
+        __wbg_syncstate_free,
+        __wbindgen_exn_store,
+        __wbindgen_export_4,
+        __wbindgen_free,
+        __wbindgen_malloc,
+        __wbindgen_realloc,
+        __wbindgen_start,
+        automerge_applyAndReturnPatches,
+        automerge_applyChanges,
+        automerge_applyPatches,
+        automerge_clone,
+        automerge_commit,
+        automerge_delete,
+        automerge_diff,
+        automerge_diffIncremental,
+        automerge_dump,
+        automerge_emptyChange,
+        automerge_enableFreeze,
+        automerge_fork,
+        automerge_generateSyncMessage,
+        automerge_get,
+        automerge_getActorId,
+        automerge_getAll,
+        automerge_getBlock,
+        automerge_getChangeByHash,
+        automerge_getChangeMetaByHash,
+        automerge_getChanges,
+        automerge_getChangesAdded,
+        automerge_getChangesMeta,
+        automerge_getCursor,
+        automerge_getCursorPosition,
+        automerge_getDecodedChangeByHash,
+        automerge_getHeads,
+        automerge_getLastLocalChange,
+        automerge_getMissingDeps,
+        automerge_getWithType,
+        automerge_hasOurChanges,
+        automerge_increment,
+        automerge_insert,
+        automerge_insertObject,
+        automerge_integrate,
+        automerge_isolate,
+        automerge_joinBlock,
+        automerge_keys,
+        automerge_length,
+        automerge_loadIncremental,
+        automerge_mark,
+        automerge_marks,
+        automerge_marksAt,
+        automerge_materialize,
+        automerge_merge,
+        automerge_new,
+        automerge_objInfo,
+        automerge_pendingOps,
+        automerge_push,
+        automerge_pushObject,
+        automerge_put,
+        automerge_putObject,
+        automerge_receiveSyncMessage,
+        automerge_registerDatatype,
+        automerge_resetDiffCursor,
+        automerge_rollback,
+        automerge_save,
+        automerge_saveAndVerify,
+        automerge_saveIncremental,
+        automerge_saveNoCompress,
+        automerge_saveSince,
+        automerge_spans,
+        automerge_splice,
+        automerge_splitBlock,
+        automerge_stats,
+        automerge_text,
+        automerge_toJS,
+        automerge_topoHistoryTraversal,
+        automerge_unmark,
+        automerge_updateBlock,
+        automerge_updateDiffCursor,
+        automerge_updateSpans,
+        automerge_updateText,
+        create,
+        decodeChange: decodeChange$1,
+        decodeSyncMessage,
+        decodeSyncState,
+        encodeChange,
+        encodeSyncMessage,
+        encodeSyncState,
+        exportSyncState,
+        importSyncState,
+        initSyncState,
+        load,
+        memory,
+        syncstate_clone,
+        syncstate_lastSentHeads,
+        syncstate_set_lastSentHeads,
+        syncstate_set_sentHashes,
+        syncstate_sharedHeads
       }, Symbol.toStringTag, {
         value: "Module"
       }));
-      We(qo);
-      gn();
-      const Jo = Object.freeze(Object.defineProperty({
+      __wbg_set_wasm(wasm);
+      __wbindgen_start();
+      const api = Object.freeze(Object.defineProperty({
         __proto__: null,
-        Automerge: R,
-        SyncState: A,
-        __wbg_String_8f0eb39a4a4c2f66: Ye,
-        __wbg_apply_eb9e9b97497f91e4: qe,
-        __wbg_assign_3627b8559449930a: Je,
-        __wbg_buffer_609cc3eee51ed158: Ke,
-        __wbg_call_672a4d21634d4a24: Xe,
-        __wbg_call_7cccdd69e0791ae2: Ge,
-        __wbg_concat_9de968491c4340cf: Ze,
-        __wbg_defineProperty_a3ddad9901e2d29e: Qe,
-        __wbg_deleteProperty_96363d4a1d977c97: et,
-        __wbg_done_769e5ede4b31c67b: tt,
-        __wbg_entries_3265d4158b33e5dc: nt,
-        __wbg_error_7534b8e9a36f1ab4: rt,
-        __wbg_for_4ff07bddd743c5e7: ot,
-        __wbg_freeze_ef6d70cf38e8d948: st,
-        __wbg_from_2a5d3e218e67aa85: at,
-        __wbg_getRandomValues_3c9c0d586e575a16: ct,
-        __wbg_getTime_46267b1c24877e30: it,
-        __wbg_get_67b2ba62fc30de12: _t,
-        __wbg_get_b9b93047fe3cf45b: ut,
-        __wbg_instanceof_ArrayBuffer_e14585432e3737fc: lt,
-        __wbg_instanceof_Date_e9a9be8b9cea7890: gt,
-        __wbg_instanceof_Object_7f2dcef8f78644a4: ft,
-        __wbg_instanceof_Uint8Array_17156bcf118086a9: dt,
-        __wbg_isArray_a1eab7e0d067391b: ht,
-        __wbg_iterator_9a24c88df860dc65: bt,
-        __wbg_keys_5c77a08ddc2fb8a6: mt,
-        __wbg_length_a446193dc22c12f8: pt,
-        __wbg_length_d56737991078581b: wt,
-        __wbg_length_e2d2a49132c1b256: yt,
-        __wbg_log_1ae1e9f741096e91: St,
-        __wbg_log_c222819a41e063d3: xt,
-        __wbg_new_1ab78df5e132f715: At,
-        __wbg_new_31a97dac4f10fab7: Ct,
-        __wbg_new_405e22f390576ce2: vt,
-        __wbg_new_78feb108b6472713: Rt,
-        __wbg_new_8a6f238a6ece86ea: jt,
-        __wbg_new_a12002a7f91c75be: Et,
-        __wbg_new_c68d7209be747379: Ot,
-        __wbg_newwithbyteoffsetandlength_d97e637ebe145a9a: It,
-        __wbg_next_25feadfc0913fea9: Tt,
-        __wbg_next_6574e1a8a62d1055: Mt,
-        __wbg_ownKeys_3930041068756f1f: kt,
-        __wbg_push_737cfc8c1432c2c6: Dt,
-        __wbg_set_37837023f3d740e8: Pt,
-        __wbg_set_3f1d0b984ed272ed: Bt,
-        __wbg_set_65595bdd868b3009: Ft,
-        __wbg_set_bb8cecf6a62b9f46: Lt,
-        __wbg_set_wasm: We,
-        __wbg_slice_972c243648c9fd2e: Ht,
-        __wbg_stack_0ed75d68575b0f3c: zt,
-        __wbg_toString_66ab719c2a98bdf1: $t,
-        __wbg_unshift_c290010f73f04fb1: Ut,
-        __wbg_value_cd1ffa7b1ab794f1: Nt,
-        __wbg_values_fcb8ba8c0aad8b58: Wt,
-        __wbindgen_bigint_from_i64: Vt,
-        __wbindgen_bigint_from_u64: Yt,
-        __wbindgen_boolean_get: qt,
-        __wbindgen_debug_string: Jt,
-        __wbindgen_error_new: Kt,
-        __wbindgen_init_externref_table: Xt,
-        __wbindgen_is_array: Gt,
-        __wbindgen_is_function: Zt,
-        __wbindgen_is_null: Qt,
-        __wbindgen_is_object: en,
-        __wbindgen_is_string: tn,
-        __wbindgen_is_undefined: nn,
-        __wbindgen_json_serialize: rn,
-        __wbindgen_jsval_loose_eq: on,
-        __wbindgen_memory: sn,
-        __wbindgen_number_get: an,
-        __wbindgen_number_new: cn,
-        __wbindgen_string_get: _n,
-        __wbindgen_string_new: un,
-        __wbindgen_throw: ln,
-        create: Vn,
-        decodeChange: Jn,
-        decodeSyncMessage: Qn,
-        decodeSyncState: tr,
-        encodeChange: qn,
-        encodeSyncMessage: Zn,
-        encodeSyncState: er,
-        exportSyncState: Gn,
-        importSyncState: Xn,
-        initSyncState: Kn,
-        load: Yn
+        Automerge,
+        SyncState,
+        __wbg_String_8f0eb39a4a4c2f66,
+        __wbg_apply_eb9e9b97497f91e4,
+        __wbg_assign_3627b8559449930a,
+        __wbg_buffer_609cc3eee51ed158,
+        __wbg_call_672a4d21634d4a24,
+        __wbg_call_7cccdd69e0791ae2,
+        __wbg_concat_9de968491c4340cf,
+        __wbg_defineProperty_a3ddad9901e2d29e,
+        __wbg_deleteProperty_96363d4a1d977c97,
+        __wbg_done_769e5ede4b31c67b,
+        __wbg_entries_3265d4158b33e5dc,
+        __wbg_error_7534b8e9a36f1ab4,
+        __wbg_for_4ff07bddd743c5e7,
+        __wbg_freeze_ef6d70cf38e8d948,
+        __wbg_from_2a5d3e218e67aa85,
+        __wbg_getRandomValues_3c9c0d586e575a16,
+        __wbg_getTime_46267b1c24877e30,
+        __wbg_get_67b2ba62fc30de12,
+        __wbg_get_b9b93047fe3cf45b,
+        __wbg_instanceof_ArrayBuffer_e14585432e3737fc,
+        __wbg_instanceof_Date_e9a9be8b9cea7890,
+        __wbg_instanceof_Object_7f2dcef8f78644a4,
+        __wbg_instanceof_Uint8Array_17156bcf118086a9,
+        __wbg_isArray_a1eab7e0d067391b,
+        __wbg_iterator_9a24c88df860dc65,
+        __wbg_keys_5c77a08ddc2fb8a6,
+        __wbg_length_a446193dc22c12f8,
+        __wbg_length_d56737991078581b,
+        __wbg_length_e2d2a49132c1b256,
+        __wbg_log_1ae1e9f741096e91,
+        __wbg_log_c222819a41e063d3,
+        __wbg_new_1ab78df5e132f715,
+        __wbg_new_31a97dac4f10fab7,
+        __wbg_new_405e22f390576ce2,
+        __wbg_new_78feb108b6472713,
+        __wbg_new_8a6f238a6ece86ea,
+        __wbg_new_a12002a7f91c75be,
+        __wbg_new_c68d7209be747379,
+        __wbg_newwithbyteoffsetandlength_d97e637ebe145a9a,
+        __wbg_next_25feadfc0913fea9,
+        __wbg_next_6574e1a8a62d1055,
+        __wbg_ownKeys_3930041068756f1f,
+        __wbg_push_737cfc8c1432c2c6,
+        __wbg_set_37837023f3d740e8,
+        __wbg_set_3f1d0b984ed272ed,
+        __wbg_set_65595bdd868b3009,
+        __wbg_set_bb8cecf6a62b9f46,
+        __wbg_set_wasm,
+        __wbg_slice_972c243648c9fd2e,
+        __wbg_stack_0ed75d68575b0f3c,
+        __wbg_toString_66ab719c2a98bdf1,
+        __wbg_unshift_c290010f73f04fb1,
+        __wbg_value_cd1ffa7b1ab794f1,
+        __wbg_values_fcb8ba8c0aad8b58,
+        __wbindgen_bigint_from_i64,
+        __wbindgen_bigint_from_u64,
+        __wbindgen_boolean_get,
+        __wbindgen_debug_string,
+        __wbindgen_error_new,
+        __wbindgen_init_externref_table,
+        __wbindgen_is_array,
+        __wbindgen_is_function,
+        __wbindgen_is_null,
+        __wbindgen_is_object,
+        __wbindgen_is_string,
+        __wbindgen_is_undefined,
+        __wbindgen_json_serialize,
+        __wbindgen_jsval_loose_eq,
+        __wbindgen_memory,
+        __wbindgen_number_get,
+        __wbindgen_number_new,
+        __wbindgen_string_get,
+        __wbindgen_string_new,
+        __wbindgen_throw,
+        create: create$1,
+        decodeChange: decodeChange$2,
+        decodeSyncMessage: decodeSyncMessage$1,
+        decodeSyncState: decodeSyncState$1,
+        encodeChange: encodeChange$1,
+        encodeSyncMessage: encodeSyncMessage$1,
+        encodeSyncState: encodeSyncState$1,
+        exportSyncState: exportSyncState$1,
+        importSyncState: importSyncState$1,
+        initSyncState: initSyncState$1,
+        load: load$1
       }, Symbol.toStringTag, {
         value: "Module"
-      })), oe = Symbol.for("_am_meta"), G = Symbol.for("_am_trace"), W = Symbol.for("_am_objectId"), pe = Symbol.for("_am_isProxy"), we = Symbol.for("_am_clearCache"), Ko = Symbol.for("_am_uint"), Xo = Symbol.for("_am_int"), Go = Symbol.for("_am_f64"), fn = Symbol.for("_am_counter"), dn = Symbol.for("_am_immutableString");
-      class fe {
-        constructor(e) {
-          this.value = e || 0, Reflect.defineProperty(this, fn, {
+      }));
+      const STATE = Symbol.for("_am_meta");
+      const TRACE = Symbol.for("_am_trace");
+      const OBJECT_ID = Symbol.for("_am_objectId");
+      const IS_PROXY = Symbol.for("_am_isProxy");
+      const CLEAR_CACHE = Symbol.for("_am_clearCache");
+      const UINT = Symbol.for("_am_uint");
+      const INT = Symbol.for("_am_int");
+      const F64 = Symbol.for("_am_f64");
+      const COUNTER = Symbol.for("_am_counter");
+      const IMMUTABLE_STRING = Symbol.for("_am_immutableString");
+      class Counter {
+        constructor(value) {
+          this.value = value || 0;
+          Reflect.defineProperty(this, COUNTER, {
             value: true
           });
         }
@@ -1213,31 +1670,39 @@ ${t.stack}` : r;
         toJSON() {
           return this.value;
         }
-        increment(e) {
+        increment(_delta) {
           throw new Error("Counters should not be incremented outside of a change callback");
         }
-        decrement(e) {
+        decrement(_delta) {
           throw new Error("Counters should not be decremented outside of a change callback");
         }
       }
-      class Zo extends fe {
-        constructor(e, n, r, o, s) {
-          super(e), this.context = n, this.path = r, this.objectId = o, this.key = s;
+      class WriteableCounter extends Counter {
+        constructor(value, context, path, objectId, key) {
+          super(value);
+          this.context = context;
+          this.path = path;
+          this.objectId = objectId;
+          this.key = key;
         }
-        increment(e) {
-          return e = typeof e == "number" ? e : 1, this.context.increment(this.objectId, this.key, e), this.value += e, this.value;
+        increment(delta) {
+          delta = typeof delta === "number" ? delta : 1;
+          this.context.increment(this.objectId, this.key, delta);
+          this.value += delta;
+          return this.value;
         }
-        decrement(e) {
-          return this.increment(typeof e == "number" ? -e : -1);
+        decrement(delta) {
+          return this.increment(typeof delta === "number" ? -delta : -1);
         }
       }
-      function Qo(t, e, n, r, o) {
-        return new Zo(t, e, n, r, o);
+      function getWriteableCounter(value, context, path, objectId, key) {
+        return new WriteableCounter(value, context, path, objectId, key);
       }
-      var hn;
-      class bn {
-        constructor(e) {
-          this[hn] = true, this.val = e;
+      var _a;
+      class ImmutableString {
+        constructor(val) {
+          this[_a] = true;
+          this.val = val;
         }
         toString() {
           return this.val;
@@ -1246,466 +1711,670 @@ ${t.stack}` : r;
           return this.val;
         }
       }
-      hn = dn;
-      function I(t) {
-        if (typeof t == "string" && /^[0-9]+$/.test(t) && (t = parseInt(t, 10)), typeof t != "number") return t;
-        if (t < 0 || isNaN(t) || t === 1 / 0 || t === -1 / 0) throw new RangeError("A list index must be positive, but you passed " + t);
-        return t;
+      _a = IMMUTABLE_STRING;
+      function parseListIndex(key) {
+        if (typeof key === "string" && /^[0-9]+$/.test(key)) key = parseInt(key, 10);
+        if (typeof key !== "number") {
+          return key;
+        }
+        if (key < 0 || isNaN(key) || key === Infinity || key === -Infinity) {
+          throw new RangeError("A list index must be positive, but you passed " + key);
+        }
+        return key;
       }
-      function w(t, e) {
-        const { context: n, objectId: r, path: o } = t, s = n.getWithType(r, e);
-        if (s === null) return;
-        const c = s[0], _ = s[1];
-        switch (c) {
+      function valueAt(target, prop) {
+        const { context, objectId, path } = target;
+        const value = context.getWithType(objectId, prop);
+        if (value === null) {
+          return;
+        }
+        const datatype = value[0];
+        const val = value[1];
+        switch (datatype) {
           case void 0:
             return;
           case "map":
-            return V(n, _, [
-              ...o,
-              e
+            return mapProxy(context, val, [
+              ...path,
+              prop
             ]);
           case "list":
-            return ae(n, _, [
-              ...o,
-              e
+            return listProxy(context, val, [
+              ...path,
+              prop
             ]);
           case "text":
-            return n.text(_);
+            return context.text(val);
           case "str":
-            return new bn(_);
+            return new ImmutableString(val);
           case "uint":
-            return _;
+            return val;
           case "int":
-            return _;
+            return val;
           case "f64":
-            return _;
+            return val;
           case "boolean":
-            return _;
+            return val;
           case "null":
             return null;
           case "bytes":
-            return _;
+            return val;
           case "timestamp":
-            return _;
-          case "counter":
-            return Qo(_, n, o, r, e);
+            return val;
+          case "counter": {
+            const counter = getWriteableCounter(val, context, path, objectId, prop);
+            return counter;
+          }
           default:
-            throw RangeError(`datatype ${c} unimplemented`);
+            throw RangeError(`datatype ${datatype} unimplemented`);
         }
       }
-      function Z(t, e, n) {
-        const r = typeof t;
-        switch (r) {
+      function import_value(value, path, context) {
+        const type = typeof value;
+        switch (type) {
           case "object":
-            if (t == null) return [
-              null,
-              "null"
-            ];
-            if (t[Ko]) return [
-              t.value,
-              "uint"
-            ];
-            if (t[Xo]) return [
-              t.value,
-              "int"
-            ];
-            if (t[Go]) return [
-              t.value,
-              "f64"
-            ];
-            if (t[fn]) return [
-              t.value,
-              "counter"
-            ];
-            if (t instanceof Date) return [
-              t.getTime(),
-              "timestamp"
-            ];
-            if (mn(t)) return [
-              t.toString(),
-              "str"
-            ];
-            if (t instanceof Uint8Array) return [
-              t,
-              "bytes"
-            ];
-            if (t instanceof Array) return [
-              t,
-              "list"
-            ];
-            if (Object.prototype.toString.call(t) === "[object Object]") return [
-              t,
-              "map"
-            ];
-            throw se(t, n) ? new RangeError("Cannot create a reference to an existing document object") : new RangeError(`Cannot assign unknown object: ${t}`);
+            if (value == null) {
+              return [
+                null,
+                "null"
+              ];
+            } else if (value[UINT]) {
+              return [
+                value.value,
+                "uint"
+              ];
+            } else if (value[INT]) {
+              return [
+                value.value,
+                "int"
+              ];
+            } else if (value[F64]) {
+              return [
+                value.value,
+                "f64"
+              ];
+            } else if (value[COUNTER]) {
+              return [
+                value.value,
+                "counter"
+              ];
+            } else if (value instanceof Date) {
+              return [
+                value.getTime(),
+                "timestamp"
+              ];
+            } else if (isImmutableString(value)) {
+              return [
+                value.toString(),
+                "str"
+              ];
+            } else if (value instanceof Uint8Array) {
+              return [
+                value,
+                "bytes"
+              ];
+            } else if (value instanceof Array) {
+              return [
+                value,
+                "list"
+              ];
+            } else if (Object.prototype.toString.call(value) === "[object Object]") {
+              return [
+                value,
+                "map"
+              ];
+            } else if (isSameDocument(value, context)) {
+              throw new RangeError("Cannot create a reference to an existing document object");
+            } else {
+              throw new RangeError(`Cannot assign unknown object: ${value}`);
+            }
           case "boolean":
             return [
-              t,
+              value,
               "boolean"
             ];
           case "number":
-            return Number.isInteger(t) ? [
-              t,
-              "int"
-            ] : [
-              t,
-              "f64"
-            ];
+            if (Number.isInteger(value)) {
+              return [
+                value,
+                "int"
+              ];
+            } else {
+              return [
+                value,
+                "f64"
+              ];
+            }
           case "string":
             return [
-              t,
+              value,
               "text"
             ];
           case "undefined":
             throw new RangeError([
-              `Cannot assign undefined value at ${De(e)}, `,
+              `Cannot assign undefined value at ${printPath(path)}, `,
               "because `undefined` is not a valid JSON data type. ",
               "You might consider setting the property's value to `null`, ",
               "or using `delete` to remove it altogether."
             ].join(""));
           default:
             throw new RangeError([
-              `Cannot assign ${r} value at ${De(e)}. `,
-              "All JSON primitive datatypes (object, array, string, number, boolean, null) ",
-              `are supported in an Automerge document; ${r} values are not. `
+              `Cannot assign ${type} value at ${printPath(path)}. `,
+              `All JSON primitive datatypes (object, array, string, number, boolean, null) `,
+              `are supported in an Automerge document; ${type} values are not. `
             ].join(""));
         }
       }
-      function se(t, e) {
-        var n, r;
-        return t instanceof Date ? false : !!(t && ((r = (n = t[oe]) === null || n === void 0 ? void 0 : n.handle) === null || r === void 0 ? void 0 : r.__wbg_ptr) === e.__wbg_ptr);
+      function isSameDocument(val, context) {
+        var _b, _c;
+        if (val instanceof Date) {
+          return false;
+        }
+        if (val && ((_c = (_b = val[STATE]) === null || _b === void 0 ? void 0 : _b.handle) === null || _c === void 0 ? void 0 : _c.__wbg_ptr) === context.__wbg_ptr) {
+          return true;
+        }
+        return false;
       }
-      const es = {
-        get(t, e) {
-          const { context: n, objectId: r, cache: o } = t;
-          return e === Symbol.toStringTag ? t[Symbol.toStringTag] : e === W ? r : e === pe ? true : e === G ? t.trace : e === oe ? {
-            handle: n
-          } : (o[e] || (o[e] = w(t, e)), o[e]);
+      const MapHandler = {
+        get(target, key) {
+          const { context, objectId, cache } = target;
+          if (key === Symbol.toStringTag) {
+            return target[Symbol.toStringTag];
+          }
+          if (key === OBJECT_ID) return objectId;
+          if (key === IS_PROXY) return true;
+          if (key === TRACE) return target.trace;
+          if (key === STATE) return {
+            handle: context
+          };
+          if (!cache[key]) {
+            cache[key] = valueAt(target, key);
+          }
+          return cache[key];
         },
-        set(t, e, n) {
-          const { context: r, objectId: o, path: s } = t;
-          if (t.cache = {}, se(n, r)) throw new RangeError("Cannot create a reference to an existing document object");
-          if (e === G) return t.trace = n, true;
-          if (e === we) return true;
-          const [c, _] = Z(n, [
-            ...s,
-            e
-          ], r);
-          switch (_) {
+        set(target, key, val) {
+          const { context, objectId, path } = target;
+          target.cache = {};
+          if (isSameDocument(val, context)) {
+            throw new RangeError("Cannot create a reference to an existing document object");
+          }
+          if (key === TRACE) {
+            target.trace = val;
+            return true;
+          }
+          if (key === CLEAR_CACHE) {
+            return true;
+          }
+          const [value, datatype] = import_value(val, [
+            ...path,
+            key
+          ], context);
+          switch (datatype) {
             case "list": {
-              const g = r.putObject(o, e, []), d = ae(r, g, [
-                ...s,
-                e
+              const list = context.putObject(objectId, key, []);
+              const proxyList = listProxy(context, list, [
+                ...path,
+                key
               ]);
-              for (let h = 0; h < c.length; h++) d[h] = c[h];
+              for (let i = 0; i < value.length; i++) {
+                proxyList[i] = value[i];
+              }
               break;
             }
             case "text": {
-              r.putObject(o, e, c);
+              context.putObject(objectId, key, value);
               break;
             }
             case "map": {
-              const g = r.putObject(o, e, {}), d = V(r, g, [
-                ...s,
-                e
+              const map = context.putObject(objectId, key, {});
+              const proxyMap = mapProxy(context, map, [
+                ...path,
+                key
               ]);
-              for (const h in c) d[h] = c[h];
+              for (const key2 in value) {
+                proxyMap[key2] = value[key2];
+              }
               break;
             }
             default:
-              r.put(o, e, c, _);
+              context.put(objectId, key, value, datatype);
           }
           return true;
         },
-        deleteProperty(t, e) {
-          const { context: n, objectId: r } = t;
-          return t.cache = {}, n.delete(r, e), true;
+        deleteProperty(target, key) {
+          const { context, objectId } = target;
+          target.cache = {};
+          context.delete(objectId, key);
+          return true;
         },
-        has(t, e) {
-          return this.get(t, e) !== void 0;
+        has(target, key) {
+          const value = this.get(target, key);
+          return value !== void 0;
         },
-        getOwnPropertyDescriptor(t, e) {
-          const n = this.get(t, e);
-          if (typeof n < "u") return {
-            configurable: true,
-            enumerable: true,
-            value: n
-          };
+        getOwnPropertyDescriptor(target, key) {
+          const value = this.get(target, key);
+          if (typeof value !== "undefined") {
+            return {
+              configurable: true,
+              enumerable: true,
+              value
+            };
+          }
         },
-        ownKeys(t) {
-          const { context: e, objectId: n } = t, r = e.keys(n);
+        ownKeys(target) {
+          const { context, objectId } = target;
+          const keys = context.keys(objectId);
           return [
-            ...new Set(r)
+            ...new Set(keys)
           ];
         }
-      }, ts = {
-        get(t, e) {
-          const { context: n, objectId: r } = t;
-          return e = I(e), e === Symbol.hasInstance ? (o) => Array.isArray(o) : e === Symbol.toStringTag ? t[Symbol.toStringTag] : e === W ? r : e === pe ? true : e === G ? t.trace : e === oe ? {
-            handle: n
-          } : e === "length" ? n.length(r) : typeof e == "number" ? w(t, e) : rs(t)[e];
+      };
+      const ListHandler = {
+        get(target, index) {
+          const { context, objectId } = target;
+          index = parseListIndex(index);
+          if (index === Symbol.hasInstance) {
+            return (instance) => {
+              return Array.isArray(instance);
+            };
+          }
+          if (index === Symbol.toStringTag) {
+            return target[Symbol.toStringTag];
+          }
+          if (index === OBJECT_ID) return objectId;
+          if (index === IS_PROXY) return true;
+          if (index === TRACE) return target.trace;
+          if (index === STATE) return {
+            handle: context
+          };
+          if (index === "length") return context.length(objectId);
+          if (typeof index === "number") {
+            return valueAt(target, index);
+          } else {
+            return listMethods(target)[index];
+          }
         },
-        set(t, e, n) {
-          const { context: r, objectId: o, path: s } = t;
-          if (e = I(e), se(n, r)) throw new RangeError("Cannot create a reference to an existing document object");
-          if (e === we) return true;
-          if (e === G) return t.trace = n, true;
-          if (typeof e == "string") throw new RangeError("list index must be a number");
-          const [c, _] = Z(n, [
-            ...s,
-            e
-          ], r);
-          switch (_) {
+        set(target, index, val) {
+          const { context, objectId, path } = target;
+          index = parseListIndex(index);
+          if (isSameDocument(val, context)) {
+            throw new RangeError("Cannot create a reference to an existing document object");
+          }
+          if (index === CLEAR_CACHE) {
+            return true;
+          }
+          if (index === TRACE) {
+            target.trace = val;
+            return true;
+          }
+          if (typeof index == "string") {
+            throw new RangeError("list index must be a number");
+          }
+          const [value, datatype] = import_value(val, [
+            ...path,
+            index
+          ], context);
+          switch (datatype) {
             case "list": {
-              let g;
-              e >= r.length(o) ? g = r.insertObject(o, e, []) : g = r.putObject(o, e, []), ae(r, g, [
-                ...s,
-                e
-              ]).splice(0, 0, ...c);
+              let list;
+              if (index >= context.length(objectId)) {
+                list = context.insertObject(objectId, index, []);
+              } else {
+                list = context.putObject(objectId, index, []);
+              }
+              const proxyList = listProxy(context, list, [
+                ...path,
+                index
+              ]);
+              proxyList.splice(0, 0, ...value);
               break;
             }
             case "text": {
-              e >= r.length(o) ? r.insertObject(o, e, c) : r.putObject(o, e, c);
+              if (index >= context.length(objectId)) {
+                context.insertObject(objectId, index, value);
+              } else {
+                context.putObject(objectId, index, value);
+              }
               break;
             }
             case "map": {
-              let g;
-              e >= r.length(o) ? g = r.insertObject(o, e, {}) : g = r.putObject(o, e, {});
-              const d = V(r, g, [
-                ...s,
-                e
+              let map;
+              if (index >= context.length(objectId)) {
+                map = context.insertObject(objectId, index, {});
+              } else {
+                map = context.putObject(objectId, index, {});
+              }
+              const proxyMap = mapProxy(context, map, [
+                ...path,
+                index
               ]);
-              for (const h in c) d[h] = c[h];
+              for (const key in value) {
+                proxyMap[key] = value[key];
+              }
               break;
             }
             default:
-              e >= r.length(o) ? r.insert(o, e, c, _) : r.put(o, e, c, _);
+              if (index >= context.length(objectId)) {
+                context.insert(objectId, index, value, datatype);
+              } else {
+                context.put(objectId, index, value, datatype);
+              }
           }
           return true;
         },
-        deleteProperty(t, e) {
-          const { context: n, objectId: r } = t;
-          e = I(e);
-          const o = n.get(r, e);
-          if (o != null && o[0] == "counter") throw new TypeError("Unsupported operation: deleting a counter from a list");
-          return n.delete(r, e), true;
+        deleteProperty(target, index) {
+          const { context, objectId } = target;
+          index = parseListIndex(index);
+          const elem = context.get(objectId, index);
+          if (elem != null && elem[0] == "counter") {
+            throw new TypeError("Unsupported operation: deleting a counter from a list");
+          }
+          context.delete(objectId, index);
+          return true;
         },
-        has(t, e) {
-          const { context: n, objectId: r } = t;
-          return e = I(e), typeof e == "number" ? e < n.length(r) : e === "length";
+        has(target, index) {
+          const { context, objectId } = target;
+          index = parseListIndex(index);
+          if (typeof index === "number") {
+            return index < context.length(objectId);
+          }
+          return index === "length";
         },
-        getOwnPropertyDescriptor(t, e) {
-          const { context: n, objectId: r } = t;
-          return e === "length" ? {
+        getOwnPropertyDescriptor(target, index) {
+          const { context, objectId } = target;
+          if (index === "length") return {
             writable: true,
-            value: n.length(r)
-          } : e === W ? {
+            value: context.length(objectId)
+          };
+          if (index === OBJECT_ID) return {
             configurable: false,
             enumerable: false,
-            value: r
-          } : (e = I(e), {
+            value: objectId
+          };
+          index = parseListIndex(index);
+          const value = valueAt(target, index);
+          return {
             configurable: true,
             enumerable: true,
-            value: w(t, e)
-          });
+            value
+          };
         },
-        getPrototypeOf(t) {
-          return Object.getPrototypeOf(t);
+        getPrototypeOf(target) {
+          return Object.getPrototypeOf(target);
         },
         ownKeys() {
-          const t = [];
-          return t.push("length"), t;
+          const keys = [];
+          keys.push("length");
+          return keys;
         }
       };
-      function V(t, e, n) {
-        const r = {
-          context: t,
-          objectId: e,
-          path: n || [],
+      function mapProxy(context, objectId, path) {
+        const target = {
+          context,
+          objectId,
+          path: path || [],
           cache: {}
-        }, o = {};
-        return Object.assign(o, r), new Proxy(o, es);
+        };
+        const proxied = {};
+        Object.assign(proxied, target);
+        const result = new Proxy(proxied, MapHandler);
+        return result;
       }
-      function ae(t, e, n) {
-        const r = {
-          context: t,
-          objectId: e,
-          path: n || [],
+      function listProxy(context, objectId, path) {
+        const target = {
+          context,
+          objectId,
+          path: path || [],
           cache: {}
-        }, o = [];
-        return Object.assign(o, r), new Proxy(o, ts);
+        };
+        const proxied = [];
+        Object.assign(proxied, target);
+        return new Proxy(proxied, ListHandler);
       }
-      function ns(t) {
-        return V(t, "_root", []);
+      function rootProxy(context) {
+        return mapProxy(context, "_root", []);
       }
-      function rs(t) {
-        const { context: e, objectId: n, path: r } = t;
-        return {
-          at(s) {
-            return w(t, s);
+      function listMethods(target) {
+        const { context, objectId, path } = target;
+        const methods = {
+          at(index) {
+            return valueAt(target, index);
           },
-          deleteAt(s, c) {
-            return typeof c == "number" ? e.splice(n, s, c) : e.delete(n, s), this;
-          },
-          fill(s, c, _) {
-            const [g, d] = Z(s, [
-              ...r,
-              c
-            ], e), h = e.length(n);
-            c = I(c || 0), _ = I(_ || h);
-            for (let m = c; m < Math.min(_, h); m++) d === "list" || d === "map" || d === "text" ? e.putObject(n, m, g) : e.put(n, m, g, d);
+          deleteAt(index, numDelete) {
+            if (typeof numDelete === "number") {
+              context.splice(objectId, index, numDelete);
+            } else {
+              context.delete(objectId, index);
+            }
             return this;
           },
-          indexOf(s, c = 0) {
-            const _ = e.length(n);
-            for (let g = c; g < _; g++) {
-              const d = e.getWithType(n, g);
-              if (!d) continue;
-              const [h, m] = d;
-              if (![
+          fill(val, start, end) {
+            const [value, datatype] = import_value(val, [
+              ...path,
+              start
+            ], context);
+            const length = context.length(objectId);
+            start = parseListIndex(start || 0);
+            end = parseListIndex(end || length);
+            for (let i = start; i < Math.min(end, length); i++) {
+              if (datatype === "list" || datatype === "map") {
+                context.putObject(objectId, i, value);
+              } else if (datatype === "text") {
+                context.putObject(objectId, i, value);
+              } else {
+                context.put(objectId, i, value, datatype);
+              }
+            }
+            return this;
+          },
+          indexOf(searchElement, start = 0) {
+            const length = context.length(objectId);
+            for (let i = start; i < length; i++) {
+              const valueWithType = context.getWithType(objectId, i);
+              if (!valueWithType) {
+                continue;
+              }
+              const [valType, value] = valueWithType;
+              const isObject2 = [
                 "map",
                 "list",
                 "text"
-              ].includes(h)) {
-                if (m === s) return g;
-                continue;
+              ].includes(valType);
+              if (!isObject2) {
+                if (value === searchElement) {
+                  return i;
+                } else {
+                  continue;
+                }
               }
-              if (h === "text" && typeof s == "string" && s === w(t, g) || s[W] === m) return g;
+              if (valType === "text" && typeof searchElement === "string") {
+                if (searchElement === valueAt(target, i)) {
+                  return i;
+                }
+              }
+              if (searchElement[OBJECT_ID] === value) {
+                return i;
+              }
             }
             return -1;
           },
-          insertAt(s, ...c) {
-            return this.splice(s, 0, ...c), this;
+          insertAt(index, ...values) {
+            this.splice(index, 0, ...values);
+            return this;
           },
           pop() {
-            const s = e.length(n);
-            if (s == 0) return;
-            const c = w(t, s - 1);
-            return e.delete(n, s - 1), c;
+            const length = context.length(objectId);
+            if (length == 0) {
+              return void 0;
+            }
+            const last = valueAt(target, length - 1);
+            context.delete(objectId, length - 1);
+            return last;
           },
-          push(...s) {
-            const c = e.length(n);
-            return this.splice(c, 0, ...s), e.length(n);
+          push(...values) {
+            const len = context.length(objectId);
+            this.splice(len, 0, ...values);
+            return context.length(objectId);
           },
           shift() {
-            if (e.length(n) == 0) return;
-            const s = w(t, 0);
-            return e.delete(n, 0), s;
+            if (context.length(objectId) == 0) return;
+            const first = valueAt(target, 0);
+            context.delete(objectId, 0);
+            return first;
           },
-          splice(s, c, ..._) {
-            s = I(s), typeof c != "number" && (c = e.length(n) - s), c = I(c);
-            for (const h of _) if (se(h, e)) throw new RangeError("Cannot create a reference to an existing document object");
-            const g = [];
-            for (let h = 0; h < c; h++) {
-              const m = w(t, s);
-              m !== void 0 && g.push(m), e.delete(n, s);
+          splice(index, del, ...vals) {
+            index = parseListIndex(index);
+            if (typeof del !== "number") {
+              del = context.length(objectId) - index;
             }
-            const d = _.map((h, m) => {
+            del = parseListIndex(del);
+            for (const val of vals) {
+              if (isSameDocument(val, context)) {
+                throw new RangeError("Cannot create a reference to an existing document object");
+              }
+            }
+            const result = [];
+            for (let i = 0; i < del; i++) {
+              const value = valueAt(target, index);
+              if (value !== void 0) {
+                result.push(value);
+              }
+              context.delete(objectId, index);
+            }
+            const values = vals.map((val, index2) => {
               try {
-                return Z(h, [
-                  ...r
-                ], e);
-              } catch (v) {
-                throw v instanceof RangeError ? new RangeError(`${v.message} (at index ${m} in the input)`) : v;
+                return import_value(val, [
+                  ...path
+                ], context);
+              } catch (e) {
+                if (e instanceof RangeError) {
+                  throw new RangeError(`${e.message} (at index ${index2} in the input)`);
+                } else {
+                  throw e;
+                }
               }
             });
-            for (const [h, m] of d) {
-              switch (m) {
+            for (const [value, datatype] of values) {
+              switch (datatype) {
                 case "list": {
-                  const v = e.insertObject(n, s, []);
-                  ae(e, v, [
-                    ...r,
-                    s
-                  ]).splice(0, 0, ...h);
+                  const list = context.insertObject(objectId, index, []);
+                  const proxyList = listProxy(context, list, [
+                    ...path,
+                    index
+                  ]);
+                  proxyList.splice(0, 0, ...value);
                   break;
                 }
                 case "text": {
-                  e.insertObject(n, s, h);
+                  context.insertObject(objectId, index, value);
                   break;
                 }
                 case "map": {
-                  const v = e.insertObject(n, s, {}), Ie = V(e, v, [
-                    ...r,
-                    s
+                  const map = context.insertObject(objectId, index, {});
+                  const proxyMap = mapProxy(context, map, [
+                    ...path,
+                    index
                   ]);
-                  for (const Te in h) Ie[Te] = h[Te];
+                  for (const key in value) {
+                    proxyMap[key] = value[key];
+                  }
                   break;
                 }
                 default:
-                  e.insert(n, s, h, m);
+                  context.insert(objectId, index, value, datatype);
               }
-              s += 1;
+              index += 1;
             }
-            return g;
+            return result;
           },
-          unshift(...s) {
-            return this.splice(0, 0, ...s), e.length(n);
+          unshift(...values) {
+            this.splice(0, 0, ...values);
+            return context.length(objectId);
           },
           entries() {
-            let s = 0;
-            return {
+            let i = 0;
+            const iterator = {
               next: () => {
-                const _ = w(t, s);
-                return _ === void 0 ? {
-                  value: void 0,
-                  done: true
-                } : {
-                  value: [
-                    s++,
-                    _
-                  ],
-                  done: false
-                };
+                const value = valueAt(target, i);
+                if (value === void 0) {
+                  return {
+                    value: void 0,
+                    done: true
+                  };
+                } else {
+                  return {
+                    value: [
+                      i++,
+                      value
+                    ],
+                    done: false
+                  };
+                }
               },
               [Symbol.iterator]() {
                 return this;
               }
             };
+            return iterator;
           },
           keys() {
-            let s = 0;
-            const c = e.length(n);
-            return {
-              next: () => s < c ? {
-                value: s++,
-                done: false
-              } : {
-                value: void 0,
-                done: true
-              },
-              [Symbol.iterator]() {
-                return this;
-              }
-            };
-          },
-          values() {
-            let s = 0;
-            return {
+            let i = 0;
+            const len = context.length(objectId);
+            const iterator = {
               next: () => {
-                const _ = w(t, s++);
-                return _ === void 0 ? {
+                if (i < len) {
+                  return {
+                    value: i++,
+                    done: false
+                  };
+                }
+                return {
                   value: void 0,
                   done: true
-                } : {
-                  value: _,
-                  done: false
                 };
               },
               [Symbol.iterator]() {
                 return this;
               }
             };
+            return iterator;
+          },
+          values() {
+            let i = 0;
+            const iterator = {
+              next: () => {
+                const value = valueAt(target, i++);
+                if (value === void 0) {
+                  return {
+                    value: void 0,
+                    done: true
+                  };
+                } else {
+                  return {
+                    value,
+                    done: false
+                  };
+                }
+              },
+              [Symbol.iterator]() {
+                return this;
+              }
+            };
+            return iterator;
           },
           toArray() {
-            const s = [];
-            let c;
-            do
-              c = w(t, s.length), c !== void 0 && s.push(c);
-            while (c !== void 0);
-            return s;
+            const list = [];
+            let value;
+            do {
+              value = valueAt(target, list.length);
+              if (value !== void 0) {
+                list.push(value);
+              }
+            } while (value !== void 0);
+            return list;
           },
-          map(s) {
-            return this.toArray().map(s);
+          map(f) {
+            return this.toArray().map(f);
           },
           toString() {
             return this.toArray().toString();
@@ -1713,402 +2382,572 @@ ${t.stack}` : r;
           toLocaleString() {
             return this.toArray().toLocaleString();
           },
-          forEach(s) {
-            return this.toArray().forEach(s);
+          forEach(f) {
+            return this.toArray().forEach(f);
           },
-          concat(s) {
-            return this.toArray().concat(s);
+          concat(other) {
+            return this.toArray().concat(other);
           },
-          every(s) {
-            return this.toArray().every(s);
+          every(f) {
+            return this.toArray().every(f);
           },
-          filter(s) {
-            return this.toArray().filter(s);
+          filter(f) {
+            return this.toArray().filter(f);
           },
-          find(s) {
-            let c = 0;
-            for (const _ of this) {
-              if (s(_, c)) return _;
-              c += 1;
+          find(f) {
+            let index = 0;
+            for (const v of this) {
+              if (f(v, index)) {
+                return v;
+              }
+              index += 1;
             }
           },
-          findIndex(s) {
-            let c = 0;
-            for (const _ of this) {
-              if (s(_, c)) return c;
-              c += 1;
+          findIndex(f) {
+            let index = 0;
+            for (const v of this) {
+              if (f(v, index)) {
+                return index;
+              }
+              index += 1;
             }
             return -1;
           },
-          includes(s) {
-            return this.find((c) => c === s) !== void 0;
+          includes(elem) {
+            return this.find((e) => e === elem) !== void 0;
           },
-          join(s) {
-            return this.toArray().join(s);
+          join(sep) {
+            return this.toArray().join(sep);
           },
-          reduce(s, c) {
-            return this.toArray().reduce(s, c);
+          reduce(f, initialValue) {
+            return this.toArray().reduce(f, initialValue);
           },
-          reduceRight(s, c) {
-            return this.toArray().reduceRight(s, c);
+          reduceRight(f, initialValue) {
+            return this.toArray().reduceRight(f, initialValue);
           },
-          lastIndexOf(s, c = 1 / 0) {
-            return this.toArray().lastIndexOf(s, c);
+          lastIndexOf(search, fromIndex = Infinity) {
+            return this.toArray().lastIndexOf(search, fromIndex);
           },
-          slice(s, c) {
-            return this.toArray().slice(s, c);
+          slice(index, num) {
+            return this.toArray().slice(index, num);
           },
-          some(s) {
-            let c = 0;
-            for (const _ of this) {
-              if (s(_, c)) return true;
-              c += 1;
+          some(f) {
+            let index = 0;
+            for (const v of this) {
+              if (f(v, index)) {
+                return true;
+              }
+              index += 1;
             }
             return false;
           },
           [Symbol.iterator]: function* () {
-            let s = 0, c = w(t, s);
-            for (; c !== void 0; ) yield c, s += 1, c = w(t, s);
+            let i = 0;
+            let value = valueAt(target, i);
+            while (value !== void 0) {
+              yield value;
+              i += 1;
+              value = valueAt(target, i);
+            }
           }
         };
+        return methods;
       }
-      function De(t) {
-        const e = t.map((n) => {
-          if (typeof n == "number") return n.toString();
-          if (typeof n == "string") return n.replace(/~/g, "~0").replace(/\//g, "~1");
+      function printPath(path) {
+        const jsonPointerComponents = path.map((component) => {
+          if (typeof component === "number") {
+            return component.toString();
+          } else if (typeof component === "string") {
+            return component.replace(/~/g, "~0").replace(/\//g, "~1");
+          }
         });
-        return t.length === 0 ? "" : "/" + e.join("/");
+        if (path.length === 0) {
+          return "";
+        } else {
+          return "/" + jsonPointerComponents.join("/");
+        }
       }
-      function mn(t) {
-        return typeof t == "object" && t !== null && Object.prototype.hasOwnProperty.call(t, dn);
+      function isImmutableString(obj) {
+        return typeof obj === "object" && obj !== null && Object.prototype.hasOwnProperty.call(obj, IMMUTABLE_STRING);
       }
-      function O(t, e = true) {
-        if (typeof t != "object") throw new RangeError("must be the document root");
-        const n = Reflect.get(t, oe);
-        if (n === void 0 || n == null || e && pn(t) !== "_root") throw new RangeError("must be the document root");
-        return n;
+      function _state(doc, checkroot = true) {
+        if (typeof doc !== "object") {
+          throw new RangeError("must be the document root");
+        }
+        const state = Reflect.get(doc, STATE);
+        if (state === void 0 || state == null || checkroot && _obj(doc) !== "_root") {
+          throw new RangeError("must be the document root");
+        }
+        return state;
       }
-      function os(t) {
-        Reflect.set(t, we, true);
+      function _clear_cache(doc) {
+        Reflect.set(doc, CLEAR_CACHE, true);
       }
-      function pn(t) {
-        return typeof t != "object" || t === null ? null : Reflect.get(t, W);
+      function _obj(doc) {
+        if (!(typeof doc === "object") || doc === null) {
+          return null;
+        }
+        return Reflect.get(doc, OBJECT_ID);
       }
-      function ye(t) {
-        return !!Reflect.get(t, pe);
+      function _is_proxy(doc) {
+        return !!Reflect.get(doc, IS_PROXY);
       }
-      var ss = function(t, e) {
-        var n = {};
-        for (var r in t) Object.prototype.hasOwnProperty.call(t, r) && e.indexOf(r) < 0 && (n[r] = t[r]);
-        if (t != null && typeof Object.getOwnPropertySymbols == "function") for (var o = 0, r = Object.getOwnPropertySymbols(t); o < r.length; o++) e.indexOf(r[o]) < 0 && Object.prototype.propertyIsEnumerable.call(t, r[o]) && (n[r[o]] = t[r[o]]);
-        return n;
+      var __rest = function(s2, e) {
+        var t = {};
+        for (var p in s2) if (Object.prototype.hasOwnProperty.call(s2, p) && e.indexOf(p) < 0) t[p] = s2[p];
+        if (s2 != null && typeof Object.getOwnPropertySymbols === "function") for (var i = 0, p = Object.getOwnPropertySymbols(s2); i < p.length; i++) {
+          if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s2, p[i])) t[p[i]] = s2[p[i]];
+        }
+        return t;
       };
-      function wn(t) {
-        return typeof t == "object" ? t : {
-          actor: t
-        };
-      }
-      function as(t) {
-        const e = wn(t), n = !!e.freeze, r = e.patchCallback, o = e.actor, s = me.create({
-          actor: o
-        });
-        return s.enableFreeze(!!e.freeze), gs(s), s.materialize("/", void 0, {
-          handle: s,
-          heads: void 0,
-          freeze: n,
-          patchCallback: r
-        });
-      }
-      function cs(t, e) {
-        const n = O(t), r = n.handle;
-        return n.handle.materialize("/", e, Object.assign(Object.assign({}, n), {
-          handle: r,
-          heads: e
-        }));
-      }
-      function Q(t, e) {
-        const n = O(t), r = n.heads, o = wn(e), s = n.handle.fork(o.actor, r);
-        s.updateDiffCursor();
-        const { heads: c } = n, _ = ss(n, [
-          "heads"
-        ]);
-        return _.patchCallback = o.patchCallback, s.applyPatches(t, Object.assign(Object.assign({}, _), {
-          handle: s
-        }));
-      }
-      function F(t, e, n) {
-        if (typeof e == "function") return is(t, "change", {}, e).newDoc;
-        throw RangeError("Invalid args for change");
-      }
-      function yn(t, e, n, r) {
-        if (n == null) return t;
-        const o = O(t), s = Object.assign(Object.assign({}, o), {
-          heads: void 0
-        }), { value: c, patches: _ } = o.handle.applyAndReturnPatches(t, s);
-        if (_.length > 0) {
-          r == null ? void 0 : r(_, {
-            before: t,
-            after: c,
-            source: e
-          });
-          const g = O(c);
-          g.mostRecentPatch = {
-            before: O(t).heads,
-            after: g.handle.getHeads(),
-            patches: _
+      function importOpts(_actor) {
+        if (typeof _actor === "object") {
+          return _actor;
+        } else {
+          return {
+            actor: _actor
           };
         }
-        return o.heads = n, c;
       }
-      function is(t, e, n, r, o) {
-        if (typeof r != "function") throw new RangeError("invalid change function");
-        const s = O(t);
-        if (t === void 0 || s === void 0) throw new RangeError("must be the document root");
-        if (s.heads) throw new RangeError("Attempting to change an outdated document.  Use Automerge.clone() if you wish to make a writable copy.");
-        if (ye(t)) throw new RangeError("Calls to Automerge.change cannot be nested");
-        let c = s.handle.getHeads();
-        "time" in n || (n.time = Math.floor(Date.now() / 1e3));
-        try {
-          s.heads = c;
-          const _ = ns(s.handle);
-          if (r(_), s.handle.pendingOps() === 0) return s.heads = void 0, {
-            newDoc: t,
-            newHeads: null
+      function init(_opts) {
+        const opts = importOpts(_opts);
+        const freeze = !!opts.freeze;
+        const patchCallback = opts.patchCallback;
+        const actor = opts.actor;
+        const handle = ApiHandler.create({
+          actor
+        });
+        handle.enableFreeze(!!opts.freeze);
+        registerDatatypes(handle);
+        const doc = handle.materialize("/", void 0, {
+          handle,
+          heads: void 0,
+          freeze,
+          patchCallback
+        });
+        return doc;
+      }
+      function clone(doc, _opts) {
+        const state = _state(doc);
+        const heads = state.heads;
+        const opts = importOpts(_opts);
+        const handle = state.handle.fork(opts.actor, heads);
+        handle.updateDiffCursor();
+        const { heads: _oldHeads } = state, stateSansHeads = __rest(state, [
+          "heads"
+        ]);
+        stateSansHeads.patchCallback = opts.patchCallback;
+        return handle.applyPatches(doc, Object.assign(Object.assign({}, stateSansHeads), {
+          handle
+        }));
+      }
+      function change(doc, options, callback) {
+        if (typeof options === "function") {
+          return _change(doc, "change", {}, options).newDoc;
+        } else {
+          throw RangeError("Invalid args for change");
+        }
+      }
+      function progressDocument(doc, source, heads, callback) {
+        if (heads == null) {
+          return doc;
+        }
+        const state = _state(doc);
+        const nextState = Object.assign(Object.assign({}, state), {
+          heads: void 0
+        });
+        const { value: nextDoc, patches } = state.handle.applyAndReturnPatches(doc, nextState);
+        if (patches.length > 0) {
+          if (callback != null) {
+            callback(patches, {
+              before: doc,
+              after: nextDoc,
+              source
+            });
+          }
+          const newState = _state(nextDoc);
+          newState.mostRecentPatch = {
+            before: _state(doc).heads,
+            after: newState.handle.getHeads(),
+            patches
           };
-          {
-            const g = s.handle.commit(n.message, n.time);
-            return s.handle.integrate(), {
-              newDoc: yn(t, e, c, n.patchCallback || s.patchCallback),
-              newHeads: g != null ? [
-                g
+        }
+        state.heads = heads;
+        return nextDoc;
+      }
+      function _change(doc, source, options, callback, scope) {
+        if (typeof callback !== "function") {
+          throw new RangeError("invalid change function");
+        }
+        const state = _state(doc);
+        if (doc === void 0 || state === void 0) {
+          throw new RangeError("must be the document root");
+        }
+        if (state.heads) {
+          throw new RangeError("Attempting to change an outdated document.  Use Automerge.clone() if you wish to make a writable copy.");
+        }
+        if (_is_proxy(doc)) {
+          throw new RangeError("Calls to Automerge.change cannot be nested");
+        }
+        let heads = state.handle.getHeads();
+        if (!("time" in options)) {
+          options.time = Math.floor(Date.now() / 1e3);
+        }
+        try {
+          state.heads = heads;
+          const root = rootProxy(state.handle);
+          callback(root);
+          if (state.handle.pendingOps() === 0) {
+            state.heads = void 0;
+            if (scope) ;
+            return {
+              newDoc: doc,
+              newHeads: null
+            };
+          } else {
+            const newHead = state.handle.commit(options.message, options.time);
+            state.handle.integrate();
+            return {
+              newDoc: progressDocument(doc, source, heads, options.patchCallback || state.patchCallback),
+              newHeads: newHead != null ? [
+                newHead
               ] : null
             };
           }
-        } catch (_) {
-          throw s.heads = void 0, s.handle.rollback(), _;
+        } catch (e) {
+          state.heads = void 0;
+          state.handle.rollback();
+          throw e;
         }
       }
-      function _s(t) {
-        return O(t).handle.getLastLocalChange() || void 0;
+      function getLastLocalChange(doc) {
+        const state = _state(doc);
+        return state.handle.getLastLocalChange() || void 0;
       }
-      function Pe(t, e, n) {
-        const r = O(t);
-        if (n || (n = {}), r.heads) throw new RangeError("Attempting to change an outdated document.  Use Automerge.clone() if you wish to make a writable copy.");
-        if (ye(t)) throw new RangeError("Calls to Automerge.change cannot be nested");
-        const o = r.handle.getHeads();
-        return r.handle.applyChanges(e), r.heads = o, [
-          yn(t, "applyChanges", o, n.patchCallback || r.patchCallback)
+      function applyChanges(doc, changes, opts) {
+        const state = _state(doc);
+        if (!opts) {
+          opts = {};
+        }
+        if (state.heads) {
+          throw new RangeError("Attempting to change an outdated document.  Use Automerge.clone() if you wish to make a writable copy.");
+        }
+        if (_is_proxy(doc)) {
+          throw new RangeError("Calls to Automerge.change cannot be nested");
+        }
+        const heads = state.handle.getHeads();
+        state.handle.applyChanges(changes);
+        state.heads = heads;
+        return [
+          progressDocument(doc, "applyChanges", heads, opts.patchCallback || state.patchCallback)
         ];
       }
-      function us(t, e, n) {
-        Be(e, "before"), Be(n, "after");
-        const r = O(t);
-        return r.mostRecentPatch && de(r.mostRecentPatch.before, e) && de(r.mostRecentPatch.after, n) ? r.mostRecentPatch.patches : r.handle.diff(e, n);
+      function diff(doc, before, after) {
+        checkHeads(before, "before");
+        checkHeads(after, "after");
+        const state = _state(doc);
+        if (state.mostRecentPatch && equals(state.mostRecentPatch.before, before) && equals(state.mostRecentPatch.after, after)) {
+          return state.mostRecentPatch.patches;
+        }
+        return state.handle.diff(before, after);
       }
-      function Be(t, e) {
-        if (!Array.isArray(t)) throw new Error(`${e} must be an array`);
+      function checkHeads(heads, fieldname) {
+        if (!Array.isArray(heads)) {
+          throw new Error(`${fieldname} must be an array`);
+        }
       }
-      function de(t, e) {
-        if (!Fe(t) || !Fe(e)) return t === e;
-        const n = Object.keys(t).sort(), r = Object.keys(e).sort();
-        if (n.length !== r.length) return false;
-        for (let o = 0; o < n.length; o++) if (n[o] !== r[o] || !de(t[n[o]], e[r[o]])) return false;
+      function equals(val1, val2) {
+        if (!isObject(val1) || !isObject(val2)) return val1 === val2;
+        const keys1 = Object.keys(val1).sort(), keys2 = Object.keys(val2).sort();
+        if (keys1.length !== keys2.length) return false;
+        for (let i = 0; i < keys1.length; i++) {
+          if (keys1[i] !== keys2[i]) return false;
+          if (!equals(val1[keys1[i]], val2[keys2[i]])) return false;
+        }
         return true;
       }
-      function ls(t) {
-        return me.decodeChange(t);
+      function decodeChange(data) {
+        return ApiHandler.decodeChange(data);
       }
-      function Fe(t) {
-        return typeof t == "object" && t !== null;
+      function isObject(obj) {
+        return typeof obj === "object" && obj !== null;
       }
-      function gs(t) {
-        t.registerDatatype("counter", (e) => new fe(e), (e) => {
-          if (e instanceof fe) return e.value;
-        }), t.registerDatatype("str", (e) => new bn(e), (e) => {
-          if (mn(e)) return e.val;
+      function registerDatatypes(handle) {
+        handle.registerDatatype("counter", (n) => new Counter(n), (n) => {
+          if (n instanceof Counter) {
+            return n.value;
+          }
+        });
+        handle.registerDatatype("str", (n) => {
+          return new ImmutableString(n);
+        }, (s2) => {
+          if (isImmutableString(s2)) {
+            return s2.val;
+          }
         });
       }
-      function fs(t, e, n) {
-        const r = ds(t, e, "updateText");
-        if (!ye(t)) throw new RangeError("object cannot be modified outside of a change block");
-        const o = O(t, false);
-        os(t);
+      function updateText(doc, path, newText) {
+        const objPath = absoluteObjPath(doc, path, "updateText");
+        if (!_is_proxy(doc)) {
+          throw new RangeError("object cannot be modified outside of a change block");
+        }
+        const state = _state(doc, false);
+        _clear_cache(doc);
         try {
-          return o.handle.updateText(r, n);
-        } catch (s) {
-          throw new RangeError(`Cannot updateText: ${s}`);
+          return state.handle.updateText(objPath, newText);
+        } catch (e) {
+          throw new RangeError(`Cannot updateText: ${e}`);
         }
       }
-      function ds(t, e, n) {
-        e = e.slice();
-        const r = pn(t);
-        if (!r) throw new RangeError(`invalid object for ${n}`);
-        return e.unshift(r), e.join("/");
+      function absoluteObjPath(doc, path, functionName) {
+        path = path.slice();
+        const objectId = _obj(doc);
+        if (!objectId) {
+          throw new RangeError(`invalid object for ${functionName}`);
+        }
+        path.unshift(objectId);
+        return path.join("/");
       }
-      Ln(Jo);
-      const he = Math.PI, Le = he * 2, hs = (t, e = 0, n = 1) => Math.min(Math.max(t, e), n), be = (t = 0, e = -1, n = 1, r = false) => {
-        let o = n === e ? e : (t - e) / (n - e);
-        return r ? hs(o) : o;
-      }, Se = (t = 0, e = -1, n = 1) => t * (n - e) + e, q = (t = 0, e = -1, n = 1, r = 0, o = 1, s = false, c = 1) => {
-        n < e && ([e, n, r, o] = [
-          n,
-          e,
-          o,
-          r
-        ]);
-        let _ = be(t, e, n, s) ** c;
-        return Se(_, r, o);
-      }, Sn = (t = 0, e = 1) => Se(Math.random(), t, e), bs = (t = 0, e = 1) => Math.floor(Sn(t, e + 1)), ms = (t) => Number.EPSILON > Math.abs(t), ps = (t, e) => {
-        const n = 1 / e;
-        return Math.round(t * n) / n;
+      UseApi(api);
+      const PI = Math.PI;
+      const TAU = PI * 2;
+      const clip = (i, min2 = 0, max2 = 1) => Math.min(Math.max(i, min2), max2);
+      const no = (i = 0, min2 = -1, max2 = 1, doClip = false) => {
+        let n = max2 === min2 ? min2 : (i - min2) / (max2 - min2);
+        return doClip ? clip(n) : n;
       };
-      function ws(t) {
-        const e = [
-          ...t
+      const de = (i = 0, min2 = -1, max2 = 1) => i * (max2 - min2) + min2;
+      const re = (i = 0, min1 = -1, max1 = 1, min2 = 0, max2 = 1, doClip = false, exp = 1) => {
+        if (max1 < min1) [min1, max1, min2, max2] = [
+          max1,
+          min1,
+          max2,
+          min2
         ];
-        for (let n = e.length - 1; n > 0; n--) {
-          const r = Math.floor(Math.random() * (n + 1));
-          [e[n], e[r]] = [
-            e[r],
-            e[n]
+        let n = no(i, min1, max1, doClip) ** exp;
+        return de(n, min2, max2);
+      };
+      const rand = (min2 = 0, max2 = 1) => de(Math.random(), min2, max2);
+      const randInt = (min2 = 0, max2 = 1) => Math.floor(rand(min2, max2 + 1));
+      const isZero = (v) => Number.EPSILON > Math.abs(v);
+      const roundTo = (input, precision) => {
+        const p = 1 / precision;
+        return Math.round(input * p) / p;
+      };
+      function shuffleArray(array) {
+        const shuffled = [
+          ...array
+        ];
+        for (let i = shuffled.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [shuffled[i], shuffled[j]] = [
+            shuffled[j],
+            shuffled[i]
           ];
         }
-        return e;
+        return shuffled;
       }
-      const ys = (t, e) => t[e % t.length], xe = (t) => t[bs(0, t.length - 1)], _e = (t = 0.5) => Sn(0, 1) < t, a = (t = 0, e = 0) => ({
-        x: t,
-        y: e
+      const arrMod = (arr, i) => arr[i % arr.length];
+      const arrRnd = (arr) => arr[randInt(0, arr.length - 1)];
+      const chance = (v = 0.5) => rand(0, 1) < v;
+      const Vec = (x = 0, y = 0) => ({
+        x,
+        y
       });
-      a.of = (t) => a(t, t);
-      a.clone = (t) => a(t.x, t.y);
-      a.random = (t = 1) => a.Smul(t, a.complement(a.Smul(2, a(Math.random(), Math.random()))));
-      a.fromA = ([t, e]) => a(t, e);
-      a.toA = (t) => [
-        t.x,
-        t.y
+      Vec.of = (s2) => Vec(s2, s2);
+      Vec.clone = (v) => Vec(v.x, v.y);
+      Vec.random = (scale = 1) => Vec.Smul(scale, Vec.complement(Vec.Smul(2, Vec(Math.random(), Math.random()))));
+      Vec.fromA = ([x, y]) => Vec(x, y);
+      Vec.toA = (v) => [
+        v.x,
+        v.y
       ];
-      a.fromPolar = (t, e) => a(e * Math.cos(t), e * Math.sin(t));
-      a.fromWindow = () => a(window.innerWidth, window.innerHeight);
-      a.log = (t, e = 1) => "(" + a.toA(a.roundTo(t, e)).join(",") + ")";
-      a.set = (t, e) => {
-        t.x = e.x, t.y = e.y;
+      Vec.fromPolar = (angle, length) => Vec(length * Math.cos(angle), length * Math.sin(angle));
+      Vec.fromWindow = () => Vec(window.innerWidth, window.innerHeight);
+      Vec.log = (v, places = 1) => "(" + Vec.toA(Vec.roundTo(v, places)).join(",") + ")";
+      Vec.set = (dest, src) => {
+        dest.x = src.x;
+        dest.y = src.y;
       };
-      a.x = Object.freeze(a(1));
-      a.y = Object.freeze(a(0, 1));
-      a.zero = Object.freeze(a());
-      a.map = (t, e) => a(t(e.x), t(e.y));
-      a.map2 = (t, e, n) => a(t(e.x, n.x), t(e.y, n.y));
-      a.reduce = (t, e) => t(e.x, e.y);
-      a.cross = (t, e) => t.x * e.y - t.y * e.x;
-      a.project = (t, e) => a.mulS(e, a.dot(t, e) / a.len2(e));
-      a.reject = (t, e) => a.sub(t, a.project(t, e));
-      a.scalarProjection = (t, e, n) => {
-        const r = a.sub(t, e), o = a.normalize(a.sub(n, e)), s = a.mulS(o, a.dot(r, o));
-        return a.add(e, s);
+      Vec.x = Object.freeze(Vec(1));
+      Vec.y = Object.freeze(Vec(0, 1));
+      Vec.zero = Object.freeze(Vec());
+      Vec.map = (f, v) => Vec(f(v.x), f(v.y));
+      Vec.map2 = (f, a, b) => Vec(f(a.x, b.x), f(a.y, b.y));
+      Vec.reduce = (f, v) => f(v.x, v.y);
+      Vec.cross = (a, b) => a.x * b.y - a.y * b.x;
+      Vec.project = (a, b) => Vec.mulS(b, Vec.dot(a, b) / Vec.len2(b));
+      Vec.reject = (a, b) => Vec.sub(a, Vec.project(a, b));
+      Vec.scalarProjection = (p, a, b) => {
+        const ap = Vec.sub(p, a);
+        const ab = Vec.normalize(Vec.sub(b, a));
+        const f = Vec.mulS(ab, Vec.dot(ap, ab));
+        return Vec.add(a, f);
       };
-      a.add = (t, e) => a(t.x + e.x, t.y + e.y);
-      a.div = (t, e) => a(t.x / e.x, t.y / e.y);
-      a.mul = (t, e) => a(t.x * e.x, t.y * e.y);
-      a.sub = (t, e) => a(t.x - e.x, t.y - e.y);
-      a.addS = (t, e) => a.add(t, a.of(e));
-      a.divS = (t, e) => a.div(t, a.of(e));
-      a.mulS = (t, e) => a.mul(t, a.of(e));
-      a.subS = (t, e) => a.sub(t, a.of(e));
-      a.Sadd = (t, e) => a.add(a.of(t), e);
-      a.Sdiv = (t, e) => a.div(a.of(t), e);
-      a.Smul = (t, e) => a.mul(a.of(t), e);
-      a.Ssub = (t, e) => a.sub(a.of(t), e);
-      a.dist = (t, e) => a.len(a.sub(t, e));
-      a.dist2 = (t, e) => a.len2(a.sub(t, e));
-      a.dot = (t, e) => t.x * e.x + t.y * e.y;
-      a.equal = (t, e) => ms(a.dist2(t, e));
-      a.len2 = (t) => a.dot(t, t);
-      a.len = (t) => Math.sqrt(a.dot(t, t));
-      a.ceil = (t) => a.map(Math.ceil, t);
-      a.floor = (t) => a.map(Math.floor, t);
-      a.round = (t) => a.map(Math.round, t);
-      a.roundTo = (t, e) => a.map2(ps, t, a.of(e));
-      a.complement = (t) => a.Ssub(1, t);
-      a.half = (t) => a.divS(t, 2);
-      a.normalize = (t) => a.divS(t, a.len(t));
-      a.recip = (t) => a.Sdiv(1, t);
-      a.renormalize = (t, e) => a.Smul(e, a.normalize(t));
-      a.lengthen = (t, e) => a.renormalize(t, a.len(t) + e);
-      a.avg = (t, e) => a.half(a.add(t, e));
-      a.lerp = (t, e, n) => a.add(t, a.Smul(n, a.sub(e, t)));
-      a.max = (t, e) => a.map2(Math.max, t, e);
-      a.min = (t, e) => a.map2(Math.min, t, e);
-      a.abs = (t) => a.map(Math.abs, t);
-      a.invert = (t) => a(-t.x, -t.y);
-      a.invertX = (t) => a(-t.x, t.y);
-      a.invertY = (t) => a(t.x, -t.y);
-      a.rotate90CW = (t) => a(t.y, -t.x);
-      a.rotate90CCW = (t) => a(-t.y, t.x);
-      a.rotate = (t, e) => a(t.x * Math.cos(e) - t.y * Math.sin(e), t.x * Math.sin(e) + t.y * Math.cos(e));
-      a.rotateAround = (t, e, n) => {
-        const r = a.sub(t, e), o = a.rotate(r, n);
-        return a.add(o, e);
+      Vec.add = (a, b) => Vec(a.x + b.x, a.y + b.y);
+      Vec.div = (a, b) => Vec(a.x / b.x, a.y / b.y);
+      Vec.mul = (a, b) => Vec(a.x * b.x, a.y * b.y);
+      Vec.sub = (a, b) => Vec(a.x - b.x, a.y - b.y);
+      Vec.addS = (v, s2) => Vec.add(v, Vec.of(s2));
+      Vec.divS = (v, s2) => Vec.div(v, Vec.of(s2));
+      Vec.mulS = (v, s2) => Vec.mul(v, Vec.of(s2));
+      Vec.subS = (v, s2) => Vec.sub(v, Vec.of(s2));
+      Vec.Sadd = (s2, v) => Vec.add(Vec.of(s2), v);
+      Vec.Sdiv = (s2, v) => Vec.div(Vec.of(s2), v);
+      Vec.Smul = (s2, v) => Vec.mul(Vec.of(s2), v);
+      Vec.Ssub = (s2, v) => Vec.sub(Vec.of(s2), v);
+      Vec.dist = (a, b) => Vec.len(Vec.sub(a, b));
+      Vec.dist2 = (a, b) => Vec.len2(Vec.sub(a, b));
+      Vec.dot = (a, b) => a.x * b.x + a.y * b.y;
+      Vec.equal = (a, b) => isZero(Vec.dist2(a, b));
+      Vec.len2 = (v) => Vec.dot(v, v);
+      Vec.len = (v) => Math.sqrt(Vec.dot(v, v));
+      Vec.ceil = (v) => Vec.map(Math.ceil, v);
+      Vec.floor = (v) => Vec.map(Math.floor, v);
+      Vec.round = (v) => Vec.map(Math.round, v);
+      Vec.roundTo = (v, s2) => Vec.map2(roundTo, v, Vec.of(s2));
+      Vec.complement = (v) => Vec.Ssub(1, v);
+      Vec.half = (v) => Vec.divS(v, 2);
+      Vec.normalize = (v) => Vec.divS(v, Vec.len(v));
+      Vec.recip = (v) => Vec.Sdiv(1, v);
+      Vec.renormalize = (v, length) => Vec.Smul(length, Vec.normalize(v));
+      Vec.lengthen = (v, amt) => Vec.renormalize(v, Vec.len(v) + amt);
+      Vec.avg = (a, b) => Vec.half(Vec.add(a, b));
+      Vec.lerp = (a, b, t) => Vec.add(a, Vec.Smul(t, Vec.sub(b, a)));
+      Vec.max = (a, b) => Vec.map2(Math.max, a, b);
+      Vec.min = (a, b) => Vec.map2(Math.min, a, b);
+      Vec.abs = (v) => Vec.map(Math.abs, v);
+      Vec.invert = (v) => Vec(-v.x, -v.y);
+      Vec.invertX = (v) => Vec(-v.x, v.y);
+      Vec.invertY = (v) => Vec(v.x, -v.y);
+      Vec.rotate90CW = (v) => Vec(v.y, -v.x);
+      Vec.rotate90CCW = (v) => Vec(-v.y, v.x);
+      Vec.rotate = (v, angle) => Vec(v.x * Math.cos(angle) - v.y * Math.sin(angle), v.x * Math.sin(angle) + v.y * Math.cos(angle));
+      Vec.rotateAround = (pointToRotate, rotateAround, angle) => {
+        const translatedPoint = Vec.sub(pointToRotate, rotateAround);
+        const rotatedPoint = Vec.rotate(translatedPoint, angle);
+        return Vec.add(rotatedPoint, rotateAround);
       };
-      a.angle = (t) => Math.atan2(t.y, t.x);
-      a.angleBetween = (t, e) => {
-        const n = a.dot(t, e), r = a.len(t), o = a.len(e);
-        return Math.acos(n / (r * o));
+      Vec.angle = (v) => Math.atan2(v.y, v.x);
+      Vec.angleBetween = (a, b) => {
+        const dotProduct = Vec.dot(a, b);
+        const magnitudeA = Vec.len(a);
+        const magnitudeB = Vec.len(b);
+        const angleInRadians = Math.acos(dotProduct / (magnitudeA * magnitudeB));
+        return angleInRadians;
       };
-      a.angleBetweenClockwise = (t, e) => {
-        const n = a.dot(t, e), r = a.cross(t, e);
-        return Math.atan2(r, n);
+      Vec.angleBetweenClockwise = (a, b) => {
+        const dP = Vec.dot(a, b);
+        const cP = Vec.cross(a, b);
+        const angleInRadians = Math.atan2(cP, dP);
+        return angleInRadians;
       };
-      const H = 500, $ = 50, Ss = 10, Ae = document.createElement("canvas"), P = Ae.getContext("2d", {
+      const step = 2;
+      const width$1 = 500;
+      const height$1 = 50;
+      const springStiffness = 10;
+      const cvs = document.createElement("canvas");
+      const ctx = cvs.getContext("2d", {
         willReadFrequently: true
-      }), y = 1;
-      Ae.width = H * y;
-      Ae.height = $ * y;
-      P.scale(y, y);
-      P.font = "500 16px / 1 'Overpass Mono'";
-      function xs(t, e) {
-        const n = [];
-        for (let r of t.edits) if (r.type == "edit") {
-          P.fillStyle = "black", P.fillRect(0, 0, H, $), P.fillStyle = "white", P.fillText(r.text, 0, 14);
-          const o = P.getImageData(0, 0, H, $).data;
-          for (let s = 0; s < $; s++) for (let c = 0; c < H; c++) {
-            const _ = (s * H + c) * 4;
-            if (o[_] > 127) {
-              let g = c + (22.5 + r.charIndex * 9.8) * y;
-              n.push(J(g, s, e));
+      });
+      cvs.width = width$1;
+      cvs.height = height$1;
+      ctx.font = "500 16px / 1 'Overpass Mono'";
+      function makeDots(info, worldPos) {
+        const dots = [];
+        for (let edit of info.edits) {
+          if (edit.type == "edit") {
+            ctx.fillStyle = "black";
+            ctx.fillRect(0, 0, width$1, height$1);
+            ctx.fillStyle = "white";
+            ctx.fillText(edit.text, 0, 14.5);
+            const data = ctx.getImageData(0, 0, width$1, height$1).data;
+            for (let y = 0; y < height$1; y += step) {
+              for (let x = 0; x < width$1; x += step) {
+                const byte = (y * width$1 + x) * 4;
+                if (data[byte] > 127) {
+                  let X = x + (30 + edit.charIndex * 9.8);
+                  dots.push(makeDot(X, y, worldPos));
+                }
+              }
+            }
+            if (dots.length == 0) dots.push(makeDot(35 + edit.charIndex * 9.8, 10, worldPos));
+          } else if (edit.type == "clear") {
+            let y1 = 8;
+            let y2 = 9;
+            let x1 = -6;
+            let x2 = 250;
+            for (let y = y1; y <= y2; y += step) {
+              for (let x = x1; x <= x2; x += step) {
+                dots.push(makeDot(x, y, worldPos));
+              }
+            }
+          } else if (edit.type == "toggle" && edit.value) {
+            let y1 = 5;
+            let y2 = 11;
+            let x1 = 6;
+            let x2 = 11;
+            for (let y = y1; y <= y2; y += step) {
+              for (let x = x1; x <= x2; x += step) {
+                dots.push(makeDot(x, y, worldPos));
+              }
+            }
+          } else {
+            let y1 = 0;
+            let y2 = 18;
+            let x1 = 0;
+            let x2 = 18;
+            let r = 2;
+            for (let y = y1; y <= y2; y += step) {
+              for (let x = x1; x <= x2; x += step) {
+                if (x - x1 < r || x2 - x < r || y - y1 < r || y2 - y < r) {
+                  dots.push(makeDot(x, y, worldPos));
+                }
+              }
             }
           }
-        } else if (r.type == "clear") {
-          let o = 8, s = 9, c = -6, _ = 250;
-          for (let g = o; g <= s; g++) for (let d = c; d <= _; d++) n.push(J(d * y, g * y, e));
-        } else if (r.type == "toggle" && r.value) {
-          let o = 2, s = 15, c = 1, _ = 14;
-          for (let g = o; g <= s; g++) for (let d = c; d <= _; d++) n.push(J(d * y, g * y, e));
-        } else {
-          let o = 1, s = 16, c = 1, _ = 15, g = 1.5;
-          for (let d = o; d <= s; d++) for (let h = c; h <= _; h++) (h - c < g || _ - h < g || d - o < g || s - d < g) && n.push(J(h * y, d * y, e));
         }
-        return n;
+        return dots;
       }
-      function J(t = 0, e = 0, n) {
-        let r = t / y, o = e / y, s = a(r, o), c = a.add(s, n), _ = a.random(0.1), g = Ss, d = 1 - e / $;
+      function makeDot(x, y, worldPos) {
+        let X = x;
+        let Y = y;
+        let local = Vec(X, Y);
+        let pos = Vec.add(local, worldPos);
+        let vel = Vec.random(0.1);
+        let springK = springStiffness;
+        let age = 1 - y / height$1 - 5 * x / width$1;
+        let color = [
+          0.166,
+          0.166,
+          0.166,
+          1
+        ];
         return {
-          local: s,
-          pos: c,
-          vel: _,
-          springPos: c,
-          springVel: _,
-          springK: g,
-          age: d,
+          local,
+          pos,
+          vel,
+          springPos: pos,
+          springVel: vel,
+          springK,
+          age,
           isComplete: false,
-          color: [
-            0.166,
-            0.166,
-            0.166,
-            1
-          ]
+          color
         };
       }
-      const As = 4, Cs = 0.8, vs = `#version 300 es
+      const sides = 4;
+      const radius = 1.2;
+      const canvas = document.querySelector("#demo canvas");
+      const dpr = window.devicePixelRatio;
+      const gl = canvas.getContext("webgl2", {
+        antialias: false
+      });
+      gl.enable(gl.BLEND);
+      gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+      let width = 0;
+      let height = 0;
+      let bounds;
+      const vertexShaderSource = `#version 300 es
 in vec2 a_position;
 in vec2 a_offset;
 in float a_alpha;
@@ -2123,7 +2962,8 @@ void main() {
   v_alpha = a_alpha;
   v_color = a_color;
 }
-`, Rs = `#version 300 es
+`;
+      const fragmentShaderSource = `#version 300 es
 precision mediump float;
 in float v_alpha;
 in vec3 v_color;
@@ -2131,125 +2971,219 @@ out vec4 outColor;
 void main() {
   outColor = vec4(v_color, v_alpha);
 }
-`, U = document.querySelector("#demo canvas"), ee = window.devicePixelRatio;
-      let te = 0, ne = 0, X;
-      const xn = () => {
-        X = U.getBoundingClientRect(), te = X.width, ne = X.height, U.width = te * ee, U.height = ne * ee;
+`;
+      const resize = () => {
+        bounds = getCanvasRect();
+        width = bounds.width;
+        height = bounds.height;
+        canvas.width = width * dpr;
+        canvas.height = height * dpr;
       };
-      xn();
-      window.onresize = xn;
-      function js() {
-        return X ?? (X = U.getBoundingClientRect());
+      resize();
+      window.onresize = resize;
+      function getCanvasRect() {
+        if (bounds) return bounds;
+        bounds = canvas.getBoundingClientRect();
+        let body = document.body.getBoundingClientRect();
+        bounds.x -= body.x;
+        bounds.y -= body.y;
+        return bounds;
       }
-      function An(t, e, n) {
-        const r = t.createShader(e);
-        return t.shaderSource(r, n), t.compileShader(r), r;
+      function compileShader(gl2, type, source) {
+        const shader = gl2.createShader(type);
+        gl2.shaderSource(shader, source);
+        gl2.compileShader(shader);
+        return shader;
       }
-      function Es(t, e) {
-        const n = [];
-        for (let r = 0; r < t; r++) {
-          const o = r / t * Le + he / 4, s = (r + 1) / t * Le + he / 4;
-          n.push(0, 0, e * Math.cos(o), e * Math.sin(o), e * Math.cos(s), e * Math.sin(s));
+      function makePolygon(sides2, radius2) {
+        const vertices = [];
+        for (let i = 0; i < sides2; i++) {
+          const a1 = i / sides2 * TAU + PI / 4;
+          const a2 = (i + 1) / sides2 * TAU + PI / 4;
+          vertices.push(0, 0, radius2 * Math.cos(a1), radius2 * Math.sin(a1), radius2 * Math.cos(a2), radius2 * Math.sin(a2));
         }
-        return n;
+        return vertices;
       }
-      const f = U.getContext("webgl2", {
-        antialias: true
+      const vertShader = compileShader(gl, gl.VERTEX_SHADER, vertexShaderSource);
+      const fragShader = compileShader(gl, gl.FRAGMENT_SHADER, fragmentShaderSource);
+      const program = gl.createProgram();
+      gl.attachShader(program, vertShader);
+      gl.attachShader(program, fragShader);
+      gl.linkProgram(program);
+      const resolutionLoc = gl.getUniformLocation(program, "u_resolution");
+      const vao = gl.createVertexArray();
+      gl.bindVertexArray(vao);
+      const shapeVertices = makePolygon(sides, radius);
+      const vertexCount = shapeVertices.length / 2;
+      const shapeBuffer = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, shapeBuffer);
+      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(shapeVertices), gl.STATIC_DRAW);
+      const positionLoc = gl.getAttribLocation(program, "a_position");
+      gl.enableVertexAttribArray(positionLoc);
+      gl.vertexAttribPointer(positionLoc, 2, gl.FLOAT, false, 0, 0);
+      const instanceBuffer = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, instanceBuffer);
+      const offsetLoc = gl.getAttribLocation(program, "a_offset");
+      gl.enableVertexAttribArray(offsetLoc);
+      gl.vertexAttribPointer(offsetLoc, 2, gl.FLOAT, false, 0, 0);
+      gl.vertexAttribDivisor(offsetLoc, 1);
+      const alphaBuffer = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, alphaBuffer);
+      const alphaLoc = gl.getAttribLocation(program, "a_alpha");
+      gl.enableVertexAttribArray(alphaLoc);
+      gl.vertexAttribPointer(alphaLoc, 1, gl.FLOAT, false, 0, 0);
+      gl.vertexAttribDivisor(alphaLoc, 1);
+      const colorBuffer = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
+      const colorLoc = gl.getAttribLocation(program, "a_color");
+      gl.enableVertexAttribArray(colorLoc);
+      gl.vertexAttribPointer(colorLoc, 3, gl.FLOAT, false, 0, 0);
+      gl.vertexAttribDivisor(colorLoc, 1);
+      function render(particles) {
+        gl.viewport(0, 0, width * dpr, height * dpr);
+        gl.clearColor(0, 0, 0, 0);
+        gl.clear(gl.COLOR_BUFFER_BIT);
+        gl.useProgram(program);
+        gl.uniform2f(resolutionLoc, width, height);
+        gl.bindVertexArray(vao);
+        let count = 0;
+        for (let particle of particles) count += particle.dots.length;
+        const offsets = new Float32Array(count * 2);
+        const alphas = new Float32Array(count);
+        const colors = new Float32Array(count * 3);
+        let i = 0;
+        for (let particle of particles) {
+          for (let dot of particle.dots) {
+            offsets[i * 2] = dot.springPos.x;
+            offsets[i * 2 + 1] = dot.springPos.y;
+            colors[i * 3] = dot.color[0];
+            colors[i * 3 + 1] = dot.color[1];
+            colors[i * 3 + 2] = dot.color[2];
+            alphas[i] = dot.color[3];
+            i++;
+          }
+        }
+        gl.bindBuffer(gl.ARRAY_BUFFER, instanceBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, offsets, gl.DYNAMIC_DRAW);
+        gl.bindBuffer(gl.ARRAY_BUFFER, alphaBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, alphas, gl.DYNAMIC_DRAW);
+        gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, colors, gl.DYNAMIC_DRAW);
+        gl.drawArraysInstanced(gl.TRIANGLES, 0, vertexCount, count);
+      }
+      let r1 = 0.166;
+      let g1 = 0.166;
+      let b1 = 0.166;
+      let r2 = 0.8 * 1;
+      let g2 = 0.8 * 0.8;
+      let b2 = 0.8 * 0.2;
+      window.addEventListener("set-theme", (e) => {
+        setTheme(e.detail);
       });
-      f.enable(f.BLEND);
-      f.blendFunc(f.SRC_ALPHA, f.ONE_MINUS_SRC_ALPHA);
-      const Os = An(f, f.VERTEX_SHADER, vs), Is = An(f, f.FRAGMENT_SHADER, Rs), M = f.createProgram();
-      f.attachShader(M, Os);
-      f.attachShader(M, Is);
-      f.linkProgram(M);
-      const Ts = f.getUniformLocation(M, "u_resolution"), Cn = f.createVertexArray();
-      f.bindVertexArray(Cn);
-      const vn = Es(As, Cs), Ms = vn.length / 2, ks = f.createBuffer();
-      f.bindBuffer(f.ARRAY_BUFFER, ks);
-      f.bufferData(f.ARRAY_BUFFER, new Float32Array(vn), f.STATIC_DRAW);
-      const Rn = f.getAttribLocation(M, "a_position");
-      f.enableVertexAttribArray(Rn);
-      f.vertexAttribPointer(Rn, 2, f.FLOAT, false, 0, 0);
-      const jn = f.createBuffer();
-      f.bindBuffer(f.ARRAY_BUFFER, jn);
-      const Ce = f.getAttribLocation(M, "a_offset");
-      f.enableVertexAttribArray(Ce);
-      f.vertexAttribPointer(Ce, 2, f.FLOAT, false, 0, 0);
-      f.vertexAttribDivisor(Ce, 1);
-      const En = f.createBuffer();
-      f.bindBuffer(f.ARRAY_BUFFER, En);
-      const ve = f.getAttribLocation(M, "a_alpha");
-      f.enableVertexAttribArray(ve);
-      f.vertexAttribPointer(ve, 1, f.FLOAT, false, 0, 0);
-      f.vertexAttribDivisor(ve, 1);
-      const On = f.createBuffer();
-      f.bindBuffer(f.ARRAY_BUFFER, On);
-      const Re = f.getAttribLocation(M, "a_color");
-      f.enableVertexAttribArray(Re);
-      f.vertexAttribPointer(Re, 3, f.FLOAT, false, 0, 0);
-      f.vertexAttribDivisor(Re, 1);
-      function Ds(t) {
-        f.viewport(0, 0, te * ee, ne * ee), f.clearColor(0, 0, 0, 0), f.clear(f.COLOR_BUFFER_BIT), f.useProgram(M), f.uniform2f(Ts, te, ne), f.bindVertexArray(Cn);
-        let e = 0;
-        for (let c of t) e += c.dots.length;
-        const n = new Float32Array(e * 2), r = new Float32Array(e), o = new Float32Array(e * 3);
-        let s = 0;
-        for (let c of t) for (let _ of c.dots) n[s * 2] = _.springPos.x, n[s * 2 + 1] = _.springPos.y, o[s * 3] = _.color[0], o[s * 3 + 1] = _.color[1], o[s * 3 + 2] = _.color[2], r[s] = _.color[3], s++;
-        f.bindBuffer(f.ARRAY_BUFFER, jn), f.bufferData(f.ARRAY_BUFFER, n, f.DYNAMIC_DRAW), f.bindBuffer(f.ARRAY_BUFFER, En), f.bufferData(f.ARRAY_BUFFER, r, f.DYNAMIC_DRAW), f.bindBuffer(f.ARRAY_BUFFER, On), f.bufferData(f.ARRAY_BUFFER, o, f.DYNAMIC_DRAW), f.drawArraysInstanced(f.TRIANGLES, 0, Ms, e);
+      function setTheme(theme) {
+        if (theme == "dark") {
+          r1 = 1;
+          g1 = 0.8;
+          b1 = 0.2;
+          r2 = 0.2;
+          g2 = 0.2;
+          b2 = 0.2;
+        } else {
+          r1 = 0.166;
+          g1 = 0.166;
+          b1 = 0.166;
+          r2 = 0.8 * 1;
+          g2 = 0.8 * 0.8;
+          b2 = 0.8 * 0.2;
+        }
       }
-      const _j = class _j {
-        constructor(e, n, r, o) {
+      setTheme(document.documentElement.getAttribute("theme"));
+      const _Particle = class _Particle {
+        constructor(sourceInfo, source, target, isDelete) {
           __publicField(this, "dots");
           __publicField(this, "dest", {
             x: 0,
             y: 0
           });
           __publicField(this, "applyEarly", false);
-          this.sourceInfo = e, this.source = n, this.target = r, this.isDelete = o, e.edits.some((c) => c.type == "add") && (this.applyEarly = true), this.dots = xs(e, He(n, e.todoIndex)), _j.all.add(this);
+          this.sourceInfo = sourceInfo;
+          this.source = source;
+          this.target = target;
+          this.isDelete = isDelete;
+          let isAdd = sourceInfo.edits.some((e) => e.type == "add");
+          if (isAdd) this.applyEarly = true;
+          this.dots = makeDots(sourceInfo, getPos(source, sourceInfo.todoIndex));
+          _Particle.all.add(this);
         }
-        static update(e) {
-          _j.all.forEach((n) => n.physics(e)), document.hidden || Ds(_j.all);
+        static update(dt) {
+          _Particle.all.forEach((p) => p.physics(dt));
+          render(_Particle.all);
         }
         static recalc() {
-          let e = /* @__PURE__ */ new Map();
-          for (let n of _j.all) {
-            for (let r = 0; r < n.target.spec.todos.length; r++) e.set(n.target.spec.todos[r].id, r);
-            n.target.speculate(n.sourceInfo);
-            for (let r = 0; r < n.target.spec.todos.length; r++) e.set(n.target.spec.todos[r].id, r);
+          let map = /* @__PURE__ */ new Map();
+          for (let particle of _Particle.all) {
+            for (let i = 0; i < particle.target.spec.todos.length; i++) map.set(particle.target.spec.todos[i].id, i);
+            particle.target.speculate(particle.sourceInfo);
+            for (let i = 0; i < particle.target.spec.todos.length; i++) map.set(particle.target.spec.todos[i].id, i);
           }
-          for (let n of _j.all) {
-            let r = e.get(n.sourceInfo.id);
-            if (r != null && r >= 0) n.dest = He(n.target, r);
+          for (let particle of _Particle.all) {
+            let idx = map.get(particle.sourceInfo.id);
+            if (idx != null && idx >= 0) particle.dest = getPos(particle.target, idx);
             else debugger;
           }
         }
-        physics(e) {
-          let n = true;
-          for (const r of this.dots) {
-            if (r.isComplete) continue;
-            let o = a.add(this.dest, r.local), s = a.len(a.sub(o, r.springPos));
-            if (s < 50 && this.applyEarly && (this.applyEarly = false, this.target.applyChange(this.sourceInfo.change)), s < 0.1) {
-              this.isDelete || (r.color[3] = 0.7), r.isComplete = true;
-              continue;
+        physics(dt) {
+          let allComplete = true;
+          for (const dot of this.dots) {
+            let destPos = Vec.add(this.dest, dot.local);
+            let springDist = Vec.len(Vec.sub(destPos, dot.springPos));
+            if (springDist < 50 && this.applyEarly) {
+              this.applyEarly = false;
+              this.target.applyChange(this.sourceInfo.change);
             }
-            n = false, r.age += e;
-            let c = be(r.age, 0, 4, true) ** 1.5, _ = 0.02 * c, g = a.renormalize(a.sub(o, r.pos), _), d = be(s, 120, 0, true), h = Se(d, 0.99, 0.88) ** (e * 60);
-            r.vel = a.add(r.vel, a.Smul(120 * e, g)), r.vel = a.mulS(r.vel, h), r.pos = a.add(r.pos, a.Smul(120 * e, r.vel));
-            const m = a.sub(r.pos, r.springPos), v = a.Smul(r.springK * c, m);
-            r.springVel = a.add(r.springVel, a.Smul(e, v)), r.springVel = a.mulS(r.springVel, h), r.springPos = a.add(r.springPos, a.Smul(e, r.springVel)), this.isDelete ? (r.color[0] = q(s, 500, 0, 0.133, 0.8 * 1), r.color[1] = q(s, 500, 0, 0.133, 0.8 * 0.8), r.color[2] = q(s, 500, 0, 0.133, 0.8 * 0.2)) : r.color[3] = q(r.age, 0, 3, 0, 1);
+            dot.isComplete = springDist < 0.2;
+            allComplete && (allComplete = dot.isComplete);
+            dot.age += dt;
+            let rampStart = no(dot.age, 0, 4, true) ** 1.5;
+            let maxAccel = 0.05 * rampStart;
+            let accel = Vec.renormalize(Vec.sub(destPos, dot.pos), maxAccel);
+            let approach = no(springDist, 180, 80, true);
+            let damping = de(approach, 0.99, 0.9) ** (dt * 60);
+            dot.vel = Vec.add(dot.vel, Vec.Smul(120 * dt, accel));
+            dot.vel = Vec.mulS(dot.vel, damping);
+            dot.pos = Vec.add(dot.pos, Vec.Smul(120 * dt, dot.vel));
+            const displacement = Vec.sub(dot.pos, dot.springPos);
+            const springAccel = Vec.Smul(dot.springK * rampStart, displacement);
+            dot.springVel = Vec.add(dot.springVel, Vec.Smul(dt, springAccel));
+            dot.springVel = Vec.mulS(dot.springVel, damping);
+            dot.springPos = Vec.add(dot.springPos, Vec.Smul(dt, dot.springVel));
+            if (this.isDelete) {
+              dot.color[0] = re(springDist, 500, 0, 0.133, r2);
+              dot.color[1] = re(springDist, 500, 0, 0.133, g2);
+              dot.color[2] = re(springDist, 500, 0, 0.133, b2);
+              dot.color[3] = 1;
+            } else {
+              dot.color[0] = r1;
+              dot.color[1] = g1;
+              dot.color[2] = b1;
+              dot.color[3] = dot.age < 1.5 ? 0 : 1;
+            }
           }
-          n && (_j.all.delete(this), this.target.applyChange(this.sourceInfo.change));
+          if (allComplete) {
+            _Particle.all.delete(this);
+            this.target.applyChange(this.sourceInfo.change);
+          }
         }
       };
-      __publicField(_j, "all", /* @__PURE__ */ new Set());
-      let j = _j;
-      function He(t, e) {
-        let n = a.add(t.cachedListElmPos, a(10, 5.5 + e * 28));
-        return a.sub(n, js());
+      __publicField(_Particle, "all", /* @__PURE__ */ new Set());
+      let Particle = _Particle;
+      function getPos(client, todoIndex) {
+        let p = Vec.add(client.cachedListElmPos, Vec(20.5, 12.5 + todoIndex * 42));
+        return Vec.sub(p, getCanvasRect());
       }
-      const ue = 5;
-      const _L = class _L {
-        constructor(e, n) {
+      const limit = 5;
+      const _Client = class _Client {
+        constructor(name, doc) {
           __publicField(this, "spec");
           __publicField(this, "nextTodoId", 0);
           __publicField(this, "editing", null);
@@ -2260,201 +3194,284 @@ void main() {
             x: 0,
             y: 0
           });
-          this.name = e, this.doc = n, this.spec = Q(this.doc);
-          const r = document.querySelector(`[js-client="${e}"]`), o = r.querySelector(".entry .text");
-          o.onkeydown = (s) => {
-            s.key == "Enter" && o.blur();
-          }, o.onblur = () => {
-            o.value.length <= 0 || (this.add(o.value, 0), o.value = "");
-          }, this.listElm = r.querySelector(".list"), this.overflowElm = r.querySelector(".todo-overflow"), _L.all.push(this), this.render();
-        }
-        add(e, n) {
-          const r = this.name + this.nextTodoId++;
-          return this.doc = F(this.doc, (o) => o.todos.splice(n ?? o.todos.length, 0, {
-            id: r,
-            text: e,
-            done: false
-          })), this.broadcast(true), r;
-        }
-        edit(e, n) {
-          const r = this.getIndex(e);
-          if (r < 0) return console.log(`Couldn't edit todo ${e} on client ${this.name}`);
-          let o = n.length < this.doc.todos[r].text.length;
-          this.doc = F(this.doc, (s) => fs(s, [
-            "todos",
-            r,
-            "text"
-          ], n)), this.broadcast(false, o);
-        }
-        toggle(e, n) {
-          const r = this.getIndex(e);
-          if (r < 0) return console.log(`Couldn't toggle todo ${e} on client ${this.name}`);
-          this.doc = F(this.doc, (o) => o.todos[r].done = n ?? !o.todos[r].done), this.broadcast();
-        }
-        clear(e) {
-          const n = this.getIndex(e);
-          if (n < 0) return console.log(`Couldn't clear todo ${e} on client ${this.name}`);
-          this.doc = F(this.doc, (r) => r.todos.splice(n, 1)), this.broadcast(true, true);
-        }
-        clearAll() {
-          for (; this.doc.todos.length > 0; ) this.doc = F(this.doc, (e) => e.todos.pop()), this.broadcast(true, true);
-        }
-        getIndex(e) {
-          return this.doc.todos.findIndex((n) => n.id == e);
-        }
-        broadcast(e = false, n = false) {
+          this.name = name;
+          this.doc = doc;
+          this.spec = clone(this.doc);
+          const elm = document.querySelector(`[js-client="${name}"]`);
+          const taskEntry = elm.querySelector(".entry .text");
+          taskEntry.onkeydown = (e) => {
+            if (e.key == "Enter") taskEntry.blur();
+          };
+          taskEntry.onblur = () => {
+            if (taskEntry.value.length <= 0) return;
+            this.add(taskEntry.value, 0);
+            taskEntry.value = "";
+          };
+          this.listElm = elm.querySelector(".list");
+          this.overflowElm = elm.querySelector(".todo-overflow");
+          _Client.all.push(this);
           this.render();
-          let r = _s(this.doc);
-          if (!r) throw new Error("Couldn't get change?!");
-          let o = Ps(this.doc, r, true);
-          for (let s of _L.all) s != this && new j(o, this, s, n);
-          for (let s of _L.all) s.resetSpec();
-          j.recalc();
         }
-        applyChange(e) {
-          this.doc = Pe(this.doc, [
-            e
-          ])[0], this.resetSpec(), this.render();
+        add(text, index) {
+          const id = this.name + this.nextTodoId++;
+          const before = this.doc;
+          this.doc = change(this.doc, (doc) => doc.todos.splice(index ?? doc.todos.length, 0, {
+            id,
+            text,
+            done: false
+          }));
+          this.broadcast(before);
+          return id;
         }
-        speculate(e) {
-          return this.spec = Pe(this.spec, [
-            e.change
+        edit(id, text) {
+          const idx = this.getIndex(id);
+          if (idx < 0) return console.log(`Couldn't edit todo ${id} on client ${this.name}`);
+          const isDelete = text.length < this.doc.todos[idx].text.length;
+          const before = this.doc;
+          this.doc = change(this.doc, (doc) => updateText(doc, [
+            "todos",
+            idx,
+            "text"
+          ], text));
+          this.broadcast(before, isDelete);
+        }
+        toggle(id, done) {
+          const idx = this.getIndex(id);
+          if (idx < 0) return console.log(`Couldn't toggle todo ${id} on client ${this.name}`);
+          const before = this.doc;
+          this.doc = change(this.doc, (doc) => doc.todos[idx].done = done ?? !doc.todos[idx].done);
+          this.broadcast(before);
+        }
+        clear(id) {
+          const idx = this.getIndex(id);
+          if (idx < 0) return console.log(`Couldn't clear todo ${id} on client ${this.name}`);
+          const before = this.doc;
+          this.doc = change(this.doc, (doc) => doc.todos.splice(idx, 1));
+          this.broadcast(before, true);
+        }
+        getIndex(id) {
+          return this.doc.todos.findIndex((todo) => todo.id == id);
+        }
+        broadcast(before, isDelete = false) {
+          this.render();
+          let change2 = getLastLocalChange(this.doc);
+          if (!change2) throw new Error("Couldn't get change?!");
+          let changeInfo = getChangeInfo(this.doc, before, change2);
+          for (let target of _Client.all) if (target != this) new Particle(changeInfo, this, target, isDelete);
+          for (let client of _Client.all) client.resetSpec();
+          Particle.recalc();
+        }
+        applyChange(change2) {
+          this.doc = applyChanges(this.doc, [
+            change2
+          ])[0];
+          this.resetSpec();
+          this.render();
+        }
+        speculate(info) {
+          return this.spec = applyChanges(this.spec, [
+            info.change
           ])[0];
         }
         resetSpec() {
-          this.spec = Q(this.doc);
+          this.spec = clone(this.doc);
         }
         render() {
-          const e = this.doc.todos, n = e.length > ue, r = Math.min(ue, e.length);
-          this.overflowElm.textContent = `${e.length - ue} more\u2026`, this.overflowElm.classList.toggle("hidden", !n);
-          const o = /* @__PURE__ */ new Map();
-          for (let s = 0; s < r; s++) {
-            const c = e[s];
-            let _ = this.elements.get(c.id) ?? this.makeTodoElms(c.id);
-            o.set(c.id, _), _.item.style.translate = `0 ${28 * s}px`, _.item.style.transition = "translate 1s", this.editing == c.id && document.activeElement != _.input && _.input.focus(), _.box.classList.toggle("hide", c.text.length <= 0), _.box.checked = c.done, (!this.editing || this.editing !== c.id) && (_.input.value = c.text);
-          }
-          this.elements.forEach(({ item: s }, c) => {
-            if (!o.has(c)) try {
-              s.remove();
-            } catch {
-              console.log("Calling .remove() failed \u2014 might want to investigate the DOM");
+          const todos = this.doc.todos;
+          const overflow = todos.length > limit;
+          const visibleCount = Math.min(limit, todos.length);
+          this.overflowElm.textContent = `${todos.length - limit} more\u2026`;
+          this.overflowElm.classList.toggle("hidden", !overflow);
+          const keepElms = /* @__PURE__ */ new Map();
+          for (let i = 0; i < visibleCount; i++) {
+            const todo = todos[i];
+            let elms = this.elements.get(todo.id) ?? this.makeTodoElms(todo.id);
+            keepElms.set(todo.id, elms);
+            elms.item.style.translate = `0 ${42 * i}px`;
+            elms.item.style.transition = `translate 1s`;
+            if (this.editing == todo.id && document.activeElement != elms.input) {
+              elms.input.focus();
             }
-          }), this.elements = o, this.resize();
+            elms.box.classList.toggle("hide", todo.text.length <= 0);
+            elms.box.checked = todo.done;
+            if (!this.editing || this.editing !== todo.id) elms.input.value = todo.text;
+          }
+          this.elements.forEach(({ item: div }, id) => {
+            if (!keepElms.has(id)) {
+              try {
+                div.remove();
+              } catch {
+                console.log("Calling .remove() failed \u2014 might want to investigate the DOM");
+              }
+            }
+          });
+          this.elements = keepElms;
+          this.resize();
         }
         resize() {
-          this.cachedListElmPos = this.listElm.getBoundingClientRect();
+          this.cachedListElmPos = Vec.sub(this.listElm.getBoundingClientRect(), document.body.getBoundingClientRect());
         }
-        makeTodoElms(e) {
-          const n = In("div", "item", this.listElm), r = ze("checkbox", "checkbox", n);
-          r.onclick = () => this.toggle(e);
-          const o = ze("text", "text", n);
-          o.onfocus = () => this.editing = e, o.oninput = () => this.edit(e, o.value), o.onkeydown = (c) => {
-            c.key == "Enter" && o.blur();
-          }, o.onblur = () => {
-            if (o.value.length == 0) return this.clear(e);
-            this.editing = null, this.render();
+        makeTodoElms(id) {
+          const item = createElement("div", "item", this.listElm);
+          const box = createInputElement("checkbox", "checkbox", item);
+          box.onclick = () => this.toggle(id);
+          const input = createInputElement("text", "text", item);
+          input.onfocus = () => this.editing = id;
+          input.oninput = () => this.edit(id, input.value);
+          input.onkeydown = (e) => {
+            if (e.key == "Enter") input.blur();
           };
-          const s = {
-            item: n,
-            box: r,
-            input: o
+          input.onblur = () => {
+            if (input.value.length == 0) return this.clear(id);
+            this.editing = null;
+            this.render();
           };
-          return this.elements.set(e, s), s;
+          const elms = {
+            item,
+            box,
+            input
+          };
+          this.elements.set(id, elms);
+          return elms;
         }
       };
-      __publicField(_L, "all", []);
-      let L = _L;
-      function In(t, e, n) {
-        const r = document.createElement(t);
-        return r.className = e, n == null ? void 0 : n.appendChild(r), r;
+      __publicField(_Client, "all", []);
+      let Client = _Client;
+      function createElement(type, className, parent) {
+        const elm = document.createElement(type);
+        elm.className = className;
+        parent == null ? void 0 : parent.appendChild(elm);
+        return elm;
       }
-      function ze(t, e, n) {
-        const r = In("input", e, n);
-        return r.setAttribute("spellcheck", "false"), r.type = t, r;
+      function createInputElement(type, className, parent) {
+        const input = createElement("input", className, parent);
+        input.setAttribute("spellcheck", "false");
+        input.type = type;
+        return input;
       }
-      function Ps(t, e, n = false) {
-        const { deps: r, hash: o } = ls(e), s = us(t, r, [
-          o
-        ]), c = cs(t, r);
+      function getChangeInfo(doc, before, change2) {
+        const { deps, hash } = decodeChange(change2);
+        const patches = diff(doc, deps, [
+          hash
+        ]);
         return {
-          change: e,
-          ...Bs(t, c, s)
+          change: change2,
+          ...parsePatches(doc, before, patches)
         };
       }
-      function Bs(t, e, n) {
-        if (n.length == 0) throw new Error("Unexpectedly empty patches");
-        let r = n[0].path[1];
-        if (n.some((c) => c.path[1] != r)) throw new Error("Found a change affecting multiple todos");
-        let o = [];
-        n.map((c) => {
-          const { action: _, path: g } = c;
-          if (_ == "conflict") {
-            if (console.log(`conflict! ${g[2]}`), g[2] == "done") return o.push({
+      function parsePatches(doc, before, patches) {
+        if (patches.length == 0) throw new Error("Unexpectedly empty patches");
+        let todoIndex = patches[0].path[1];
+        if (patches.some((p) => p.path[1] != todoIndex)) throw new Error("Found a change affecting multiple todos");
+        let edits = [];
+        patches.map((patch) => {
+          const { action, path } = patch;
+          if (action == "conflict") {
+            console.log(`conflict! ${path[2]}`);
+            if (path[2] == "done") return edits.push({
               type: "toggle",
               value: false
             });
-            if (g[2] == "text") return o.push({
+            if (path[2] == "text") return edits.push({
               type: "edit",
               text: "Nice! You made a conflict!",
               charIndex: 0
             });
           }
-          if (_ == "insert") return o.push({
+          if (action == "insert") return edits.push({
             type: "add"
           });
-          if (_ == "put" && g[2] == "done") {
-            let h = c.value;
-            return o.push({
+          if (action == "put" && path[2] == "done") {
+            let putPatch = patch;
+            let value = putPatch.value;
+            return edits.push({
               type: "toggle",
-              value: h
+              value
             });
           }
-          if (_ == "del" && g.length == 2) return o.push({
-            type: "clear"
-          });
-          if (_ == "splice" && g[2] == "text") {
-            let { value: d } = c, h = g[3];
-            return o.push({
+          if (action == "del" && path.length == 2) {
+            return edits.push({
+              type: "clear"
+            });
+          }
+          if (action == "splice" && path[2] == "text") {
+            let { value } = patch;
+            let charIndex = path[3];
+            return edits.push({
               type: "edit",
-              text: d,
-              charIndex: h
+              text: value,
+              charIndex
             });
           }
-          if (_ == "del" && g[2] == "text") {
-            let d = g[3], h = c.length ?? 1, m = e.todos[r].text.slice(d, d + h);
-            return o.push({
+          if (action == "del" && path[2] == "text") {
+            let charIndex = path[3];
+            let length = patch.length ?? 1;
+            let text = before.todos[todoIndex].text.slice(charIndex, charIndex + length);
+            return edits.push({
               type: "edit",
-              text: m,
-              charIndex: d
+              text,
+              charIndex
             });
           }
-          if (g[2] != "id" && !(_ == "put" && g[2] == "text")) throw new Error("Unknown edit type");
+          if (path[2] == "id") return;
+          if (action == "put" && path[2] == "text") return;
+          throw new Error("Unknown edit type");
         });
-        let s = t.todos[r] ?? e.todos[r];
-        if (!s) throw new Error("Unable to determine which TODO was changed");
+        let todo = doc.todos[todoIndex] ?? before.todos[todoIndex];
+        if (!todo) throw new Error("Unable to determine which TODO was changed");
         return {
-          id: s.id,
-          edits: o,
-          todoIndex: r
+          id: todo.id,
+          edits,
+          todoIndex
         };
       }
-      let Tn = F(as(), (t) => t.todos = []), N = new L("a", Q(Tn, {
+      let rootDoc = change(init(), (doc) => doc.todos = []);
+      let desktop = new Client("a", clone(rootDoc, {
         actor: "01"
-      })), re = new L("b", Q(Tn, {
+      }));
+      let phone = new Client("b", clone(rootDoc, {
         actor: "00"
       }));
-      window.desktop = N;
-      window.phone = re;
-      let $e = performance.now() / 1e3;
-      function Mn(t) {
-        let e = t / 1e3, n = Math.min(e - $e, 1 / 20);
-        $e = e, j.update(n), requestAnimationFrame(Mn);
+      window.desktop = desktop;
+      window.phone = phone;
+      let queuedActions = /* @__PURE__ */ new Set();
+      let enqueue = (action, delay) => queuedActions.add({
+        action,
+        time: (performance.now() + delay) / 1e3
+      });
+      let timeSinceAction = 0;
+      let s = performance.now() / 1e3;
+      function update(ms) {
+        let t = ms / 1e3;
+        let dt = Math.min(t - s, 1 / 20);
+        s = t;
+        requestAnimationFrame(update);
+        if (!running || document.hidden) return;
+        if (queuedActions.size == 0) {
+          timeSinceAction += dt;
+          if (timeSinceAction > 10) {
+            timeSinceAction = 0;
+            nextAction();
+          }
+        } else {
+          for (let qa of queuedActions) {
+            if (qa.time < t) {
+              queuedActions.delete(qa);
+              qa.action();
+            }
+          }
+        }
+        Particle.update(dt);
       }
-      requestAnimationFrame(Mn);
+      requestAnimationFrame(update);
+      let running = false;
+      let observer = new IntersectionObserver(([entry]) => running = entry.isIntersecting);
+      observer.observe(document.querySelector("#demo"));
       window.onresize = () => {
-        N.resize(), re.resize();
+        desktop.resize();
+        phone.resize();
       };
-      let Fs = [
+      let sets = [
         [
           "Align dilithium matrix",
           "Charge AT field",
@@ -2480,61 +3497,93 @@ void main() {
           "Open the pod bay doors",
           "Experience Bij"
         ]
-      ], Ls = 0, ce = [], kn = () => ce = ws(ys(Fs, Ls++));
-      kn();
-      let Dn = (t) => t.doc.todos.filter((e) => e.done), je = (t) => t.doc.todos.filter((e) => !e.done);
-      function Ee(t, e) {
-        let n = t.add("");
-        Pn(t, e, n);
+      ];
+      let setIndex = 0;
+      let currentSet = [];
+      let nextSet = () => currentSet = shuffleArray(arrMod(sets, setIndex++));
+      nextSet();
+      let getIsDone = (client) => client.doc.todos.filter((t) => t.done);
+      let getNotDone = (client) => client.doc.todos.filter((t) => !t.done);
+      function addTodo(client, text) {
+        let id = client.add("");
+        populateTodo(client, text, id);
       }
-      function Pn(t, e, n) {
-        let r = Array.from(e), o = () => {
-          if (r.length <= 0) return;
-          let s = t.getIndex(n);
-          if (s < 0) return console.log("Can't add chars to missing todo");
-          let _ = t.doc.todos[s].text + r.shift();
-          t.edit(n, _), setTimeout(o, 50);
+      function populateTodo(client, text, id) {
+        let charsToAdd = Array.from(text);
+        let addNextChar = () => {
+          if (charsToAdd.length <= 0) return;
+          let idx = client.getIndex(id);
+          if (idx < 0) return console.log("Can't add chars to missing todo");
+          let oldText = client.doc.todos[idx].text;
+          let newText = oldText + charsToAdd.shift();
+          client.edit(id, newText);
+          enqueue(addNextChar, 50);
         };
-        o();
+        addNextChar();
       }
-      let Hs = (t, e, n) => {
-        let r = () => {
-          let o = t.getIndex(n);
-          if (o < 0) return Ee(t, e);
-          let s = t.doc.todos[o].text;
-          if (s.length <= 0) return setTimeout(() => Pn(t, e, n), 2e3);
-          let c = s.slice(0, -1);
-          t.edit(n, c), setTimeout(r, 50);
+      let editTodo = (client, text, id) => {
+        let removeNextChar = () => {
+          let idx = client.getIndex(id);
+          if (idx < 0) return addTodo(client, text);
+          let oldText = client.doc.todos[idx].text;
+          if (oldText.length <= 0) return enqueue(() => populateTodo(client, text, id), 2e3);
+          let newText = oldText.slice(0, -1);
+          client.edit(id, newText);
+          enqueue(removeNextChar, 50);
         };
-        r();
-      }, le = (t) => Ee(t, ce.pop()), zs = (t) => {
-        let e = ce.pop(), n = je(t);
-        n.length == 0 ? Ee(t, e) : Hs(t, e, xe(n).id);
-      }, Ue = (t) => {
-        let e = je(t);
-        e.length > 0 && t.toggle(xe(e).id, true);
-      }, $s = (t) => {
-        let e = Dn(t);
-        e.length > 0 && t.clear(xe(e).id);
-      }, Us = (t) => t.clearAll();
-      function k(t, e) {
-        t(e), setTimeout(Oe, 1e3 * 9);
+        removeNextChar();
+      };
+      let clearAll = (client) => {
+        let clearNextTodo = () => {
+          let todo = getIsDone(client).at(-1);
+          if (!todo) return;
+          client.clear(todo.id);
+          enqueue(clearNextTodo, 200);
+        };
+        clearNextTodo();
+      };
+      let addNextTodo = (client) => addTodo(client, currentSet.pop());
+      let editRandomTodo = (client) => {
+        let text = currentSet.pop();
+        let notDone = getNotDone(client);
+        if (notDone.length == 0) addTodo(client, text);
+        else editTodo(client, text, arrRnd(notDone).id);
+      };
+      let doComplete = (client) => {
+        let notDone = getNotDone(client);
+        if (notDone.length > 0) client.toggle(arrRnd(notDone).id, true);
+      };
+      let doClear = (client) => {
+        let isDone = getIsDone(client);
+        if (isDone.length > 0) client.clear(arrRnd(isDone).id);
+      };
+      let doClearAll = (client) => clearAll(client);
+      function runAction(action, client) {
+        action(client);
       }
-      function Oe() {
-        if (N.editing != null || re.editing != null) return setTimeout(Oe, 3e3);
-        let t = _e() ? N : re, e = t.doc.todos.length, n = je(t), r = Dn(t);
-        if (ce.length == 0) {
-          n.length > 0 ? k(Ue, t) : (k(Us, t), kn());
+      function nextAction(client) {
+        if (desktop.editing != null || phone.editing != null) return;
+        client ?? (client = chance() ? desktop : phone);
+        let todoCount = client.doc.todos.length;
+        let notDone = getNotDone(client);
+        let isDone = getIsDone(client);
+        if (currentSet.length == 0) {
+          if (notDone.length > 0) runAction(doComplete, client);
+          else {
+            runAction(doClearAll, client);
+            nextSet();
+          }
           return;
         }
-        if (e < 2) return k(le, N);
-        if (_e(0.33) && e < 4) return k(le, t);
-        if (_e(0.5)) return k(zs, t);
-        if (n.length > 0) return k(Ue, t);
-        if (r.length > 0) return k($s, t);
-        k(le, t);
+        if (todoCount < 2) return runAction(addNextTodo, client);
+        if (isDone.length > 4) return runAction(clearAll, client);
+        if (chance(0.33) && todoCount < 4) return runAction(addNextTodo, client);
+        if (chance(0.5)) return runAction(editRandomTodo, client);
+        if (notDone.length > 0) return runAction(doComplete, client);
+        if (isDone.length > 0) return runAction(doClear, client);
+        runAction(addNextTodo, client);
       }
-      Oe();
+      nextAction(desktop);
     })();
   }
 });

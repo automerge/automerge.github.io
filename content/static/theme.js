@@ -7,6 +7,7 @@ const setTheme = (t) => {
   theme = t
   localStorage.setItem("theme", theme);
   html.setAttribute("theme", theme);
+  window.dispatchEvent(new CustomEvent("set-theme", { detail: theme }))
 }
 
 toggle.onclick = ()=> setTheme(theme == "light" ? "dark" : "light")

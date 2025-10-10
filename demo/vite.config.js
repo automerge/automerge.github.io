@@ -9,6 +9,7 @@ export default defineConfig({
     sourcemap: "inline",
     outDir: "../content/index/",
     emptyOutDir: false,
+    minify: false,
     rollupOptions: {
       input: "src/demo.ts",
       output: { entryFileNames: `[name].js`, assetFileNames: `[name].[ext]` },

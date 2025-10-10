@@ -69,6 +69,15 @@ export function expandMacros(text: string, page: Page, pages: Page[]) {
             return elms
           }
 
+          case "most-recent-blog-post": {
+            let mostRecentPost = pages
+              .filter((p) => p.frontmatter.template == "blog")
+              .toSorted((a, b) => compare(a.frontmatter.date, b.frontmatter.date))
+              .at(-1)
+            if (!mostRecentPost) throw new Error("Can't determine most recent blog post when expanding {{most-recent-blog-post}}")
+            return mostRecentPost.url.pathname
+          }
+
           // {{figure ![](src.ext)}} — A <figure> with some media (image or video)
           // {{figure wide frame ![](src.ext) }} — with class="wide frame"
           // {{figure autoplay ![](src.mp4) }} — the "autoplay" class is special, and adds "autoplay loop muted" to the <video>

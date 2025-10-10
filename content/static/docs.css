@@ -133,7 +133,7 @@ main {
 }
 
 @media (width > 800px) {
-  main { margin-top: 6.3rem; }
+  main { margin-top: 5.8rem; }
 }
 
 @media (width <= 800px) {
@@ -146,7 +146,25 @@ main {
 
 
 
-footer {
-  padding-inline: 0;
-  text-align: left;
+
+
+
+a[is-current] {
+  position: relative;
+}
+
+a[is-current]::before {
+  content: "";
+  position: absolute;
+  top: -.05em;
+  left: -.25em;
+  width: calc(100% + .5em);
+  height: 100%;
+  border-radius: 3px;
+  background: var(--current);
+  z-index: -1;
+}
+
+.nav a[is-current]::before {
+  display: none;
 }

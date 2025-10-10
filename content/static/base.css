@@ -15,6 +15,7 @@ html {
 
   /* These are all the colors we use across the site */
   --white: #fcfcfc;
+  --cream: hsl(45, 70%, 90%);
   --silver: #ddd;
   --yellow: #fc3;
   --grey: #888;
@@ -30,6 +31,7 @@ html {
   --bg: var(--yellow);
   --fg: var(--slate);
   --hover-bg: var(--white);
+  --current: var(--cream);
   --inactive: var(--grey);
   --separator: var(--silver);
   --footer-fg: var(--white);
@@ -41,6 +43,7 @@ html {
   --bg: light-dark(var(--white), var(--slate));
   --fg: light-dark(var(--slate), var(--white));
   --hover-bg: light-dark(var(--slate), var(--yellow));
+  --current: light-dark(var(--cream), var(--smoke));
   --inactive: light-dark(var(--grey), var(--grey));
   --separator: light-dark(var(--silver), var(--grey));
   --footer-fg: light-dark(var(--white), var(--yellow));
@@ -59,12 +62,13 @@ html[theme="dark"] { color-scheme: dark; }
 
 /* TYPOGRAPHIC HIERARCHY *************************************************************************/
 
-h1   { font: 600 32px / 36px "Overpass", sans-serif; }
-h2   { font: 600 24px / 32px "Overpass", sans-serif; }
-h3   { font: 600 20px / 24px "Overpass", sans-serif; }
+h1   { font: 280 32px / 36px "Overpass", sans-serif; }
+h2   { font: 400 24px / 32px "Overpass", sans-serif; }
+h3   { font: 500 20px / 24px "Overpass", sans-serif; }
 h4   { font: 600 16px / 24px "Overpass", sans-serif; }
 body { font: 400 16px / 24px "Overpass", sans-serif; }
 code { font-family: "Overpass Mono", monospace; }
+strong { font-weight: 650; }
 
 /* Specify all fonts here. Remember, the browser will only load the ones actually used on each page. */
 /* When adding/changing fonts, see the docs for instructions on our automatic font subsetting system. */
@@ -128,19 +132,28 @@ footer {
 
 footer .diamond {
   display: block;
-  width: 1em;
-  height: 1em;
-  border-radius: 4px;
-  background-color: var(--fg);
-  rotate: 45deg;
   margin-inline: auto;
   margin-bottom: .5rem;
+}
+
+footer .diamond i {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  background-color: var(--fg);
+  margin-inline: .3em;;
+  rotate: 45deg;
 }
 
 /* BLOCK-LEVEL TEXT ELEMENTS */
 
 h1, h2, h3, h4 {
   margin: 0 0 1rem;
+}
+
+h1, h2 {
+  text-wrap: balance;
 }
 
 p {
@@ -412,9 +425,4 @@ a.blog-link:hover .title {
   font-size: 12px;
   line-height: 1.2;
   color: var(--inactive);
-}
-
-[is-current] {
-  /* TODO: HERE */
-  /* background: #f00; */
 }

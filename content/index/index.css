@@ -1,87 +1,175 @@
 /* Note: the home page also uses landing.css and demo.css */
 
-h4 {
-  margin-block: 0;
+section {
+  padding-inline: 1rem;
+  margin-inline: auto;
+  max-width: var(--page-width);
 }
 
-h2 {
-  margin: 0 auto;
+.unit h4 {
+  font: 800 16px / 1.5 "Overpass";
 }
+
+.unit p {
+  font: 500 16px / 1.5 "Overpass";
+}
+
+footer {
+  padding-block: 0 3em;
+}
+
+/* BACKGROUNDS ************************************************************************************/
 
 .demo-bg {
   margin-bottom: 4em;
   padding-top: 4em;
   border-bottom: 2px solid var(--fg);
-  background-image: url("dots.png");
-  background-size: 3px;
+  background-image: url("autodots-bg.png");
+  background-size: auto 351.5px;
   background-position: bottom;
   background-repeat: repeat-x;
+  image-rendering: pixelated;
 }
 
-.unit h4 {
-  font: 800 max(1vw, 16px) / 1.5 "Overpass";
-}
-
-.unit p {
-  font: 500 max(1vw, 16px) / 1.5 "Overpass";
-}
-
-#illustration {
-  position: relative;
-  font-size: 1vw;
-}
-
-#illustration > svg {
-  display: block;
-  margin-inline: auto;
-  width: 32vw;
-}
-
-#illustration .unit {
-  position: absolute;
-  width: 18em;
-}
-
-@media(width < 1500px) {
-  #illustration .unit br { display: none; }
-}
-
-#illustration .unit:nth-of-type(odd) {
-  right: 50%;
-  margin-right: 16em;
-}
-
-#illustration .unit:nth-of-type(even) {
-  left: 50%;
-  margin-left: 16em;
-}
-
-.multiplayer.unit { top: 6em; }
-.offline.unit { top: 24em; }
-.conflict.unit { top: 44em; }
-.versioned.unit { top: 76em; }
-.compact.unit { top: 94em; }
-.fast.unit { top: 108em; }
-
-.multiplayer.unit svg {
-  margin-bottom: 1em;
-  margin-left: -1em;
-}
-
-.offline.unit svg {
-  display: block;
-  margin-top: -1em;
-  margin-left: auto;
-}
-
-#devs {
-  margin-top: 6em;
-  padding-block: 6em;
+.devs-bg {
   --fg: var(--yellow);
   --bg: var(--slate);
   --bg: light-dark(var(--slate), var(--deep));
   color: var(--fg);
   background: var(--bg);
+}
+
+.team-bg, footer {
+  --mid: #33322e;
+  --fg: var(--white);
+  --bg: var(--mid);
+  --bg: light-dark(var(--mid), var(--slate));
+  background: var(--bg);
+  color: var(--fg);
+}
+
+/* ILLUSTRATION ***********************************************************************************/
+
+#illustration {
+  position: relative;
+  font-size: min(1.388vw, 16px);
+}
+
+#illustration .full {
+  display: block;
+  margin: 0 auto;
+}
+
+#illustration .chop {
+  display: none;
+}
+
+#illustration .unit {
+  position: absolute;
+  max-width: 18em;
+  left: 50%;
+  margin-left: 16em;
+}
+
+@media (width > 1024px) {
+  #illustration .unit:nth-of-type(odd) {
+    left: auto;
+    right: 50%;
+    margin-inline: 0 16em;
+  }
+}
+
+.multiplayer.unit { top: 6rem; }
+.offline.unit { top: 24rem; }
+.conflict.unit { top: 44rem; }
+.versioned.unit { top: calc(50rem + 26em); }
+.compact.unit { top: 94rem; }
+.fast.unit { top: 108rem; }
+
+.cursor.speedy {
+  margin-bottom: 1em;
+  margin-left: -1em;
+}
+
+.cursor.hello {
+  position: absolute;
+  top: 480px;
+  left: calc(50% + 26em);
+}
+
+@media (width <= 1024px) {
+  #illustration {
+    font-size: 1.5625vw;
+  }
+  #illustration .full {
+    margin-left: 0;
+    width: 50vw;
+  }
+  #illustration .unit {
+    left: 50%;
+    margin-left: 5em;
+    max-width: 24em;
+  }
+  .multiplayer.unit { top: 5em; }
+  .offline.unit { top: 29em; }
+  .conflict.unit { top: 52em; }
+  .versioned.unit { top: 73em; }
+  .compact.unit { top: 92em; }
+  .fast.unit { top: 108em; }
+  .cursor.hello {
+    position: absolute;
+    top: 40em;
+    left: calc(50% + 15em);
+  }
+}
+
+@media (width <= 700px) {
+  #illustration {
+    font-size: 16px;
+  }
+
+  #illustration .full {
+    display: none;
+  }
+  #illustration {
+    margin-top: 3em;
+  }
+  #illustration .chop {
+    display: block;
+    margin: 1.5em auto 5em;
+  }
+  #illustration .unit {
+    position: static;
+    left: auto;
+    right: auto;
+    top: 0;
+    margin: 0 auto;
+    max-width: 19em;
+  }
+  #illustration .chop.versioned { margin-block: -1em 1em; }
+  #illustration .chop.compact { margin-block: 0em 1em; }
+
+  #illustration .cursor {
+    position: relative;
+    display: block;
+    margin-inline: auto;
+  }
+  #illustration .cursor.speedy {
+    margin-right: 3em;
+    margin-bottom: -1em;
+  }
+  #illustration .cursor.hello {
+    left: 6.5em;
+    top: -4em;
+    margin-top: -4em;
+  }
+}
+
+/* DEVS ******************************************************************************************/
+
+#devs {
+  margin-top: 6em;
+  padding-block: 6em;
 }
 
 #devs h2 {
@@ -90,35 +178,47 @@ h2 {
 
 #devs .grid {
   display: grid;
-  grid-template-columns: 28em 28em;
-  gap: 6em 8em;
+  grid-template-columns: repeat(auto-fit, 22em);
   justify-content: center;
+  gap: 5em;
 }
+
+@media (width <= 700px) {
+  #devs {
+    padding-bottom: 2em;
+  }
+  #devs br {
+    display: none;
+  }
+  #devs .grid {
+    display: block;
+    padding-inline: 0;
+  }
+  #devs .unit {
+    margin: 0 auto 3em;
+  }
+}
+
+/* TEAM ******************************************************************************************/
 
 #team {
-  display: flex;
-  justify-content: center;
-  gap: 6em;
+  display: grid;
+  gap: 1em 4em;
   padding-block: 6em;
-  --mid: #33322e;
-  --fg: var(--white);
-  --bg: var(--mid);
-  background: var(--bg);
-  color: var(--fg);
 }
 
-#team div:first-child {
-  flex: 0 1 32em;
+#team .photos {
+  display: flex;
+  flex-flow: row wrap;
+  gap: 1em;
+}
+
+#team .photos div {
+  flex: 1 1 280px;
 }
 
 #team img {
-  display: block;
-  margin-bottom: 1rem;
-  width: 400px;
-}
-
-#team div {
-  flex: 0 0 auto;
+  width: 100%;
 }
 
 #team h2 {
@@ -126,11 +226,30 @@ h2 {
   margin: 0 0 1rem;
 }
 
-footer {
-  padding-block: 0 3em;
-   --mid: #33322e;
-  --fg: var(--white);
-  --bg: var(--mid);
-  background: var(--bg);
-  color: var(--fg);
+#team h3 {
+  text-align: left;
+  margin: 0 0 1rem;
+  font: 350 24px / 28px "Overpass";
+}
+
+#team h4 {
+  margin: 1rem 0 0;
+}
+
+@media (width > 800px) {
+  #team {
+    grid-template: "intro image" "units image";
+  }
+
+  #team .intro {
+    grid-area: intro;
+  }
+
+  #team .photos {
+    grid-area: image;
+  }
+
+  #team .units {
+    grid-area: units;
+  }
 }

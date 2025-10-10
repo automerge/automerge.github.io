@@ -1,6 +1,7 @@
 import * as Automerge from "@automerge/automerge"
 import { Particle } from "./particle.ts"
 import { ChangeInfo, Doc, Edit, Id } from "./types.ts"
+import Vec from "./vec.ts"
 
 // What's the max number of todos that can be shown?
 const limit = 5
@@ -50,58 +51,53 @@ export class Client {
 
   add(text: string, index?: number) {
     const id = this.name + this.nextTodoId++
+    const before = this.doc
     this.doc = Automerge.change(this.doc, (doc) => doc.todos.splice(index ?? doc.todos.length, 0, { id, text, done: false }))
-    this.broadcast(true)
+    this.broadcast(before)
     return id
   }
 
   edit(id: Id, text: string) {
     const idx = this.getIndex(id)
     if (idx < 0) return console.log(`Couldn't edit todo ${id} on client ${this.name}`)
-    let isDelete = text.length < this.doc.todos[idx].text.length
+    const isDelete = text.length < this.doc.todos[idx].text.length
+    const before = this.doc
     this.doc = Automerge.change(this.doc, (doc) => Automerge.updateText(doc, ["todos", idx, "text"], text))
-    this.broadcast(false, isDelete)
+    this.broadcast(before, isDelete)
   }
 
   toggle(id: Id, done?: boolean) {
     const idx = this.getIndex(id)
     if (idx < 0) return console.log(`Couldn't toggle todo ${id} on client ${this.name}`)
+    const before = this.doc
     this.doc = Automerge.change(this.doc, (doc) => (doc.todos[idx].done = done ?? !doc.todos[idx].done))
-    this.broadcast()
+    this.broadcast(before)
   }
 
   clear(id: Id) {
     const idx = this.getIndex(id)
     if (idx < 0) return console.log(`Couldn't clear todo ${id} on client ${this.name}`)
+    const before = this.doc
     this.doc = Automerge.change(this.doc, (doc) => doc.todos.splice(idx, 1))
-    this.broadcast(true, true)
-  }
-
-  clearAll() {
-    while (this.doc.todos.length > 0) {
-      this.doc = Automerge.change(this.doc, (doc) => doc.todos.pop())
-      this.broadcast(true, true)
-    }
+    this.broadcast(before, true)
   }
 
   getIndex(id: Id) {
     return this.doc.todos.findIndex((todo) => todo.id == id)
   }
 
-  broadcast(recalc = false, isDelete = false) {
+  broadcast(before: Doc, isDelete = false) {
     // Render first, to make sure our cached rect position is updated
     this.render()
     let change = Automerge.getLastLocalChange(this.doc)
     if (!change) throw new Error("Couldn't get change?!")
     // Calculate info about this change, which we need for generating and animating particles
-    let changeInfo = getChangeInfo(this.doc, change, true)
+    let changeInfo = getChangeInfo(this.doc, before, change)
     // Now send the change to peers
     for (let target of Client.all) if (target != this) new Particle(changeInfo, this, target, isDelete)
-    // If this change added or removed a todo, we need to recalc all inbound particles
-    // if (recalc) {
+    // Recalc all particles
     for (let client of Client.all) client.resetSpec()
     Particle.recalc()
-    // }
   }
 
   applyChange(change: Automerge.Change) {
@@ -112,13 +108,6 @@ export class Client {
 
   speculate(info: ChangeInfo) {
     return (this.spec = Automerge.applyChanges(this.spec, [info.change])[0])
-    // let todoIndex = this.spec.todos.findIndex((todo) => todo.id == info.id)
-    // if (todoIndex < 0) {
-    //   let { hash } = Automerge.decodeChange(info.change)
-    //   let hasHeads = Automerge.hasHeads(this.spec, [hash])
-    //   return 0
-    // }
-    // return todoIndex
   }
 
   resetSpec() {
@@ -146,7 +135,7 @@ export class Client {
       keepElms.set(todo.id, elms)
 
       // Ensure element is in correct position
-      elms.item.style.translate = `0 ${28 * i}px`
+      elms.item.style.translate = `0 ${42 * i}px`
       elms.item.style.transition = `translate 1s`
 
       if (this.editing == todo.id && document.activeElement != elms.input) {
@@ -177,7 +166,7 @@ export class Client {
 
   resize() {
     // Cache the list elm position, for particles to use
-    this.cachedListElmPos = this.listElm.getBoundingClientRect()
+    this.cachedListElmPos = Vec.sub(this.listElm.getBoundingClientRect(), document.body.getBoundingClientRect())
   }
 
   makeTodoElms(id: Id) {
@@ -218,10 +207,9 @@ function createInputElement(type: string, className: string, parent: HTMLElement
   return input
 }
 
-function getChangeInfo(doc: Doc, change: Automerge.Change, log = false): ChangeInfo {
+function getChangeInfo(doc: Doc, before: Doc, change: Automerge.Change): ChangeInfo {
   const { deps, hash } = Automerge.decodeChange(change)
   const patches = Automerge.diff(doc, deps, [hash])
-  const before = Automerge.view(doc, deps)
   return { change, ...parsePatches(doc, before, patches) }
 }
 
