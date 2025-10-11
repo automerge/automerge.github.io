@@ -1,41 +1,9 @@
-import { Client } from "./client.ts"
+import { Client, limit } from "./client.ts"
 import { Dot, makeDots } from "./dots.ts"
 import { getCanvasRect, render } from "./ParticleRenderer.ts"
 import { ChangeInfo, Id, Position } from "./types.ts"
-import { de, no, re } from "./util.ts"
+import { clip, no, ss } from "./util.ts"
 import Vec from "./vec.ts"
-
-let r1 = 0.166
-let g1 = 0.166
-let b1 = 0.166
-let r2 = 0.8 * 1
-let g2 = 0.8 * 0.8
-let b2 = 0.8 * 0.2
-
-type Theme = "light" | "dark"
-window.addEventListener("set-theme", (e) => {
-  setTheme((e as CustomEvent).detail as Theme)
-})
-
-function setTheme(theme: Theme) {
-  if (theme == "dark") {
-    r1 = 1
-    g1 = 0.8
-    b1 = 0.2
-    r2 = 0.2
-    g2 = 0.2
-    b2 = 0.2
-  } else {
-    r1 = 0.166
-    g1 = 0.166
-    b1 = 0.166
-    r2 = 0.8 * 1
-    g2 = 0.8 * 0.8
-    b2 = 0.8 * 0.2
-  }
-}
-
-setTheme(document.documentElement.getAttribute("theme") as Theme)
 
 export class Particle {
   static all: Set<Particle> = new Set()
@@ -48,30 +16,44 @@ export class Particle {
   static recalc() {
     let map = new Map<Id, number>()
 
+    // To start, the target spec doc has been reset to its own local doc state
     for (let particle of Particle.all) {
+      // Capture the ID=>IDX mapping for each todo currently in the spec doc
       for (let i = 0; i < particle.target.spec.todos.length; i++) map.set(particle.target.spec.todos[i].id, i)
+      // Apply this particle's changes
       particle.target.speculate(particle.sourceInfo)
+      // Again, capture the ID=>IDX mapping for each todo currently in the spec doc
       for (let i = 0; i < particle.target.spec.todos.length; i++) map.set(particle.target.spec.todos[i].id, i)
     }
+    // At this point, every todo ID will have its last-known IDX stored.
 
     for (let particle of Particle.all) {
+      // Now, update the destination positions for each particle
       let idx = map.get(particle.sourceInfo.id)
-      if (idx != null && idx >= 0) particle.dest = getPos(particle.target, idx)
-      else debugger
+      if (idx != null && idx >= 0) {
+        particle.dest = getPos(particle.target, idx)
+        particle.skipEnd = idx >= limit
+      }
+      // This is an extremely rare failure case, where we couldn't find a TODO for this particle anywhere in history.
+      // In this case, we use the particle's last-known destination, or just go to idx 0 as a final fallback.
+      else particle.dest ??= getPos(particle.target, 0)
     }
   }
 
   dots: Dot[]
   dest: Position = { x: 0, y: 0 }
   applyEarly = false
+  skipStart = false
+  skipEnd = false
 
-  constructor(public sourceInfo: ChangeInfo, public source: Client, public target: Client, public isDelete: boolean) {
+  constructor(public sourceInfo: ChangeInfo, public source: Client, public target: Client, isDelete: boolean) {
     // When adding a new todo, we apply early so that other todos scoot out of the way
     let isAdd = sourceInfo.edits.some((e) => e.type == "add")
     if (isAdd) this.applyEarly = true
-    this.dots = makeDots(sourceInfo, getPos(source, sourceInfo.todoIndex))
+    this.dots = makeDots(sourceInfo, getPos(source, sourceInfo.todoIndex), isDelete)
     // let targetInfo = target.speculate(sourceInfo)
     // this.dest = getPos(target, targetInfo)
+    this.skipStart = sourceInfo.todoIndex >= limit
     Particle.all.add(this)
   }
 
@@ -79,51 +61,34 @@ export class Particle {
     let allComplete = true
 
     for (const dot of this.dots) {
-      let destPos = Vec.add(this.dest, dot.local)
-      let springDist = Vec.len(Vec.sub(destPos, dot.springPos))
+      let dest = Vec.add(this.dest, dot.local) // TODO: cache this, only recompute on recalc
 
-      if (springDist < 50 && this.applyEarly) {
+      dot.age += dt
+
+      // scatter
+      let accel = Vec.mulS(dot.accel, no(dot.age, 0.8, 2, true))
+      dot.vel = Vec.add(dot.vel, Vec.mulS(accel, 120 * dt))
+      dot.pos = Vec.add(dot.pos, Vec.mulS(dot.vel, 120 * dt))
+
+      // figure out our lerp to target
+      let goalT = ss(no(dot.age, 1.3, 3, true))
+      let goal = Vec.lerp(dot.start, dest, goalT)
+
+      let blendT = ss(no(dot.age, 1.3, 3, true))
+      dot.pos = Vec.lerp(dot.pos, goal, blendT)
+
+      if (dot.age > 2.5 && this.applyEarly) {
         this.applyEarly = false
         this.target.applyChange(this.sourceInfo.change)
       }
 
-      dot.isComplete = springDist < 0.2
-      allComplete &&= dot.isComplete
+      dot.size = clip(dot.age - 1)
+      dot.size *= no(dot.age, 4, 2.5, true)
+      if (this.skipStart) dot.size *= no(dot.age, 0, 3, true)
+      if (this.skipEnd) dot.size *= no(dot.age, 3, 0, true)
 
-      dot.age += dt
-
-      // move slowly for the first few seconds
-      let rampStart = no(dot.age, 0, 4, true) ** 1.5
-      let maxAccel = 0.05 * rampStart // per second
-      let accel = Vec.renormalize(Vec.sub(destPos, dot.pos), maxAccel)
-
-      // slow down as we approach
-      let approach = no(springDist, 180, 80, true)
-      let damping = de(approach, 0.99, 0.9) ** (dt * 60)
-
-      dot.vel = Vec.add(dot.vel, Vec.Smul(120 * dt, accel))
-      dot.vel = Vec.mulS(dot.vel, damping)
-      dot.pos = Vec.add(dot.pos, Vec.Smul(120 * dt, dot.vel))
-
-      // Spring pos (oscillating noisily around dot.pos) goes here
-      const displacement = Vec.sub(dot.pos, dot.springPos)
-      const springAccel = Vec.Smul(dot.springK * rampStart, displacement)
-      dot.springVel = Vec.add(dot.springVel, Vec.Smul(dt, springAccel))
-      dot.springVel = Vec.mulS(dot.springVel, damping)
-      dot.springPos = Vec.add(dot.springPos, Vec.Smul(dt, dot.springVel))
-
-      // Color
-      if (this.isDelete) {
-        dot.color[0] = re(springDist, 500, 0, 0.133, r2)
-        dot.color[1] = re(springDist, 500, 0, 0.133, g2)
-        dot.color[2] = re(springDist, 500, 0, 0.133, b2)
-        dot.color[3] = 1
-      } else {
-        dot.color[0] = r1
-        dot.color[1] = g1
-        dot.color[2] = b1
-        dot.color[3] = dot.age < 1.5 ? 0 : 1
-      }
+      dot.complete = dot.age > 3.2
+      allComplete &&= dot.complete
     }
 
     if (allComplete) {

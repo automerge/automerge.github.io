@@ -1,10 +1,31 @@
 import { ChangeInfo, Color, Position } from "./types.ts"
+import { rand } from "./util.ts"
 import Vec, { Vector } from "./vec.ts"
 
+let colorA: Color = [0.22, 0.21, 0.2]
+let colorB: Color = [0.7 * 1, 0.7 * 0.8, 0.7 * 0.2]
+
+type Theme = "light" | "dark"
+window.addEventListener("set-theme", (e) => setTheme((e as CustomEvent).detail as Theme))
+
+function setTheme(theme: Theme) {
+  if (theme == "dark") {
+    colorA = [1, 0.8, 0.2]
+    colorB = [0.35, 0.35, 0.35]
+  } else {
+    colorA = [0.22, 0.21, 0.2]
+    colorB = [0.7 * 1, 0.7 * 0.8, 0.7 * 0.2]
+  }
+}
+
+setTheme(document.documentElement.getAttribute("theme") as Theme)
+
+// Density of particles — bigger values are more spaced-out
 const step = 2
-const width = 500
-const height = 50
-const springStiffness = 10
+
+// Size of the offscreen canvas used for generating text particles
+const width = 330
+const height = 30
 
 // Create offscreen canvas
 const cvs = document.createElement("canvas")
@@ -16,69 +37,79 @@ cvs.height = height
 
 // Must match the stylesheet
 ctx.font = "500 16px / 1 'Overpass Mono'"
-// ctx.textBaseline = "middle"
 
 export type Dot = {
-  // Offset with respect to the canvas (used for offset with respect to destination)
+  // Offset with respect to the particle
   local: Position
-
-  // Screen position (moves with velocity/acceleration toward target)
+  // For lerping
+  start: Position
+  dest: Position
+  // For physics-driven animation
   pos: Position
   vel: Vector
-
-  // Rendered position (springs around the real position)
-  springPos: Position
-  springVel: Vector
-  springK: number
-
+  accel: Vector
+  // Etc
   age: number
-
-  isComplete: boolean
-
+  size: number
   color: Color
+  complete: boolean
 }
 
-export function makeDots(info: ChangeInfo, worldPos: Position) {
+export function makeDots(info: ChangeInfo, worldPos: Position, isDelete: boolean) {
   const dots: Dot[] = []
   for (let edit of info.edits) {
+    // Text addition / removal
     if (edit.type == "edit") {
+      // Draw the text white-on-black into our offscreen canvas
       ctx.fillStyle = "black"
       ctx.fillRect(0, 0, width, height)
       ctx.fillStyle = "white"
       ctx.fillText(edit.text, 0, 14.5)
       const data = ctx.getImageData(0, 0, width, height).data
+      // Find all bright pixels, and put dots there
       for (let y = 0; y < height; y += step) {
         for (let x = 0; x < width; x += step) {
           const byte = (y * width + x) * 4
           if (data[byte] > 127) {
+            // Manually adjust dot position to match text (tuned by eye)
             let X = x + (30 + edit.charIndex * 9.8)
-            dots.push(makeDot(X, y, worldPos))
+            dots.push(makeDot(X, y, worldPos, isDelete))
           }
         }
       }
-      // We'll have no dots if the only edits were whitepsace
-      if (dots.length == 0) dots.push(makeDot(35 + edit.charIndex * 9.8, 10, worldPos))
-    } else if (edit.type == "clear") {
+      // Place a dot at the center of space chars
+      if (dots.length == 0) dots.push(makeDot(35 + edit.charIndex * 9.8, 10, worldPos, isDelete))
+    }
+
+    // Crossing-out a completed task with a long horizontal line
+    // TODO: make the line match the length of the text?
+    else if (edit.type == "clear") {
       let y1 = 8
       let y2 = 9
       let x1 = -6
       let x2 = 250
       for (let y = y1; y <= y2; y += step) {
         for (let x = x1; x <= x2; x += step) {
-          dots.push(makeDot(x, y, worldPos))
+          dots.push(makeDot(x, y, worldPos, isDelete))
         }
       }
-    } else if (edit.type == "toggle" && edit.value) {
+    }
+
+    // Toggling a checkbox ON with a little square in the middle
+    else if (edit.type == "toggle" && edit.value) {
       let y1 = 5
       let y2 = 11
       let x1 = 6
       let x2 = 11
       for (let y = y1; y <= y2; y += step) {
         for (let x = x1; x <= x2; x += step) {
-          dots.push(makeDot(x, y, worldPos))
+          dots.push(makeDot(x, y, worldPos, isDelete, 1))
         }
       }
-    } else {
+    }
+
+    // Toggling a checkbox OFF with a hollow outline around the checkbox
+    else {
       let y1 = 0
       let y2 = 18
       let x1 = 0
@@ -87,7 +118,7 @@ export function makeDots(info: ChangeInfo, worldPos: Position) {
       for (let y = y1; y <= y2; y += step) {
         for (let x = x1; x <= x2; x += step) {
           if (x - x1 < r || x2 - x < r || y - y1 < r || y2 - y < r) {
-            dots.push(makeDot(x, y, worldPos))
+            dots.push(makeDot(x, y, worldPos, isDelete, info.edits[0].type == "add" ? 0 : 1))
           }
         }
       }
@@ -97,14 +128,18 @@ export function makeDots(info: ChangeInfo, worldPos: Position) {
   return dots
 }
 
-function makeDot(x: number, y: number, worldPos: Position) {
+function makeDot(x: number, y: number, worldPos: Position, isDelete: boolean, hurry = 0) {
   let X = x
   let Y = y
   let local = Vec(X, Y)
-  let pos = Vec.add(local, worldPos)
-  let vel = Vec.random(0.1) // TODO: adjust
-  let springK = springStiffness // + rand(-0.1, 0.1)
-  let age = 1 - y / height - (5 * x) / width
-  let color: Color = [0.166, 0.166, 0.166, 1]
-  return { local, pos, vel, springPos: pos, springVel: vel, springK, age, isComplete: false, color }
+  let start = Vec.add(local, worldPos)
+  let dest = Vec()
+  let pos = start
+  let vel = Vec()
+  let accel = Vec.random(0.02)
+  let age = isDelete ? 1 : hurry - (rand(0, 0.1) * y) / height - (rand(0, 0.5) * x) / width
+  let size = 0
+  let color = isDelete ? colorB : colorA
+  let complete = false
+  return { local, start, dest, pos, vel, accel, age, size, color, complete }
 }

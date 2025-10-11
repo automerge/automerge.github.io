@@ -138,7 +138,6 @@ export function expandMacros(text: string, page: Page, pages: Page[]) {
             if (!frontmatter.date) return bail(`This page's template requires a date: ` + green(path))
             return new Date(frontmatter.date).toLocaleDateString("en-US", { month: "long", year: "numeric", timeZone: "UTC" })
 
-          // Link to the next notebook entry, used by lab notebook entries
           case "next-in-section":
             if (page.parent) {
               let children = page.parent.children
@@ -147,7 +146,20 @@ export function expandMacros(text: string, page: Page, pages: Page[]) {
               if (next) {
                 return `<p class="next-page">Next entry: <a href="${next.url.pathname}">${next.frontmatter.title}</a></p>`
               } else {
-                return `<p class="next-page">This is the last entry for now, but you can <a href="${page.parent.url.pathname}">go back to read the lab notebook from the beginning</a>.</p>`
+                return `<p class="next-page">Nuttin</p>`
+              }
+            }
+            return ""
+
+          case "prev-in-section":
+            if (page.parent) {
+              let children = page.parent.children
+              children.sort((a, b) => compare(a.frontmatter.date, b.frontmatter.date))
+              let next = children[children.indexOf(page) + 1]
+              if (next) {
+                return `<p class="next-page">Next entry: <a href="${next.url.pathname}">${next.frontmatter.title}</a></p>`
+              } else {
+                return `<p class="next-page">Nuttin</p>`
               }
             }
             return ""

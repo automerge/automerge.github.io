@@ -2717,16 +2717,6 @@ ${val.stack}`;
         return doClip ? clip(n) : n;
       };
       const de = (i = 0, min2 = -1, max2 = 1) => i * (max2 - min2) + min2;
-      const re = (i = 0, min1 = -1, max1 = 1, min2 = 0, max2 = 1, doClip = false, exp = 1) => {
-        if (max1 < min1) [min1, max1, min2, max2] = [
-          max1,
-          min1,
-          max2,
-          min2
-        ];
-        let n = no(i, min1, max1, doClip) ** exp;
-        return de(n, min2, max2);
-      };
       const rand = (min2 = 0, max2 = 1) => de(Math.random(), min2, max2);
       const randInt = (min2 = 0, max2 = 1) => Math.floor(rand(min2, max2 + 1));
       const isZero = (v) => Number.EPSILON > Math.abs(v);
@@ -2750,6 +2740,7 @@ ${val.stack}`;
       const arrMod = (arr, i) => arr[i % arr.length];
       const arrRnd = (arr) => arr[randInt(0, arr.length - 1)];
       const chance = (v = 0.5) => rand(0, 1) < v;
+      const ss = (v = 0) => v * v * (3 - 2 * v);
       const Vec = (x = 0, y = 0) => ({
         x,
         y
@@ -2842,10 +2833,46 @@ ${val.stack}`;
         const angleInRadians = Math.atan2(cP, dP);
         return angleInRadians;
       };
+      let colorA = [
+        0.22,
+        0.21,
+        0.2
+      ];
+      let colorB = [
+        0.7 * 1,
+        0.7 * 0.8,
+        0.7 * 0.2
+      ];
+      window.addEventListener("set-theme", (e) => setTheme(e.detail));
+      function setTheme(theme) {
+        if (theme == "dark") {
+          colorA = [
+            1,
+            0.8,
+            0.2
+          ];
+          colorB = [
+            0.35,
+            0.35,
+            0.35
+          ];
+        } else {
+          colorA = [
+            0.22,
+            0.21,
+            0.2
+          ];
+          colorB = [
+            0.7 * 1,
+            0.7 * 0.8,
+            0.7 * 0.2
+          ];
+        }
+      }
+      setTheme(document.documentElement.getAttribute("theme"));
       const step = 2;
-      const width$1 = 500;
-      const height$1 = 50;
-      const springStiffness = 10;
+      const width$1 = 330;
+      const height$1 = 30;
       const cvs = document.createElement("canvas");
       const ctx = cvs.getContext("2d", {
         willReadFrequently: true
@@ -2853,7 +2880,7 @@ ${val.stack}`;
       cvs.width = width$1;
       cvs.height = height$1;
       ctx.font = "500 16px / 1 'Overpass Mono'";
-      function makeDots(info, worldPos) {
+      function makeDots(info, worldPos, isDelete) {
         const dots = [];
         for (let edit of info.edits) {
           if (edit.type == "edit") {
@@ -2867,11 +2894,11 @@ ${val.stack}`;
                 const byte = (y * width$1 + x) * 4;
                 if (data[byte] > 127) {
                   let X = x + (30 + edit.charIndex * 9.8);
-                  dots.push(makeDot(X, y, worldPos));
+                  dots.push(makeDot(X, y, worldPos, isDelete));
                 }
               }
             }
-            if (dots.length == 0) dots.push(makeDot(35 + edit.charIndex * 9.8, 10, worldPos));
+            if (dots.length == 0) dots.push(makeDot(35 + edit.charIndex * 9.8, 10, worldPos, isDelete));
           } else if (edit.type == "clear") {
             let y1 = 8;
             let y2 = 9;
@@ -2879,7 +2906,7 @@ ${val.stack}`;
             let x2 = 250;
             for (let y = y1; y <= y2; y += step) {
               for (let x = x1; x <= x2; x += step) {
-                dots.push(makeDot(x, y, worldPos));
+                dots.push(makeDot(x, y, worldPos, isDelete));
               }
             }
           } else if (edit.type == "toggle" && edit.value) {
@@ -2889,7 +2916,7 @@ ${val.stack}`;
             let x2 = 11;
             for (let y = y1; y <= y2; y += step) {
               for (let x = x1; x <= x2; x += step) {
-                dots.push(makeDot(x, y, worldPos));
+                dots.push(makeDot(x, y, worldPos, isDelete, 1));
               }
             }
           } else {
@@ -2901,7 +2928,7 @@ ${val.stack}`;
             for (let y = y1; y <= y2; y += step) {
               for (let x = x1; x <= x2; x += step) {
                 if (x - x1 < r || x2 - x < r || y - y1 < r || y2 - y < r) {
-                  dots.push(makeDot(x, y, worldPos));
+                  dots.push(makeDot(x, y, worldPos, isDelete, info.edits[0].type == "add" ? 0 : 1));
                 }
               }
             }
@@ -2909,70 +2936,63 @@ ${val.stack}`;
         }
         return dots;
       }
-      function makeDot(x, y, worldPos) {
+      function makeDot(x, y, worldPos, isDelete, hurry = 0) {
         let X = x;
         let Y = y;
         let local = Vec(X, Y);
-        let pos = Vec.add(local, worldPos);
-        let vel = Vec.random(0.1);
-        let springK = springStiffness;
-        let age = 1 - y / height$1 - 5 * x / width$1;
-        let color = [
-          0.166,
-          0.166,
-          0.166,
-          1
-        ];
+        let start = Vec.add(local, worldPos);
+        let dest = Vec();
+        let pos = start;
+        let vel = Vec();
+        let accel = Vec.random(0.02);
+        let age = isDelete ? 1 : hurry - rand(0, 0.1) * y / height$1 - rand(0, 0.5) * x / width$1;
+        let size = 0;
+        let color = isDelete ? colorB : colorA;
+        let complete = false;
         return {
           local,
+          start,
+          dest,
           pos,
           vel,
-          springPos: pos,
-          springVel: vel,
-          springK,
+          accel,
           age,
-          isComplete: false,
-          color
+          size,
+          color,
+          complete
         };
       }
-      const sides = 4;
-      const radius = 1.2;
+      const sides = 8;
+      const radius = 1.5;
+      let width = 0;
+      let height = 0;
+      let bounds;
       const canvas = document.querySelector("#demo canvas");
       const dpr = window.devicePixelRatio;
       const gl = canvas.getContext("webgl2", {
         antialias: false
       });
-      gl.enable(gl.BLEND);
-      gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-      let width = 0;
-      let height = 0;
-      let bounds;
       const vertexShaderSource = `#version 300 es
 in vec2 a_position;
-in vec2 a_offset;
-in float a_alpha;
+in vec3 a_offset;
 in vec3 a_color;
-out float v_alpha;
 out vec3 v_color;
 uniform vec2 u_resolution;
 void main() {
-  vec2 pos = a_position + a_offset;
+  vec2 pos = a_position * a_offset.z + a_offset.xy;
   gl_Position = vec4(pos / u_resolution * 2.0 - 1.0, 0, 1);
   gl_Position.y *= -1.0;
-  v_alpha = a_alpha;
   v_color = a_color;
 }
 `;
       const fragmentShaderSource = `#version 300 es
 precision mediump float;
-in float v_alpha;
 in vec3 v_color;
 out vec4 outColor;
-void main() {
-  outColor = vec4(v_color, v_alpha);
-}
+void main() { outColor = vec4(v_color, 1.0); }
 `;
       const resize = () => {
+        bounds = null;
         bounds = getCanvasRect();
         width = bounds.width;
         height = bounds.height;
@@ -2980,7 +3000,7 @@ void main() {
         canvas.height = height * dpr;
       };
       resize();
-      window.onresize = resize;
+      window.addEventListener("resize", resize);
       function getCanvasRect() {
         if (bounds) return bounds;
         bounds = canvas.getBoundingClientRect();
@@ -3025,14 +3045,8 @@ void main() {
       gl.bindBuffer(gl.ARRAY_BUFFER, instanceBuffer);
       const offsetLoc = gl.getAttribLocation(program, "a_offset");
       gl.enableVertexAttribArray(offsetLoc);
-      gl.vertexAttribPointer(offsetLoc, 2, gl.FLOAT, false, 0, 0);
+      gl.vertexAttribPointer(offsetLoc, 3, gl.FLOAT, false, 0, 0);
       gl.vertexAttribDivisor(offsetLoc, 1);
-      const alphaBuffer = gl.createBuffer();
-      gl.bindBuffer(gl.ARRAY_BUFFER, alphaBuffer);
-      const alphaLoc = gl.getAttribLocation(program, "a_alpha");
-      gl.enableVertexAttribArray(alphaLoc);
-      gl.vertexAttribPointer(alphaLoc, 1, gl.FLOAT, false, 0, 0);
-      gl.vertexAttribDivisor(alphaLoc, 1);
       const colorBuffer = gl.createBuffer();
       gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
       const colorLoc = gl.getAttribLocation(program, "a_color");
@@ -3048,56 +3062,26 @@ void main() {
         gl.bindVertexArray(vao);
         let count = 0;
         for (let particle of particles) count += particle.dots.length;
-        const offsets = new Float32Array(count * 2);
-        const alphas = new Float32Array(count);
+        const offsets = new Float32Array(count * 3);
         const colors = new Float32Array(count * 3);
         let i = 0;
         for (let particle of particles) {
           for (let dot of particle.dots) {
-            offsets[i * 2] = dot.springPos.x;
-            offsets[i * 2 + 1] = dot.springPos.y;
-            colors[i * 3] = dot.color[0];
+            offsets[i * 3 + 0] = dot.pos.x;
+            offsets[i * 3 + 1] = dot.pos.y;
+            offsets[i * 3 + 2] = dot.size;
+            colors[i * 3 + 0] = dot.color[0];
             colors[i * 3 + 1] = dot.color[1];
             colors[i * 3 + 2] = dot.color[2];
-            alphas[i] = dot.color[3];
             i++;
           }
         }
         gl.bindBuffer(gl.ARRAY_BUFFER, instanceBuffer);
         gl.bufferData(gl.ARRAY_BUFFER, offsets, gl.DYNAMIC_DRAW);
-        gl.bindBuffer(gl.ARRAY_BUFFER, alphaBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, alphas, gl.DYNAMIC_DRAW);
         gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
         gl.bufferData(gl.ARRAY_BUFFER, colors, gl.DYNAMIC_DRAW);
         gl.drawArraysInstanced(gl.TRIANGLES, 0, vertexCount, count);
       }
-      let r1 = 0.166;
-      let g1 = 0.166;
-      let b1 = 0.166;
-      let r2 = 0.8 * 1;
-      let g2 = 0.8 * 0.8;
-      let b2 = 0.8 * 0.2;
-      window.addEventListener("set-theme", (e) => {
-        setTheme(e.detail);
-      });
-      function setTheme(theme) {
-        if (theme == "dark") {
-          r1 = 1;
-          g1 = 0.8;
-          b1 = 0.2;
-          r2 = 0.2;
-          g2 = 0.2;
-          b2 = 0.2;
-        } else {
-          r1 = 0.166;
-          g1 = 0.166;
-          b1 = 0.166;
-          r2 = 0.8 * 1;
-          g2 = 0.8 * 0.8;
-          b2 = 0.8 * 0.2;
-        }
-      }
-      setTheme(document.documentElement.getAttribute("theme"));
       const _Particle = class _Particle {
         constructor(sourceInfo, source, target, isDelete) {
           __publicField(this, "dots");
@@ -3106,13 +3090,15 @@ void main() {
             y: 0
           });
           __publicField(this, "applyEarly", false);
+          __publicField(this, "skipStart", false);
+          __publicField(this, "skipEnd", false);
           this.sourceInfo = sourceInfo;
           this.source = source;
           this.target = target;
-          this.isDelete = isDelete;
           let isAdd = sourceInfo.edits.some((e) => e.type == "add");
           if (isAdd) this.applyEarly = true;
-          this.dots = makeDots(sourceInfo, getPos(source, sourceInfo.todoIndex));
+          this.dots = makeDots(sourceInfo, getPos(source, sourceInfo.todoIndex), isDelete);
+          this.skipStart = sourceInfo.todoIndex >= limit;
           _Particle.all.add(this);
         }
         static update(dt) {
@@ -3128,46 +3114,34 @@ void main() {
           }
           for (let particle of _Particle.all) {
             let idx = map.get(particle.sourceInfo.id);
-            if (idx != null && idx >= 0) particle.dest = getPos(particle.target, idx);
-            else debugger;
+            if (idx != null && idx >= 0) {
+              particle.dest = getPos(particle.target, idx);
+              particle.skipEnd = idx >= limit;
+            } else particle.dest ?? (particle.dest = getPos(particle.target, 0));
           }
         }
         physics(dt) {
           let allComplete = true;
           for (const dot of this.dots) {
-            let destPos = Vec.add(this.dest, dot.local);
-            let springDist = Vec.len(Vec.sub(destPos, dot.springPos));
-            if (springDist < 50 && this.applyEarly) {
+            let dest = Vec.add(this.dest, dot.local);
+            dot.age += dt;
+            let accel = Vec.mulS(dot.accel, no(dot.age, 0.8, 2, true));
+            dot.vel = Vec.add(dot.vel, Vec.mulS(accel, 120 * dt));
+            dot.pos = Vec.add(dot.pos, Vec.mulS(dot.vel, 120 * dt));
+            let goalT = ss(no(dot.age, 1.3, 3, true));
+            let goal = Vec.lerp(dot.start, dest, goalT);
+            let blendT = ss(no(dot.age, 1.3, 3, true));
+            dot.pos = Vec.lerp(dot.pos, goal, blendT);
+            if (dot.age > 2.5 && this.applyEarly) {
               this.applyEarly = false;
               this.target.applyChange(this.sourceInfo.change);
             }
-            dot.isComplete = springDist < 0.2;
-            allComplete && (allComplete = dot.isComplete);
-            dot.age += dt;
-            let rampStart = no(dot.age, 0, 4, true) ** 1.5;
-            let maxAccel = 0.05 * rampStart;
-            let accel = Vec.renormalize(Vec.sub(destPos, dot.pos), maxAccel);
-            let approach = no(springDist, 180, 80, true);
-            let damping = de(approach, 0.99, 0.9) ** (dt * 60);
-            dot.vel = Vec.add(dot.vel, Vec.Smul(120 * dt, accel));
-            dot.vel = Vec.mulS(dot.vel, damping);
-            dot.pos = Vec.add(dot.pos, Vec.Smul(120 * dt, dot.vel));
-            const displacement = Vec.sub(dot.pos, dot.springPos);
-            const springAccel = Vec.Smul(dot.springK * rampStart, displacement);
-            dot.springVel = Vec.add(dot.springVel, Vec.Smul(dt, springAccel));
-            dot.springVel = Vec.mulS(dot.springVel, damping);
-            dot.springPos = Vec.add(dot.springPos, Vec.Smul(dt, dot.springVel));
-            if (this.isDelete) {
-              dot.color[0] = re(springDist, 500, 0, 0.133, r2);
-              dot.color[1] = re(springDist, 500, 0, 0.133, g2);
-              dot.color[2] = re(springDist, 500, 0, 0.133, b2);
-              dot.color[3] = 1;
-            } else {
-              dot.color[0] = r1;
-              dot.color[1] = g1;
-              dot.color[2] = b1;
-              dot.color[3] = dot.age < 1.5 ? 0 : 1;
-            }
+            dot.size = clip(dot.age - 1);
+            dot.size *= no(dot.age, 4, 2.5, true);
+            if (this.skipStart) dot.size *= no(dot.age, 0, 3, true);
+            if (this.skipEnd) dot.size *= no(dot.age, 3, 0, true);
+            dot.complete = dot.age > 3.2;
+            allComplete && (allComplete = dot.complete);
           }
           if (allComplete) {
             _Particle.all.delete(this);
@@ -3204,7 +3178,7 @@ void main() {
           };
           taskEntry.onblur = () => {
             if (taskEntry.value.length <= 0) return;
-            this.add(taskEntry.value, 0);
+            animatedAddTodo(this, taskEntry.value, 0);
             taskEntry.value = "";
           };
           this.listElm = elm.querySelector(".list");
@@ -3215,7 +3189,8 @@ void main() {
         add(text, index) {
           const id = this.name + this.nextTodoId++;
           const before = this.doc;
-          this.doc = change(this.doc, (doc) => doc.todos.splice(index ?? doc.todos.length, 0, {
+          index ?? (index = Math.min(this.doc.todos.length, limit - 1));
+          this.doc = change(this.doc, (doc) => doc.todos.splice(index, 0, {
             id,
             text,
             done: false
@@ -3276,6 +3251,13 @@ void main() {
         resetSpec() {
           this.spec = clone(this.doc);
         }
+        isEditing() {
+          if (this.editing && this.getIndex(this.editing) < 0) {
+            console.log("YES");
+            this.editing = null;
+          }
+          return this.editing != null;
+        }
         render() {
           const todos = this.doc.todos;
           const overflow = todos.length > limit;
@@ -3283,21 +3265,27 @@ void main() {
           this.overflowElm.textContent = `${todos.length - limit} more\u2026`;
           this.overflowElm.classList.toggle("hidden", !overflow);
           const keepElms = /* @__PURE__ */ new Map();
+          let prevElm = null;
           for (let i = 0; i < visibleCount; i++) {
             const todo = todos[i];
             let elms = this.elements.get(todo.id) ?? this.makeTodoElms(todo.id);
             keepElms.set(todo.id, elms);
             elms.item.style.translate = `0 ${42 * i}px`;
-            elms.item.style.transition = `translate 1s`;
             if (this.editing == todo.id && document.activeElement != elms.input) {
               elms.input.focus();
             }
-            elms.box.classList.toggle("hide", todo.text.length <= 0);
+            if (todo.text.length > 0) elms.item.setAttribute("had-text", "");
+            elms.box.classList.toggle("hide", elms.item.getAttribute("had-text") == null);
             elms.box.checked = todo.done;
             if (!this.editing || this.editing !== todo.id) elms.input.value = todo.text;
+            if (elms.item.previousElementSibling != prevElm) {
+              this.listElm.insertBefore(elms.item, (prevElm == null ? void 0 : prevElm.nextSibling) ?? this.listElm.firstChild);
+            }
+            prevElm = elms.item;
           }
           this.elements.forEach(({ item: div }, id) => {
             if (!keepElms.has(id)) {
+              if (this.editing == id) this.editing = null;
               try {
                 div.remove();
               } catch {
@@ -3449,7 +3437,7 @@ void main() {
         if (!running || document.hidden) return;
         if (queuedActions.size == 0) {
           timeSinceAction += dt;
-          if (timeSinceAction > 10) {
+          if (timeSinceAction > 6) {
             timeSinceAction = 0;
             nextAction();
           }
@@ -3467,10 +3455,11 @@ void main() {
       let running = false;
       let observer = new IntersectionObserver(([entry]) => running = entry.isIntersecting);
       observer.observe(document.querySelector("#demo"));
-      window.onresize = () => {
+      window.addEventListener("resize", () => {
         desktop.resize();
         phone.resize();
-      };
+        Particle.recalc();
+      });
       let sets = [
         [
           "Align dilithium matrix",
@@ -3504,11 +3493,13 @@ void main() {
       nextSet();
       let getIsDone = (client) => client.doc.todos.filter((t) => t.done);
       let getNotDone = (client) => client.doc.todos.filter((t) => !t.done);
-      function addTodo(client, text) {
-        let id = client.add("");
-        populateTodo(client, text, id);
+      let getVisibleIsDone = (client) => client.doc.todos.filter((t) => t.done).slice(0, limit);
+      let getVisibleNotDone = (client) => client.doc.todos.filter((t) => !t.done).slice(0, limit);
+      function animatedAddTodo(client, text, index) {
+        let id = client.add("", index);
+        animatedPopulateTodo(client, text, id);
       }
-      function populateTodo(client, text, id) {
+      function animatedPopulateTodo(client, text, id) {
         let charsToAdd = Array.from(text);
         let addNextChar = () => {
           if (charsToAdd.length <= 0) return;
@@ -3517,23 +3508,23 @@ void main() {
           let oldText = client.doc.todos[idx].text;
           let newText = oldText + charsToAdd.shift();
           client.edit(id, newText);
-          enqueue(addNextChar, 50);
+          enqueue(addNextChar, randInt(20, 60));
         };
         addNextChar();
       }
-      let editTodo = (client, text, id) => {
+      let animatedEditTodo = (client, text, id) => {
         let removeNextChar = () => {
           let idx = client.getIndex(id);
-          if (idx < 0) return addTodo(client, text);
+          if (idx < 0) return animatedAddTodo(client, text);
           let oldText = client.doc.todos[idx].text;
-          if (oldText.length <= 0) return enqueue(() => populateTodo(client, text, id), 2e3);
+          if (oldText.length <= 0) return enqueue(() => animatedPopulateTodo(client, text, id), 1500);
           let newText = oldText.slice(0, -1);
           client.edit(id, newText);
-          enqueue(removeNextChar, 50);
+          enqueue(removeNextChar, randInt(20, 30));
         };
         removeNextChar();
       };
-      let clearAll = (client) => {
+      let animatedClearAllDone = (client) => {
         let clearNextTodo = () => {
           let todo = getIsDone(client).at(-1);
           if (!todo) return;
@@ -3542,46 +3533,54 @@ void main() {
         };
         clearNextTodo();
       };
-      let addNextTodo = (client) => addTodo(client, currentSet.pop());
-      let editRandomTodo = (client) => {
+      let animatedCompleteAllNotDone = (client) => {
+        let completeNextTodo = () => {
+          let todo = getNotDone(client).at(-1);
+          if (!todo) return;
+          client.toggle(todo.id, true);
+          enqueue(completeNextTodo, 300);
+        };
+        completeNextTodo();
+      };
+      let doAddNextTodo = (client) => animatedAddTodo(client, currentSet.pop());
+      let doEditRandomVisible = (client) => {
         let text = currentSet.pop();
-        let notDone = getNotDone(client);
-        if (notDone.length == 0) addTodo(client, text);
-        else editTodo(client, text, arrRnd(notDone).id);
+        let visibleNotDone = getVisibleNotDone(client);
+        if (visibleNotDone.length == 0) animatedAddTodo(client, text);
+        else animatedEditTodo(client, text, arrRnd(visibleNotDone).id);
       };
-      let doComplete = (client) => {
-        let notDone = getNotDone(client);
-        if (notDone.length > 0) client.toggle(arrRnd(notDone).id, true);
+      let doCompleteRandomVisible = (client) => {
+        let visibleNotDone = getVisibleNotDone(client);
+        if (visibleNotDone.length > 0) client.toggle(arrRnd(visibleNotDone).id, true);
       };
-      let doClear = (client) => {
-        let isDone = getIsDone(client);
-        if (isDone.length > 0) client.clear(arrRnd(isDone).id);
+      let doClearRandomVisible = (client) => {
+        let visibleIsDone = getVisibleIsDone(client);
+        if (visibleIsDone.length > 0) client.clear(arrRnd(visibleIsDone).id);
       };
-      let doClearAll = (client) => clearAll(client);
-      function runAction(action, client) {
-        action(client);
-      }
       function nextAction(client) {
-        if (desktop.editing != null || phone.editing != null) return;
+        if (desktop.isEditing() || phone.isEditing()) return;
         client ?? (client = chance() ? desktop : phone);
         let todoCount = client.doc.todos.length;
-        let notDone = getNotDone(client);
         let isDone = getIsDone(client);
+        let notDone = getNotDone(client);
+        let visibleNotDone = getVisibleNotDone(client);
+        let visibleIsDone = getVisibleIsDone(client);
         if (currentSet.length == 0) {
-          if (notDone.length > 0) runAction(doComplete, client);
+          if (visibleNotDone.length > 0) doCompleteRandomVisible(client);
           else {
-            runAction(doClearAll, client);
+            animatedClearAllDone(client);
             nextSet();
           }
           return;
         }
-        if (todoCount < 2) return runAction(addNextTodo, client);
-        if (isDone.length > 4) return runAction(clearAll, client);
-        if (chance(0.33) && todoCount < 4) return runAction(addNextTodo, client);
-        if (chance(0.5)) return runAction(editRandomTodo, client);
-        if (notDone.length > 0) return runAction(doComplete, client);
-        if (isDone.length > 0) return runAction(doClear, client);
-        runAction(addNextTodo, client);
+        if (todoCount < 2) return doAddNextTodo(client);
+        if (isDone.length > 4) return animatedClearAllDone(client);
+        if (notDone.length > 10) return animatedCompleteAllNotDone(client);
+        if (chance(0.33) && todoCount < 4) return doAddNextTodo(client);
+        if (chance(0.5)) return doEditRandomVisible(client);
+        if (visibleNotDone.length > 0) return doCompleteRandomVisible(client);
+        if (visibleIsDone.length > 0) return doClearRandomVisible(client);
+        doAddNextTodo(client);
       }
       nextAction(desktop);
     })();

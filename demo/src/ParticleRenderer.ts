@@ -1,52 +1,41 @@
 import { Particle } from "./particle.ts"
-import { Color, Position } from "./types.ts"
 import { PI, TAU } from "./util.ts"
 
-const sides = 4
-const radius = 1.2
+const sides = 8
+const radius = 1.5
+
+let width = 0
+let height = 0
+let bounds: DOMRect
 
 const canvas = document.querySelector("#demo canvas") as HTMLCanvasElement
 const dpr = window.devicePixelRatio
 
 const gl = canvas.getContext("webgl2", { antialias: false })!
 
-gl.enable(gl.BLEND)
-gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
-
-let width = 0
-let height = 0
-let bounds: DOMRect
-
-export type RenderDot = Position & { color: Color }
-
 const vertexShaderSource = `#version 300 es
 in vec2 a_position;
-in vec2 a_offset;
-in float a_alpha;
+in vec3 a_offset;
 in vec3 a_color;
-out float v_alpha;
 out vec3 v_color;
 uniform vec2 u_resolution;
 void main() {
-  vec2 pos = a_position + a_offset;
+  vec2 pos = a_position * a_offset.z + a_offset.xy;
   gl_Position = vec4(pos / u_resolution * 2.0 - 1.0, 0, 1);
   gl_Position.y *= -1.0;
-  v_alpha = a_alpha;
   v_color = a_color;
 }
 `
 
 const fragmentShaderSource = `#version 300 es
 precision mediump float;
-in float v_alpha;
 in vec3 v_color;
 out vec4 outColor;
-void main() {
-  outColor = vec4(v_color, v_alpha);
-}
+void main() { outColor = vec4(v_color, 1.0); }
 `
 
 const resize = () => {
+  bounds = null!
   bounds = getCanvasRect()
   width = bounds.width
   height = bounds.height
@@ -54,7 +43,7 @@ const resize = () => {
   canvas.height = height * dpr
 }
 resize()
-window.onresize = resize
+window.addEventListener("resize", resize)
 
 export function getCanvasRect() {
   if (bounds) return bounds
@@ -110,16 +99,8 @@ gl.bindBuffer(gl.ARRAY_BUFFER, instanceBuffer)
 
 const offsetLoc = gl.getAttribLocation(program, "a_offset")
 gl.enableVertexAttribArray(offsetLoc)
-gl.vertexAttribPointer(offsetLoc, 2, gl.FLOAT, false, 0, 0)
+gl.vertexAttribPointer(offsetLoc, 3, gl.FLOAT, false, 0, 0)
 gl.vertexAttribDivisor(offsetLoc, 1)
-
-const alphaBuffer = gl.createBuffer()!
-gl.bindBuffer(gl.ARRAY_BUFFER, alphaBuffer)
-
-const alphaLoc = gl.getAttribLocation(program, "a_alpha")
-gl.enableVertexAttribArray(alphaLoc)
-gl.vertexAttribPointer(alphaLoc, 1, gl.FLOAT, false, 0, 0)
-gl.vertexAttribDivisor(alphaLoc, 1)
 
 const colorBuffer = gl.createBuffer()!
 gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer)
@@ -141,28 +122,24 @@ export function render(particles: Set<Particle>) {
   let count = 0
   for (let particle of particles) count += particle.dots.length
 
-  const offsets = new Float32Array(count * 2)
-  const alphas = new Float32Array(count)
+  const offsets = new Float32Array(count * 3)
   const colors = new Float32Array(count * 3)
 
   let i = 0
   for (let particle of particles) {
     for (let dot of particle.dots) {
-      offsets[i * 2] = dot.springPos.x
-      offsets[i * 2 + 1] = dot.springPos.y
-      colors[i * 3] = dot.color[0]
+      offsets[i * 3 + 0] = dot.pos.x
+      offsets[i * 3 + 1] = dot.pos.y
+      offsets[i * 3 + 2] = dot.size
+      colors[i * 3 + 0] = dot.color[0]
       colors[i * 3 + 1] = dot.color[1]
       colors[i * 3 + 2] = dot.color[2]
-      alphas[i] = dot.color[3]
       i++
     }
   }
 
   gl.bindBuffer(gl.ARRAY_BUFFER, instanceBuffer)
   gl.bufferData(gl.ARRAY_BUFFER, offsets, gl.DYNAMIC_DRAW)
-
-  gl.bindBuffer(gl.ARRAY_BUFFER, alphaBuffer)
-  gl.bufferData(gl.ARRAY_BUFFER, alphas, gl.DYNAMIC_DRAW)
 
   gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer)
   gl.bufferData(gl.ARRAY_BUFFER, colors, gl.DYNAMIC_DRAW)

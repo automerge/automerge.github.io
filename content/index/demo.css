@@ -213,11 +213,7 @@
   align-items: center;
   gap: 2px;
   padding-left: 20px;
-  animation: fade-in 1s linear both;
-}
-
-@keyframes fade-in {
-  from { opacity: 0 }
+  transition: translate .5s cubic-bezier(.6, 1, 0, 1);
 }
 
 #demo input {
@@ -249,7 +245,7 @@
   height: 6px;
   top: 4px;
   left: 4px;
-  background: var(--fg);
+  background: currentColor;
   z-index: 2;
 }
 

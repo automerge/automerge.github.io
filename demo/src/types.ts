@@ -10,7 +10,7 @@ export type DocSchema = { todos: Todo[] }
 export type Doc = Automerge.next.Doc<DocSchema>
 
 export type Position = { x: number; y: number }
-export type Color = [number, number, number, number]
+export type Color = [number, number, number]
 
 export type ChangeInfo = {
   id: Id

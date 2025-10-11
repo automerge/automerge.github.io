@@ -1,28 +1,32 @@
 /* Note: the home page also uses landing.css and demo.css */
 
+/* <section> is usually surrounded by a full-width div with a BG color */
 section {
-  padding-inline: 1rem;
-  margin-inline: auto;
   max-width: var(--page-width);
-}
+  margin-inline: auto;
+  padding-inline: 1em;
 
-.unit h4 {
-  font: 800 16px / 1.5 "Overpass";
-}
-
-.unit p {
-  font: 500 16px / 1.5 "Overpass";
+  /* On super-narrow screens, some of our SVGs might poke *slightly* past the edge — this is fine. */
+  overflow-x: hidden;
 }
 
 footer {
   padding-block: 0 3em;
 }
 
+@media (width <= 700px) {
+  /* These titles are really big, and we want a little extra space around them on narrow screens. */
+  h1 { margin: 0 .3em 2rem }
+  h2 { margin-inline: 1em }
+}
+
+/* Used to put a little heading and block of text together, often floating in space */
+.unit h4 { font: 800 16px / 1.5 "Overpass" }
+.unit p  { font: 500 16px / 1.5 "Overpass" }
+
 /* BACKGROUNDS ************************************************************************************/
 
 .demo-bg {
-  margin-bottom: 4em;
-  padding-top: 4em;
   border-bottom: 2px solid var(--fg);
   background-image: url("autodots-bg.png");
   background-size: auto 351.5px;
@@ -44,14 +48,25 @@ footer {
   --fg: var(--white);
   --bg: var(--mid);
   --bg: light-dark(var(--mid), var(--slate));
-  background: var(--bg);
   color: var(--fg);
+  background: var(--bg);
 }
+
+/* TAG ********************************************************************************************/
+
+#tag {
+  margin-bottom: 4em;
+}
+
+/* DEMO *******************************************************************************************/
+
+/* See /content/index/demo.css */
 
 /* ILLUSTRATION ***********************************************************************************/
 
 #illustration {
   position: relative;
+  margin-top: 5rem;
   font-size: min(1.388vw, 16px);
 }
 
@@ -124,19 +139,15 @@ footer {
 }
 
 @media (width <= 700px) {
-  #illustration {
-    font-size: 16px;
-  }
+  #illustration { font-size: 16px }
 
-  #illustration .full {
-    display: none;
-  }
-  #illustration {
-    margin-top: 3em;
-  }
+  #illustration h2 { margin-bottom: 3rem; }
+
+  #illustration .full { display: none }
+
   #illustration .chop {
     display: block;
-    margin: 1.5em auto 5em;
+    margin: 2.5em auto 5em;
   }
   #illustration .unit {
     position: static;
@@ -146,8 +157,8 @@ footer {
     margin: 0 auto;
     max-width: 19em;
   }
-  #illustration .chop.versioned { margin-block: -1em 1em; }
-  #illustration .chop.compact { margin-block: 0em 1em; }
+  #illustration .chop.versioned { margin-block: 0 1em; }
+  #illustration .chop.compact { margin-block: 1em; }
 
   #illustration .cursor {
     position: relative;
@@ -203,8 +214,18 @@ footer {
 
 #team {
   display: grid;
-  gap: 1em 4em;
+  align-items: start;
+  gap: 4em 2em;
   padding-block: 6em;
+}
+
+#team h2 {
+  text-align: left;
+  margin: -.5rem 0 .5rem;
+}
+
+#team p {
+  margin-bottom: 1em;
 }
 
 #team .photos {
@@ -213,43 +234,17 @@ footer {
   gap: 1em;
 }
 
-#team .photos div {
-  flex: 1 1 280px;
-}
-
 #team img {
   width: 100%;
 }
 
-#team h2 {
-  text-align: left;
-  margin: 0 0 1rem;
+@media (width <= 700px) {
+  #team .photos { display: none; }
+  #team img { margin: 0 0 1rem; }
 }
 
-#team h3 {
-  text-align: left;
-  margin: 0 0 1rem;
-  font: 350 24px / 28px "Overpass";
-}
-
-#team h4 {
-  margin: 1rem 0 0;
-}
-
-@media (width > 800px) {
-  #team {
-    grid-template: "intro image" "units image";
-  }
-
-  #team .intro {
-    grid-area: intro;
-  }
-
-  #team .photos {
-    grid-area: image;
-  }
-
-  #team .units {
-    grid-area: units;
-  }
+@media (width > 700px) {
+  #team { grid-template-columns: auto auto; }
+  #team img { max-width: 460px; }
+  #team .text img { display: none; }
 }

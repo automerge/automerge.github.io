@@ -115,10 +115,12 @@ export const bell = (v: number, min = 0, max = 1) => re(cos1(clip(v) - 0.25), mi
 
 export const chance = (v = 0.5) => rand(0, 1) < v
 
-export const cos = (t = 0) => Math.sin(t * TAU)
+export const cos = (t = 0) => Math.cos(t * TAU)
 export const sin = (t = 0) => Math.sin(t * TAU)
 export const cos1 = (t = 0) => no(cos(t))
 export const sin1 = (t = 0) => no(sin(t))
+
+export const ss = (v = 0) => v * v * (3 - 2 * v)
 
 export const min = (a = 1, b = 1) => Math.min(a, b)
 export const max = (a = 0, b = 0) => Math.max(a, b)

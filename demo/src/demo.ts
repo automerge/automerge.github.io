@@ -1,14 +1,16 @@
 import * as Automerge from "@automerge/automerge"
-import { Client } from "./client.ts"
+import { Client, limit } from "./client.ts"
 import { Particle } from "./particle.ts"
 import { DocSchema, Id } from "./types.ts"
-import { arrMod, arrRnd, chance, shuffleArray } from "./util.ts"
+import { arrMod, arrRnd, chance, randInt, shuffleArray } from "./util.ts"
 
 let rootDoc = Automerge.change(Automerge.init<DocSchema>(), (doc) => (doc.todos = []))
 
 // We give desktop a higher actorId to hint the merge behaviour such that its todos come first
 let desktop = new Client("a", Automerge.clone(rootDoc, { actor: "01" }))
 let phone = new Client("b", Automerge.clone(rootDoc, { actor: "00" }))
+
+// TODO: How do we respect reduce motion??
 
 // For debugging
 ;(window as any).desktop = desktop
@@ -20,16 +22,19 @@ let enqueue = (action: () => void, delay: number) => queuedActions.add({ action,
 let timeSinceAction = 0
 
 let s = performance.now() / 1000
+
 function update(ms: number) {
   let t = ms / 1000
   let dt = Math.min(t - s, 1 / 20) // longest frame time before skewing is 1/20th of a second
   s = t
+
   requestAnimationFrame(update)
+
   if (!running || document.hidden) return
 
   if (queuedActions.size == 0) {
     timeSinceAction += dt
-    if (timeSinceAction > 10) {
+    if (timeSinceAction > 6) {
       timeSinceAction = 0
       nextAction()
     }
@@ -50,12 +55,11 @@ let running = false
 let observer = new IntersectionObserver(([entry]) => (running = entry.isIntersecting))
 observer.observe(document.querySelector("#demo")!)
 
-window.onresize = () => {
+window.addEventListener("resize", () => {
   desktop.resize()
   phone.resize()
-  // Particle.recalc(desktop)
-  // Particle.recalc(phone)
-}
+  Particle.recalc()
+})
 
 // AUTOMATIC DEMO /////////////////////////////////////////////////////////////////////////////////
 
@@ -74,15 +78,17 @@ nextSet()
 
 let getIsDone = (client: Client) => client.doc.todos.filter((t) => t.done)
 let getNotDone = (client: Client) => client.doc.todos.filter((t) => !t.done)
+let getVisibleIsDone = (client: Client) => client.doc.todos.filter((t) => t.done).slice(0, limit)
+let getVisibleNotDone = (client: Client) => client.doc.todos.filter((t) => !t.done).slice(0, limit)
 
 // ANIMATED CHANGES
 
-function addTodo(client: Client, text: string) {
-  let id = client.add("")
-  populateTodo(client, text, id)
+export function animatedAddTodo(client: Client, text: string, index?: number) {
+  let id = client.add("", index)
+  animatedPopulateTodo(client, text, id)
 }
 
-function populateTodo(client: Client, text: string, id: Id) {
+function animatedPopulateTodo(client: Client, text: string, id: Id) {
   let charsToAdd = Array.from(text)
   let addNextChar = () => {
     if (charsToAdd.length <= 0) return // done
@@ -91,25 +97,25 @@ function populateTodo(client: Client, text: string, id: Id) {
     let oldText = client.doc.todos[idx].text
     let newText = oldText + charsToAdd.shift()
     client.edit(id, newText)
-    enqueue(addNextChar, 50)
+    enqueue(addNextChar, randInt(20, 60))
   }
   addNextChar()
 }
 
-let editTodo = (client: Client, text: string, id: Id) => {
+let animatedEditTodo = (client: Client, text: string, id: Id) => {
   let removeNextChar = () => {
     let idx = client.getIndex(id)
-    if (idx < 0) return addTodo(client, text) // If at any point the todo we're editing doesn't exist, just add the text as a new todo
+    if (idx < 0) return animatedAddTodo(client, text) // If at any point the todo we're editing doesn't exist, just add the text as a new todo
     let oldText = client.doc.todos[idx].text
-    if (oldText.length <= 0) return enqueue(() => populateTodo(client, text, id), 2000) // After the todo is empty, fill it with the new text
+    if (oldText.length <= 0) return enqueue(() => animatedPopulateTodo(client, text, id), 1500) // After the todo is empty, fill it with the new text
     let newText = oldText.slice(0, -1)
     client.edit(id, newText)
-    enqueue(removeNextChar, 50)
+    enqueue(removeNextChar, randInt(20, 30))
   }
   removeNextChar()
 }
 
-let clearAll = (client: Client) => {
+let animatedClearAllDone = (client: Client) => {
   let clearNextTodo = () => {
     let todo = getIsDone(client).at(-1)
     if (!todo) return
@@ -119,49 +125,55 @@ let clearAll = (client: Client) => {
   clearNextTodo()
 }
 
+let animatedCompleteAllNotDone = (client: Client) => {
+  let completeNextTodo = () => {
+    let todo = getNotDone(client).at(-1)
+    if (!todo) return
+    client.toggle(todo.id, true)
+    enqueue(completeNextTodo, 300)
+  }
+  completeNextTodo()
+}
+
 // ACTIONS
 
-let addNextTodo = (client: Client) => addTodo(client, currentSet.pop()!)
+let doAddNextTodo = (client: Client) => animatedAddTodo(client, currentSet.pop()!)
 
-let editRandomTodo = (client: Client) => {
+let doEditRandomVisible = (client: Client) => {
   let text = currentSet.pop()!
-  let notDone = getNotDone(client)
-  if (notDone.length == 0) addTodo(client, text)
-  else editTodo(client, text, arrRnd(notDone).id)
+  let visibleNotDone = getVisibleNotDone(client)
+  if (visibleNotDone.length == 0) animatedAddTodo(client, text)
+  else animatedEditTodo(client, text, arrRnd(visibleNotDone).id)
 }
 
-let doComplete = (client: Client) => {
-  let notDone = getNotDone(client)
-  if (notDone.length > 0) client.toggle(arrRnd(notDone).id, true)
+let doCompleteRandomVisible = (client: Client) => {
+  let visibleNotDone = getVisibleNotDone(client)
+  if (visibleNotDone.length > 0) client.toggle(arrRnd(visibleNotDone).id, true)
 }
 
-let doClear = (client: Client) => {
-  let isDone = getIsDone(client)
-  if (isDone.length > 0) client.clear(arrRnd(isDone).id)
-}
-
-let doClearAll = (client: Client) => clearAll(client)
-
-function runAction(action: (client: Client) => void, client: Client) {
-  action(client)
+let doClearRandomVisible = (client: Client) => {
+  let visibleIsDone = getVisibleIsDone(client)
+  if (visibleIsDone.length > 0) client.clear(arrRnd(visibleIsDone).id)
 }
 
 function nextAction(client?: Client) {
   // If the user is editing, wait until they stop before resuming the demo
-  if (desktop.editing != null || phone.editing != null) return
+  if (desktop.isEditing() || phone.isEditing()) return
 
   client ??= chance() ? desktop : phone
   let todoCount = client.doc.todos.length
-  let notDone = getNotDone(client)
   let isDone = getIsDone(client)
+  let notDone = getNotDone(client)
+  let visibleNotDone = getVisibleNotDone(client)
+  let visibleIsDone = getVisibleIsDone(client)
 
   // When we have no more todos left to add in the current set…
   if (currentSet.length == 0) {
-    // …first mark all of them as complete, then…
-    if (notDone.length > 0) runAction(doComplete, client)
-    // …clear them all and move on to the next set
+    // …first mark all of them as complete…
+    if (visibleNotDone.length > 0) doCompleteRandomVisible(client)
+    // …then clear them all and move on to the next set.
     else {
-      runAction(doClearAll, client)
+      animatedClearAllDone(client)
       nextSet()
     }
     return
@@ -170,29 +182,32 @@ function nextAction(client?: Client) {
   // From here on down, we know we have todos left to add
 
   // Whenever we have no todos, add more
-  if (todoCount < 2) return runAction(addNextTodo, client)
+  if (todoCount < 2) return doAddNextTodo(client)
 
   // Whenever we have too many done todos, clear them
-  if (isDone.length > 4) return runAction(clearAll, client)
+  if (isDone.length > 4) return animatedClearAllDone(client)
+
+  // If the user gets silly and adds a ton of todos, clean them up
+  if (notDone.length > 10) return animatedCompleteAllNotDone(client)
 
   // From here, we know we have todos to add and a few todos that exist
 
   // 33% of the time, add a new todo
-  if (chance(0.33) && todoCount < 4) return runAction(addNextTodo, client)
+  if (chance(0.33) && todoCount < 4) return doAddNextTodo(client)
 
   // 33% of the time, edit an existing todo
-  if (chance(0.5)) return runAction(editRandomTodo, client)
+  if (chance(0.5)) return doEditRandomVisible(client)
 
   // For the remaining 33% of the time…
 
   // Mark todos as completed
-  if (notDone.length > 0) return runAction(doComplete, client)
+  if (visibleNotDone.length > 0) return doCompleteRandomVisible(client)
 
   // Clear completed todos
-  if (isDone.length > 0) return runAction(doClear, client)
+  if (visibleIsDone.length > 0) return doClearRandomVisible(client)
 
   // If all else fails, add a todo
-  runAction(addNextTodo, client)
+  doAddNextTodo(client)
 }
 
 nextAction(desktop)

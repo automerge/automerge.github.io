@@ -2,9 +2,10 @@ import * as Automerge from "@automerge/automerge"
 import { Particle } from "./particle.ts"
 import { ChangeInfo, Doc, Edit, Id } from "./types.ts"
 import Vec from "./vec.ts"
+import { animatedAddTodo } from "./demo.ts"
 
 // What's the max number of todos that can be shown?
-const limit = 5
+export const limit = 5
 
 // A little collection of HTML elements used to render each todo
 type Elements = {
@@ -37,7 +38,7 @@ export class Client {
     }
     taskEntry.onblur = () => {
       if (taskEntry.value.length <= 0) return
-      this.add(taskEntry.value, 0)
+      animatedAddTodo(this, taskEntry.value, 0)
       taskEntry.value = ""
     }
     this.listElm = elm.querySelector(".list") as HTMLElement
@@ -52,7 +53,8 @@ export class Client {
   add(text: string, index?: number) {
     const id = this.name + this.nextTodoId++
     const before = this.doc
-    this.doc = Automerge.change(this.doc, (doc) => doc.todos.splice(index ?? doc.todos.length, 0, { id, text, done: false }))
+    index ??= Math.min(this.doc.todos.length, limit - 1)
+    this.doc = Automerge.change(this.doc, (doc) => doc.todos.splice(index, 0, { id, text, done: false }))
     this.broadcast(before)
     return id
   }
@@ -114,6 +116,15 @@ export class Client {
     this.spec = Automerge.clone(this.doc)
   }
 
+  isEditing() {
+    // Make sure the todo we're editing actually still exists
+    if (this.editing && this.getIndex(this.editing) < 0) {
+      console.log("YES")
+      this.editing = null
+    }
+    return this.editing != null
+  }
+
   render() {
     const todos = this.doc.todos
     const overflow = todos.length > limit
@@ -127,6 +138,8 @@ export class Client {
     const keepElms = new Map<Id, Elements>()
 
     // Update visible todos
+    let prevElm: Node | null = null
+
     for (let i = 0; i < visibleCount; i++) {
       const todo = todos[i]
 
@@ -136,21 +149,29 @@ export class Client {
 
       // Ensure element is in correct position
       elms.item.style.translate = `0 ${42 * i}px`
-      elms.item.style.transition = `translate 1s`
 
       if (this.editing == todo.id && document.activeElement != elms.input) {
         elms.input.focus()
       }
 
-      // Update element display
-      elms.box.classList.toggle("hide", todo.text.length <= 0)
+      // don't show the checkbox until some text exists — makes the "apply early" effect look better
+      if (todo.text.length > 0) elms.item.setAttribute("had-text", "")
+      elms.box.classList.toggle("hide", elms.item.getAttribute("had-text") == null)
+
       elms.box.checked = todo.done
       if (!this.editing || this.editing !== todo.id) elms.input.value = todo.text
+
+      // Sort the items, so we can tab through them
+      if (elms.item.previousElementSibling != prevElm) {
+        this.listElm.insertBefore(elms.item, prevElm?.nextSibling ?? this.listElm.firstChild)
+      }
+      prevElm = elms.item
     }
 
     // Cleanup elements that weren't kept
     this.elements.forEach(({ item: div }, id) => {
       if (!keepElms.has(id)) {
+        if (this.editing == id) this.editing = null
         try {
           div.remove()
         } catch {
