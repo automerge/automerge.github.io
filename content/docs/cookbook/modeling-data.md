@@ -1,9 +1,7 @@
 ---
-sidebar_position: 1
+title: Modeling Data
 template: docs
 ---
-
-# Modeling Data
 
 All data in Automerge must be stored in a document. A document can be modeled in a variety of ways, and there are many design patterns that can be used. An application could have many documents, typically identified by a UUID.
 
@@ -89,7 +87,7 @@ if (doc.version === 1) {
 
 Also keep in mind that in your app there might be some users using an old version of the app while other users are using a newer version; you will need to take care with migrations to ensure that they do not break compatibility with older app versions, or force all users to update to the latest version.
 
-Some further ideas on safe schema migrations in CRDT apps are discussed in the [Cambria](https://www.inkandswitch.com/cambria) paper, but these are not yet implemented in Automerge. If you want to work on improving schema migrations in Automerge, please get in touch — contributions are welcome!
+Some further ideas on safe schema migrations in CRDT apps are discussed in the [Cambria](https://www.inkandswitch.com/cambria) paper, but these are not yet implemented in Automerge. If you want to work on improving schema migrations in Automerge, please get in touch — contributions are welcome!
 
 ## Performance
 

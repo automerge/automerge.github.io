@@ -1,10 +1,7 @@
 ---
-title: "Next Steps"
+title: Next Steps
 template: docs
 ---
-
-import { jsx } from "react/jsx-runtime";
-import Admonition from "@theme/Admonition";
 
 ## Congratulations!
 
@@ -33,7 +30,7 @@ If you're hungry for more:
 
 ## Community
 
-Join the [Discord](https://discord.gg/zKGe4DCfgR) to:
+Join the [Automerge community](/community) to:
 
 - Ask questions
 - Show off your Automerge apps

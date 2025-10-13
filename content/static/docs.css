@@ -20,6 +20,8 @@ aside p {
 }
 
 aside a {
+  position: relative;
+  display: block;
   color: var(--fg);
 }
 
@@ -54,25 +56,32 @@ aside nav {
 }
 
 .nav {
-  margin-bottom: 1rem;
-  padding-bottom: 1rem;
+  margin-bottom: .8rem;
+  padding-bottom: .7rem;
   border-bottom: 2px solid var(--separator);
 }
 
-.api {
+.api, .subscribe {
   display: flex;
   flex-flow: row wrap;
   justify-content: space-between;
   align-items: baseline;
-  margin-bottom: 1rem;
-  padding-bottom: 1rem;
+  margin-bottom: .8rem;
+  padding-bottom: .7rem;
   border-bottom: 2px solid var(--separator);
 }
 
-.api span {
+.subscribe {
+  justify-content: start;
+  gap: .7em;
+}
+
+.api span,
+.subscribe span {
   font: 500 14px / 14px "Overpass Mono";
   color: var(--inactive);
 }
+
 
 @media (max-width: 800px) {
   aside {
@@ -91,20 +100,6 @@ aside nav {
     padding-bottom: 1rem;
     margin-bottom: 2.5rem;
   }
-
-  /* The nav fills the screen */
-  /* aside nav {
-    position: absolute;
-    inset: 0;
-    height: 100vh;
-    background: #fff;
-    flex-flow: column;
-    justify-content: start;
-    align-items: center;
-    gap: 1em;
-    padding-top: 4em;
-    overscroll-behavior: contain;
-  } */
 }
 
 
@@ -149,17 +144,13 @@ main {
 
 
 
-a[is-current] {
-  position: relative;
-}
-
 a[is-current]::before {
   content: "";
   position: absolute;
-  top: -.05em;
-  left: -.25em;
-  width: calc(100% + .5em);
-  height: 100%;
+  top: -.3em;
+  left: -.5em;
+  width: calc(100% + 1em);
+  height: calc(100% + .4em);
   border-radius: 3px;
   background: var(--current);
   z-index: -1;
@@ -167,4 +158,32 @@ a[is-current]::before {
 
 .nav a[is-current]::before {
   display: none;
+}
+
+
+.page-nav {
+  display: flex;
+  gap: 1rem;
+}
+
+.page-nav a {
+  flex: 0 1 50%;
+  padding: 1rem;
+  border: 2px solid var(--fg);
+  border-radius: 8px;
+  text-decoration: none;
+}
+
+.page-nav a:hover {
+  outline: 2px solid currentColor;
+  outline-offset: -1px;
+}
+
+.page-nav span {
+  display: block;
+  color: var(--inactive);
+}
+
+.page-nav .right {
+  margin-left: auto;
 }

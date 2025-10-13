@@ -1,9 +1,7 @@
 ---
-sidebar_position: 3
+title: Counters
 template: docs
 ---
-
-# Counters
 
 If you have a numeric value that is only ever changed by adding or subtracting (e.g. counting how
 many times the user has done a particular thing), you should use the `Automerge.Counter` datatype

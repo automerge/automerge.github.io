@@ -1,19 +1,17 @@
 ---
-sidebar_position: 3
+title: Merge Rules
 template: docs
 ---
 
-# Merge Rules
-
-:::info
+<div class="note">
 
 It isn't important to understand this section to use automerge. You can just let automerge handle merging for you. But it may be interesting to understand.
 
-:::
+</div>
 
 How does automerge merge concurent changes? Well, let's think about what kinds of concurrent changes are possible. Automerge documents always carry their history with them, so the way to think about two concurrent versions of a document is as the set of changes since some common ancestor.
 
-```mermaid
+{{# Note — I tried to add Mermaid support to the build system, but it was a rabbit hole, so for now here's the original markup for reference, followed by a pre-compiled SVG. Sorry!
 graph LR
     A --> B
     B --> C
@@ -21,7 +19,8 @@ graph LR
     D --> E
     C --> F
     F --> G
-```
+}}
+![](graph-lr.svg)
 
 Here the common ancestor is `C` and the concurrent changes are `(D,E)` and `(F,G)`.
 

@@ -1,9 +1,7 @@
 ---
-sidebar_position: 2
+title: Using Automerge with LLMs
 template: docs
 ---
-
-# Using Automerge with LLMs
 
 We support the [llms.txt](https://llmstxt.org/) standard for making documentation available to large language models.
 

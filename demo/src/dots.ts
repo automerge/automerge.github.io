@@ -6,7 +6,6 @@ let colorA: Color = [0.22, 0.21, 0.2]
 let colorB: Color = [0.7 * 1, 0.7 * 0.8, 0.7 * 0.2]
 
 type Theme = "light" | "dark"
-window.addEventListener("set-theme", (e) => setTheme((e as CustomEvent).detail as Theme))
 
 function setTheme(theme: Theme) {
   if (theme == "dark") {
@@ -18,6 +17,7 @@ function setTheme(theme: Theme) {
   }
 }
 
+window.addEventListener("set-theme", (e) => setTheme((e as CustomEvent).detail as Theme))
 setTheme(document.documentElement.getAttribute("theme") as Theme)
 
 // Density of particles — bigger values are more spaced-out

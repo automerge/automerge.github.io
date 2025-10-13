@@ -1,9 +1,7 @@
 ---
-sidebar_position: 3
+title: Prosemirror + VanillaJS + Automerge
 template: docs
 ---
-
-# Prosemirror + VanillaJS + Automerge
 
 Automerge supports rich text using [ProseMirror](https://prosemirror.net/). This guide will show you how to set up a simple collaborative rich text editor in a vanilla JS app; where "vanilla" means plain JavaScript without any frameworks or libraries.
 

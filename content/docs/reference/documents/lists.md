@@ -1,9 +1,7 @@
 ---
-sidebar_position: 3
+title: Lists
 template: docs
 ---
-
-# Lists
 
 JavaScript Arrays are fully supported in Automerge. You can use `push`, `unshift`, `insertAt`, `deleteAt`, `splice`, loops, and nested objects.
 

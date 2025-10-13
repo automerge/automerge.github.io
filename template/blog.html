@@ -20,14 +20,17 @@ styles: /static/docs.css
         {{include: nav}}
         {{include: theme-toggle}}
       </div>
+      <div class="subscribe"><span>Subscribe via</span> <a href="/index.xml">RSS</a></div>
       {{ blog-sidebar }}
-      <hr>
-      <a href="/index.xml">RSS Feed</a>
     </nav>
   </aside>
   <main id="content">
     <h1>{{title?}}</h1>
     {{content}}
+    <div class="page-nav">
+      {{newer-in-blog}}
+      {{older-in-blog}}
+    </div>
     <footer>{{include: footer}}</footer>
   </main>
 </body>

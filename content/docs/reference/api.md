@@ -1,6 +1,6 @@
 ---
-template: docs
 title: API Docs
+template: docs
 ---
 
 Here are the API docs for the main JavaScript Automerge libraries:

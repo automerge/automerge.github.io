@@ -1,9 +1,7 @@
 ---
-sidebar_position: 3
+title: DocHandles
 template: docs
 ---
-
-# `DocHandle`s
 
 Once you have a `Repo` with a `NetworkAdapter` and a `StorageAdapter` you can get down to the business of creating and working with [`DocHandle`](https://automerge.org/automerge-repo/classes/_automerge_automerge_repo.DocHandle.html)s.
 
@@ -44,7 +42,7 @@ These actions are asynchronous, as they complete the state of the document chang
 
 The transitions between these states look like this:
 
-```mermaid
+{{# Note — I tried to add Mermaid support to the build system, but it was a rabbit hole, so for now here's the original markup for reference, followed by a pre-compiled SVG. Sorry!
 stateDiagram-V2
     direction LR
     [*] --> LOADING: Repo.find
@@ -60,7 +58,8 @@ stateDiagram-V2
     UNAVAILABLE --> DELETED
     REQUESTING --> READY: Received sync for this doc
     READY --> DELETED
-```
+}}
+![](states.svg)
 
 Note that every state can transition to `DELETED`, either via `DocHandle.delete` or `Repo.delete`.
 

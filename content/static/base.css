@@ -14,12 +14,14 @@ html {
   --page-width: 72rem;
 
   /* These are all the colors we use across the site */
+  --true-white: #fff;
   --white: #fcfcfc;
   --cream: hsl(45, 70%, 90%);
   --silver: #ddd;
   --yellow: #fc3;
   --grey: #888;
   --smoke: #555;
+  --mid: #33322e;
   --slate: #222;
   --deep: #111;
   --black: #000;
@@ -36,20 +38,20 @@ html {
   --separator: var(--silver);
   --footer-fg: var(--white);
   --footer-bg: var(--slate);
-  --stark-bg: #fff;
+  --stark-bg: var(--true-white);
   --stark-shadow: var(--silver);
 
   /* And, somewhat redundantly (sigh), here are the colors for light and dark themes. */
   --bg: light-dark(var(--white), var(--slate));
   --fg: light-dark(var(--slate), var(--white));
   --hover-bg: light-dark(var(--slate), var(--yellow));
-  --current: light-dark(var(--cream), var(--smoke));
+  --current: light-dark(var(--cream), var(--mid));
   --inactive: light-dark(var(--grey), var(--grey));
   --separator: light-dark(var(--silver), var(--grey));
   --footer-fg: light-dark(var(--white), var(--yellow));
   --footer-bg: light-dark(var(--slate), var(--black));
-  --stark-bg: light-dark(#fff, #111);
-  --stark-shadow: light-dark(var(--silver), #000);
+  --stark-bg: light-dark(var(--true-white), var(--deep));
+  --stark-shadow: light-dark(var(--silver), var(--black));
 
   /* Use these colors */
   background: var(--bg);
@@ -246,12 +248,28 @@ hr {
 /* MISC */
 
 .caution {
-  background: #fff8e6;
+  --fg: var(--slate);
+  --bg: var(--yellow);
+  --fg: light-dark(var(--slate), var(--yellow));
+  --bg: light-dark(var(--yellow), var(--deep));
+}
+
+.note {
+  --fg: var(--black);
+  --bg: var(--silver);
+  --fg: light-dark(var(--black), var(--white));
+  --bg: light-dark(var(--silver), var(--smoke));
+}
+
+.caution, .note {
+  background: var(--bg);
+  color: var(--fg);
   padding: 1em;
   margin-bottom: 1em;
 }
 
-.caution p:last-child {
+.caution *:last-child,
+.note *:last-child {
   margin-bottom: 0;
 }
 
@@ -349,7 +367,9 @@ html[theme="dark"] #theme-toggle .dark { display: inherit; }
 html[theme="dark"] #theme-toggle .light { display: none; }
 
 
-
+code {
+  display: inline-block;
+}
 
 pre, .code-title {
   overflow: auto;

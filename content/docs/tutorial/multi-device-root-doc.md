@@ -1,5 +1,5 @@
 ---
-title: "Multi Device Root Document"
+title: Multi Device Root Document
 template: docs
 ---
 
@@ -41,7 +41,7 @@ Now, let's add a component to handle the export and import of the root document 
 Create a new file `src/components/SyncControls.tsx`:
 
 
-```typescript
+```tsx
 import { useState } from "react";
 import { type AutomergeUrl, isValidAutomergeUrl } from "@automerge/react";
 import { setRootDocUrl } from "../rootDoc";
@@ -112,7 +112,7 @@ export const SyncControls: React.FC<SyncControlsProps> = ({ docUrl }) => {
 
 Now let's add it to our footer in `src/components/App.tsx`:
 
-```typescript
+```tsx
 // ..
 import { useHash } from "react-use";
 // highlight-next-line

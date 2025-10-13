@@ -5,6 +5,8 @@ import { ChangeInfo, Id, Position } from "./types.ts"
 import { clip, no, ss } from "./util.ts"
 import Vec from "./vec.ts"
 
+let reduceMotion = matchMedia("(prefers-reduced-motion)").matches
+
 export class Particle {
   static all: Set<Particle> = new Set()
 
@@ -61,25 +63,29 @@ export class Particle {
     let allComplete = true
 
     for (const dot of this.dots) {
-      let dest = Vec.add(this.dest, dot.local) // TODO: cache this, only recompute on recalc
-
       dot.age += dt
 
-      // scatter
-      let accel = Vec.mulS(dot.accel, no(dot.age, 0.8, 2, true))
-      dot.vel = Vec.add(dot.vel, Vec.mulS(accel, 120 * dt))
-      dot.pos = Vec.add(dot.pos, Vec.mulS(dot.vel, 120 * dt))
+      let dest = Vec.add(this.dest, dot.local) // TODO: cache this, only recompute on recalc
 
-      // figure out our lerp to target
-      let goalT = ss(no(dot.age, 1.3, 3, true))
-      let goal = Vec.lerp(dot.start, dest, goalT)
+      if (reduceMotion) {
+        if (dot.age > 2) dot.pos = dest
+      } else {
+        // scatter
+        let accel = Vec.mulS(dot.accel, no(dot.age, 0.8, 2, true))
+        dot.vel = Vec.add(dot.vel, Vec.mulS(accel, 120 * dt))
+        dot.pos = Vec.add(dot.pos, Vec.mulS(dot.vel, 120 * dt))
 
-      let blendT = ss(no(dot.age, 1.3, 3, true))
-      dot.pos = Vec.lerp(dot.pos, goal, blendT)
+        // figure out our lerp to target
+        let goalT = ss(no(dot.age, 1.3, 3, true))
+        let goal = Vec.lerp(dot.start, dest, goalT)
 
-      if (dot.age > 2.5 && this.applyEarly) {
-        this.applyEarly = false
-        this.target.applyChange(this.sourceInfo.change)
+        let blendT = ss(no(dot.age, 1.3, 3, true))
+        dot.pos = Vec.lerp(dot.pos, goal, blendT)
+
+        if (dot.age > 2.5 && this.applyEarly) {
+          this.applyEarly = false
+          this.target.applyChange(this.sourceInfo.change)
+        }
       }
 
       dot.size = clip(dot.age - 1)

@@ -1,20 +1,13 @@
 ---
-title: "React Integration"
+title: React Integration
 template: docs
 ---
-
-import { jsx } from "react/jsx-runtime";
-import Admonition from "@theme/Admonition";
-import Exercise from "../components/Exercise";
-import Solution from "../components/Solution";
 
 ### Repos in React: `RepoContext`
 
 We've set up a `Repo` which stores its data locally and syncs documents between tabs, and we have a mechanism for sharing documents via URL. Now we need to actually integrate this with our task list, which is a React application.
 
 The [`@automerge/react` package](https://github.com/automerge/automerge-repo/tree/main/packages/automerge-repo-react-hooks) provides some React-specific conveniences for working with Automerge repositories. The first thing we have to do is setup a `RepoContext` to make the `Repo` available inside our React components. Then, we can use the hooks provided by `@automerge/react` to load and modify documents from within the React app.
-
-<Exercise>
 
 #### Add a `RepoContext` to the React app
 
@@ -51,8 +44,6 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
 );
 ```
 
-</Exercise>
-
 ## Working with Documents in React
 
 Now that we have a `RepoContext` set up we can use the `useDocument` hook to load the URL which we have extracted from the page's hash. This will give us access to the document we want to work with.
@@ -65,8 +56,6 @@ There are two steps to updating the app to use this new functionality:
 
 * Modify the `App` and `TaskList` components to accept an `AutomergeUrl` instead of a `TaskList`
 * Modify the `App` component to use `useDocument` to load and modify the document
-
-<Exercise>
 
 #### Pass an `AutomergeUrl` to the `App`
 
@@ -136,10 +125,6 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
 
 At this point, the `App` component is set up to accept an `AutomergeUrl`, and the `TaskList` component is ready to load the document using that URL. However, we still need to implement the logic to read and modify the document.
 
-</Exercise>
-
-<Exercise>
-
 ### Reading a document
 
 Let's look at reading the contents of a document. Until the document loads, it's undefined. After that, it will become a POJO. First, let's update the `TaskList` component to use the `useDocument` hook to load the task list state.
@@ -208,8 +193,6 @@ window.handle.change(d => d.tasks[d.tasks.length - 1].done = true)
 ```
 
 You should see the checkbox for the final task in the list become ticked in the UI.
-
-</Exercise>
 
 ### Editing a document
 

@@ -1,9 +1,7 @@
 ---
-sidebar_position: 1
+title: Storage
 template: docs
 ---
-
-# Storage
 
 In `automerge-repo` "storage" refers to any implementation of [`StorageAdapter`](https://automerge.org/automerge-repo/classes/_automerge_automerge_repo.StorageAdapter.html). You _can_ run a `Repo` without a `StorageAdapter` but it will be entirely transient and will have to load all its data from remote peers on every restart.
 

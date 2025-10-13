@@ -1,8 +1,7 @@
 ---
+title: Repositories
 template: docs
 ---
-
-# Repositories
 
 `@automerge/automerge` provides a JSON-like CRDT and a sync protocol, but this still leaves a lot of plumbing to do to use it in an application. [`@automerge/automerge-repo`](https://www.npmjs.com/package/@automerge/automerge-repo) is that plumbing.
 

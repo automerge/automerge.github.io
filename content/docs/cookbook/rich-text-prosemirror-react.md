@@ -1,9 +1,7 @@
 ---
-sidebar_position: 2
+title: Prosemirror + React + Automerge
 template: docs
 ---
-
-# Prosemirror + React + Automerge
 
 Automerge supports rich text editing on top of [ProseMirror](https://prosemirror.net/). This guide will show you how to set up a simple collaborative rich text editor in React using Automerge and ProseMirror.
 
@@ -24,7 +22,7 @@ yarn add @automerge/prosemirror prosemirror-example-setup prosemirror-model pros
 
 Now, the app created by `@automerge/vite-app` creates a document which contains a `Counter`, but we want a `string` which will contain the text. Modify `main.tsx` so that the handle initialization logic looks like this:
 
-```jsx title="src/main.tsx"
+```tsx title="src/main.tsx"
 ...
 let handle
 if (isValidAutomergeUrl(rootDocUrl)) {
@@ -37,7 +35,7 @@ if (isValidAutomergeUrl(rootDocUrl)) {
 
 First, let's create a basic skeleton component which just loads the document handle. The prosemirror bindings require that the document handle be loaded before we begin, so we'll add a bit of boilerplate to achieve this:
 
-```jsx title="src/App.tsx"
+```tsx title="src/App.tsx"
 import { AutomergeUrl } from "@automerge/automerge-repo"
 import { useHandle } from "@automerge/automerge-repo-react-hooks"
 import { useEffect, useState } from "react"
@@ -63,7 +61,7 @@ export default App
 
 Now, we're going to create a ProseMirror editor. Prosemirror manages its own UI and state, it just needs to be attached to the DOM somehow. To achieve this we'll use the `useRef` hook to get hold of a reference to a dom element inside a React component which we can pass to prosemirror.
 
-```jsx title="src/App.tsx"
+```tsx title="src/App.tsx"
 import { AutomergeUrl } from "@automerge/automerge-repo"
 import { useHandle } from "@automerge/automerge-repo-react-hooks"
 // highlight-start
@@ -96,7 +94,7 @@ function App({ docUrl }: { docUrl: AutomergeUrl }) {
   const [view, setView] = useState<EditorView | null>(null)
   useEffect(() => {
     if (editorRoot.current != null && loaded) {
-      // This is the integration with automerge   
+      // This is the integration with automerge
       const { pmDoc: doc, schema, plugin } = init(handle!, ["text"])
       const plugins = exampleSetup({schema})
       plugins.push(plugin)

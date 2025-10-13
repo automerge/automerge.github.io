@@ -1,4 +1,6 @@
 html {
+  --fg: var(--slate);
+  --bg: var(--yellow);
   --fg: light-dark(var(--slate), var(--yellow));
   --bg: light-dark(var(--yellow), var(--slate));
 }

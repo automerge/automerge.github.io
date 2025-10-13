@@ -1,9 +1,7 @@
 ---
-sidebar_position: 4
+title: Rich Text Schema
 template: docs
 ---
-
-# Rich Text Schema
 
 The [rich text](../../documents/rich_text) API provides a set of primitives for annotating a sequence of characters with formatting information. The two primitives in question are
 
@@ -26,7 +24,7 @@ We define the following marks
 * `"em"` - represents a span of italicized text, has value `true` if present
 * `"link"` - represents a span of text which links to a URL. The value is a string  representing the JSON serialization of the following object
 
-    ```json
+    ```js
     {
         "href": "<the URL to link to>",
         "title": "<a description of what the link points to>"
@@ -40,7 +38,7 @@ Any other mark names are application specific and should be prefixed by a probab
 
 Blocks represent the hierarchical structure of the document. A block has the following type:
 
-```typescript
+```ts
 {
     type: string,
     parents: string[],
@@ -61,7 +59,7 @@ The `type` of the block determines how the block is rendered. We define the foll
 * `"unordered-list-item"` - An item in an unordered list (i.e. a bulleted list)
 * `"image"` - An image. The `attrs` object should contain the following keys:
 
-    ```typescript
+    ```ts
     {
         src: string // the URL of the image,
         alt: string | null // the alt text describing the content of the image,
@@ -76,7 +74,7 @@ Any other block types are application specific and should be prefixed by a proba
 
 The `parents` array of a block represents the blocks which it appears inside. For example, a block like this:
 
-```
+```ts
 {
     type: "paragraph",
     parents: ["blockquote"]
@@ -87,14 +85,15 @@ The `parents` array of a block represents the blocks which it appears inside. Fo
 
 Represents a paragraph which is inside a blockquote. We call the `path` of a block marker the array `[...parents, type]`. The children of some block `a` are all the blocks following that marker for which the path of `a` is a proper prefix of the child block's path. Note that because a blocks contents are always after it and before it's next sibling, paths don't need to be unique - they only need to provide enough information to clearly match where in the hierarchy a block sits.
 
-:::info
+<div class="note">
 
 Sometimes a block will reference a parent that doesn't exist in the list. When that happens - that parent is implicitly created with the defaults expected for it's block type. This ensures you can't accidentally remove a block's container by deleting the containing block or one of the block's siblings, since each block contains a minimal copy of the hierarchy needed to properly place it.
-:::
+
+</div>
 
 For example, the following sequence of block marks:
 
-```
+```ts
 { parents: ["blockquote"], type: "paragraph" }
 { parents: ["blockquote", "ordered-list-item"], type: "paragraph" }
 { parents: [], type: "paragraph" }

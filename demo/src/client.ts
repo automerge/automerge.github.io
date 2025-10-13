@@ -119,7 +119,7 @@ export class Client {
   isEditing() {
     // Make sure the todo we're editing actually still exists
     if (this.editing && this.getIndex(this.editing) < 0) {
-      console.log("YES")
+      console.log("Confirmed this has happened!") // Hmm
       this.editing = null
     }
     return this.editing != null
@@ -159,12 +159,31 @@ export class Client {
       elms.box.classList.toggle("hide", elms.item.getAttribute("had-text") == null)
 
       elms.box.checked = todo.done
-      if (!this.editing || this.editing !== todo.id) elms.input.value = todo.text
+
+      // Preserve the text insertion point when edits are being applied
+      // TODO: do cursors have overhead? Is it bad that I'm creating them this often?
+      let start: Automerge.Cursor | null = null
+      let end: Automerge.Cursor | null = null
+      let path = ["todos", i, "text"]
+      if (this.editing == todo.id) {
+        let selStart = idxToCursorPosition(elms.input.selectionStart, elms.input)
+        let selEnd = idxToCursorPosition(elms.input.selectionEnd, elms.input)
+        start = Automerge.getCursor(this.doc, path, selStart)
+        end = Automerge.getCursor(this.doc, path, selEnd)
+      }
+      elms.input.value = todo.text
+      if (start != null) {
+        end ??= start
+        let startPos = Automerge.getCursorPosition(this.doc, path, start)
+        let endPos = Automerge.getCursorPosition(this.doc, path, end)
+        elms.input.setSelectionRange(startPos, endPos)
+      }
 
       // Sort the items, so we can tab through them
-      if (elms.item.previousElementSibling != prevElm) {
-        this.listElm.insertBefore(elms.item, prevElm?.nextSibling ?? this.listElm.firstChild)
-      }
+      // TODO: this is off because it breaks the sliding transitions
+      // if (elms.item.previousElementSibling != prevElm) {
+      //   this.listElm.insertBefore(elms.item, prevElm?.nextSibling ?? this.listElm.firstChild)
+      // }
       prevElm = elms.item
     }
 
@@ -225,6 +244,7 @@ function createInputElement(type: string, className: string, parent: HTMLElement
   const input = createElement("input", className, parent) as HTMLInputElement
   input.setAttribute("spellcheck", "false")
   input.type = type
+  input.maxLength = 64
   return input
 }
 
@@ -293,4 +313,11 @@ function parsePatches(doc: Doc, before: Doc, patches: Automerge.Patch[]) {
   if (!todo) throw new Error("Unable to determine which TODO was changed")
 
   return { id: todo.id, edits, todoIndex }
+}
+
+type CursorPosition = number | "start" | "end"
+const idxToCursorPosition = (n: number | null, elm: HTMLInputElement): CursorPosition => {
+  if (!n || n <= 0) return "start"
+  if (n >= elm.value.length - 1) return "end"
+  return n
 }

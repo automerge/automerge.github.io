@@ -138,29 +138,41 @@ export function expandMacros(text: string, page: Page, pages: Page[]) {
             if (!frontmatter.date) return bail(`This page's template requires a date: ` + green(path))
             return new Date(frontmatter.date).toLocaleDateString("en-US", { month: "long", year: "numeric", timeZone: "UTC" })
 
-          case "next-in-section":
+          case "prev-in-docs": {
+            let html = expandMacros(`{{include:docs}}`, page, pages)
+            let hrefs = getValuesOfAttributes(html, "href")
+            let idx = hrefs.indexOf(page.url.pathname)
+            if (idx < 1) return ""
+            let href = hrefs[idx - 1]
+            let nextPage = pages.find((p) => p.url.pathname == href)
+            if (!nextPage) return ""
+            return `<a class="prev-page" href="${href}"><span>Previous page</span> ${nextPage.frontmatter.title}</a>`
+          }
+
+          case "next-in-docs": {
+            let html = expandMacros(`{{include:docs}}`, page, pages)
+            let hrefs = getValuesOfAttributes(html, "href")
+            let idx = hrefs.indexOf(page.url.pathname)
+            if (idx < 0 || idx == hrefs.length - 1) return ""
+            let href = hrefs[idx + 1]
+            let nextPage = pages.find((p) => p.url.pathname == href)
+            if (!nextPage) return ""
+            return `<a class="right" href="${href}"><span>Next page</span> ${nextPage.frontmatter.title}</a>`
+          }
+
+          case "newer-in-blog":
             if (page.parent) {
-              let children = page.parent.children
-              children.sort((a, b) => compare(a.frontmatter.date, b.frontmatter.date))
+              let children = page.parent.children.toSorted((a, b) => compare(a.frontmatter.date, b.frontmatter.date))
               let next = children[children.indexOf(page) + 1]
-              if (next) {
-                return `<p class="next-page">Next entry: <a href="${next.url.pathname}">${next.frontmatter.title}</a></p>`
-              } else {
-                return `<p class="next-page">Nuttin</p>`
-              }
+              if (next) return `<a href="${next.url.pathname}"><span>Newer post</span> ${next.frontmatter.title}</a>`
             }
             return ""
 
-          case "prev-in-section":
+          case "older-in-blog":
             if (page.parent) {
-              let children = page.parent.children
-              children.sort((a, b) => compare(a.frontmatter.date, b.frontmatter.date))
-              let next = children[children.indexOf(page) + 1]
-              if (next) {
-                return `<p class="next-page">Next entry: <a href="${next.url.pathname}">${next.frontmatter.title}</a></p>`
-              } else {
-                return `<p class="next-page">Nuttin</p>`
-              }
+              let children = page.parent.children.toSorted((a, b) => compare(a.frontmatter.date, b.frontmatter.date))
+              let prev = children[children.indexOf(page) - 1]
+              if (prev) return `<a class="right" href="${prev.url.pathname}"><span>Older post</span> ${prev.frontmatter.title}</a>`
             }
             return ""
 

@@ -25,10 +25,12 @@ styles: /static/docs.css
     </nav>
   </aside>
   <main id="content">
-    <h1>{{title?}}</h1>
+    <h1>{{title}}</h1>
     {{content}}
-    {{prev-in-section}}
-    {{next-in-section}}
+    <div class="page-nav">
+      {{prev-in-docs}}
+      {{next-in-docs}}
+    </div>
     <footer>{{include: footer}}</footer>
   </main>
 </body>

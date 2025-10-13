@@ -10,8 +10,6 @@ let rootDoc = Automerge.change(Automerge.init<DocSchema>(), (doc) => (doc.todos 
 let desktop = new Client("a", Automerge.clone(rootDoc, { actor: "01" }))
 let phone = new Client("b", Automerge.clone(rootDoc, { actor: "00" }))
 
-// TODO: How do we respect reduce motion??
-
 // For debugging
 ;(window as any).desktop = desktop
 ;(window as any).phone = phone
@@ -19,7 +17,8 @@ let phone = new Client("b", Automerge.clone(rootDoc, { actor: "00" }))
 type QueuedAction = { time: number; action: () => void }
 let queuedActions: Set<QueuedAction> = new Set()
 let enqueue = (action: () => void, delay: number) => queuedActions.add({ action, time: (performance.now() + delay) / 1000 })
-let timeSinceAction = 0
+let timeBetweenActions = 5
+let timeUntilNextAction = timeBetweenActions
 
 let s = performance.now() / 1000
 
@@ -33,9 +32,9 @@ function update(ms: number) {
   if (!running || document.hidden) return
 
   if (queuedActions.size == 0) {
-    timeSinceAction += dt
-    if (timeSinceAction > 6) {
-      timeSinceAction = 0
+    timeUntilNextAction -= dt
+    if (timeUntilNextAction <= 0) {
+      timeUntilNextAction = timeBetweenActions
       nextAction()
     }
   } else {

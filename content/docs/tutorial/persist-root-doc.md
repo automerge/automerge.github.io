@@ -1,12 +1,7 @@
 ---
-title: "Persisting the Root Document"
+title: Persisting the Root Document
 template: docs
 ---
-
-import { jsx } from "react/jsx-runtime";
-import Admonition from "@theme/Admonition";
-import Exercise from "../components/Exercise";
-import Solution from "../components/Solution";
 
 ## Keeping Track of the Root Document
 
@@ -14,11 +9,9 @@ Putting all our task lists in a root document is great, but right now we don't p
 
 To achieve this kind of usage we're going to store the root document ID in the browser's local storage. This way, even if you close the browser or refresh the page, your root document will still be there when you come back. Let's add some code to manage this process to `src/rootDoc.ts`.
 
-<Exercise>
-
 Create the root document management functions:
 
-```typescript file="src/rootDoc.ts"
+```ts file="src/rootDoc.ts"
 // highlight-start
 import { AutomergeUrl, Repo } from "@automerge/react";
 
@@ -45,28 +38,20 @@ export const getOrCreateRoot = (repo: Repo): AutomergeUrl => {
 // highlight-end
 ```
 
-</Exercise>
-
-<Solution>
-
 This code:
 
 1. Uses `localStorage` to persist the root document ID
 2. Provides a function to get/create the root document
 
-</Solution>
-
 
 
 ## Using the Root Document
 
-Let's update our main app to use the root document:
-
-<Exercise>
+Let's update our main app to use the root document.
 
 Update `src/main.tsx` to initialize the root document:
 
-```typescript
+```tsx
 import React, { Suspense } from "react";
 import ReactDOM from "react-dom/client";
 import App from "./components/App.tsx";
@@ -119,7 +104,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
 ```
 
 Make sure you've removed this old code from `src/main.tsx`:
-```typescript
+```tsx
 // highlight-red-start
 - // Check the URL for a document to load
 - const locationHash = document.location.hash.substring(1);
@@ -154,8 +139,6 @@ console.log("Root document:", root.doc());
 You should see a console log showing the root document with an empty `taskLists` array.
 
 If you open the application, you should be able to create multiple task lists and switch between them in the UI adding items. If you refresh the page, or copy the URL and open it in a new tab, you should see the same task lists and items because the root document URL is now being persisted in local storage.
-
-</Exercise>
 
 Now we have the foundation for our document management system. The root document serves as your personal storage space, keeping track of all documents you've opened. This makes it easy to find and access your documents again, even after closing the browser or switching devices.
 

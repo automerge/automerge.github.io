@@ -1,9 +1,7 @@
 ---
-sidebar_position: 2
+title: Library Initialization
 template: docs
 ---
-
-# Library Initialization
 
 Automerge is implemented in Rust and compiled to WebAssembly for use in javascript environments. Unfortunately the way that WebAssembly modules are loaded varies across environments. In some situations this can be handled by your build tool, but in others you may need to manually load the module. This page describes how to load automerge in various environments, and also an [escape hatch](#the-escape-hatch) which should work everywhere.
 
@@ -73,11 +71,12 @@ Note that in some environments you may not have support for top-level await, in 
 
 Here you should be good to go by just importing `@automerge/automerge` as normal.
 
-:::warning
+<div class="caution">
 
+#### A Word of Warning
 If you see obscure looking rust stack traces complaining about being unable to create random bytes while constructing a UUID then this is because you are trying to create a document (either a new one, or loading or forking one) outside of a handler. If you run the problematic code in a handler you should be fine.
 
-:::
+</div>
 
 ### Deno
 
@@ -135,7 +134,8 @@ If you're in an environment which doesn't support importing WebAssembly modules 
 
 For this latter part we expose two exports from the `@automerge/automerge` package which can be used to obtain the raw WebAssembly. `@automerge/automerge/automerge.wasm` is a binary version of the WebAssembly file, whilst `@automerge/automerge/automerge.wasm.base64.js` is a JS modules with a single export called `automergeWasmBase64` which is a base64 encoded version of the WebAssembly file.
 
-:::note
+<div class="note">
+
 Automerge's npm module uses the [package exports](https://nodejs.org/api/packages.html#exports) feature, which means your environment will need to support that.
 
 For example, React Native requires [configuring](https://reactnative.dev/blog/2023/06/21/package-exports-support) a `metro.config.js` to support package exports:
@@ -147,7 +147,7 @@ config.resolver && (config.resolver.unstable_enablePackageExports = true);
 module.exports = config;
 ```
 
-:::
+</div>
 
 Once you've obtained the WebAssembly file you initialize it by passing it to either `initializeWasm` - which expects a WebAssembly module or a URL to fetch - or to `initializeBase64Wasm` which expects a base64 encoded string.
 

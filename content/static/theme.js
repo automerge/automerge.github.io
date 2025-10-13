@@ -1,14 +1,19 @@
-const html = document.querySelector("html");
-const toggle = document.querySelector("#theme-toggle")
+(()=> {
 
-let theme = localStorage.getItem("theme")
+  const html = document.querySelector("html");
 
-const setTheme = (t) => {
-  theme = t
-  localStorage.setItem("theme", theme);
-  html.setAttribute("theme", theme);
-  window.dispatchEvent(new CustomEvent("set-theme", { detail: theme }))
-}
+  let theme = localStorage.getItem("theme")
+  theme ??= matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark"
 
-toggle.onclick = ()=> setTheme(theme == "light" ? "dark" : "light")
-if (theme) setTheme(theme)
+  let setTheme = (t) => {
+    theme = t
+    html.setAttribute("theme", theme);
+    localStorage.setItem("theme", theme);
+    window.dispatchEvent(new CustomEvent("set-theme", { detail: theme }))
+  }
+
+  document.querySelector("#theme-toggle").onclick = ()=> setTheme(theme == "light" ? "dark" : "light")
+
+  if (theme != null) setTheme(theme)
+
+})()

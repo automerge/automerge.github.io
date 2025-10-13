@@ -1,5 +1,5 @@
 ---
-title: "Network Sync"
+title: Network Sync
 template: docs
 ---
 
@@ -47,7 +47,7 @@ The Automerge project provides a public sync server for you to experiment with, 
 
 To see this in action, open the same URL (including the document ID) in a different browser, or on a different device. Unlike the local-only version, you'll now see the data updates synced across _all_ open clients.
 
-{{ figure ![Screen capture of two browser windows side-by-side showing the same app titled "Automerge Task List". As the user clicks buttons, enters text or checks boxes in one window, their changes show up immediately in the other window.](task-list-sync.webm) Local collaboration via the BroadcastChannelNetworkAdapter }}
+{{ figure ![Screen capture of two browser windows side-by-side showing the same app titled "Automerge Task List". As the user clicks buttons, enters text or checks boxes in one window, their changes show up immediately in the other window.](/docs/tutorial/task-list-sync.webm) Local collaboration via the BroadcastChannelNetworkAdapter }}
 
 ## Network Not Required
 

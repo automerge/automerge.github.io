@@ -2699,6 +2699,24 @@ ${val.stack}`;
           throw new RangeError(`Cannot updateText: ${e}`);
         }
       }
+      function getCursor(doc, path, position, move) {
+        const objPath = absoluteObjPath(doc, path, "getCursor");
+        const state = _state(doc, false);
+        try {
+          return state.handle.getCursor(objPath, position, state.heads, move);
+        } catch (e) {
+          throw new RangeError(`Cannot getCursor: ${e}`);
+        }
+      }
+      function getCursorPosition(doc, path, cursor) {
+        const objPath = absoluteObjPath(doc, path, "getCursorPosition");
+        const state = _state(doc, false);
+        try {
+          return state.handle.getCursorPosition(objPath, cursor, state.heads);
+        } catch (e) {
+          throw new RangeError(`Cannot getCursorPosition: ${e}`);
+        }
+      }
       function absoluteObjPath(doc, path, functionName) {
         path = path.slice();
         const objectId = _obj(doc);
@@ -2843,7 +2861,6 @@ ${val.stack}`;
         0.7 * 0.8,
         0.7 * 0.2
       ];
-      window.addEventListener("set-theme", (e) => setTheme(e.detail));
       function setTheme(theme) {
         if (theme == "dark") {
           colorA = [
@@ -2869,6 +2886,7 @@ ${val.stack}`;
           ];
         }
       }
+      window.addEventListener("set-theme", (e) => setTheme(e.detail));
       setTheme(document.documentElement.getAttribute("theme"));
       const step = 2;
       const width$1 = 330;
@@ -3082,6 +3100,7 @@ void main() { outColor = vec4(v_color, 1.0); }
         gl.bufferData(gl.ARRAY_BUFFER, colors, gl.DYNAMIC_DRAW);
         gl.drawArraysInstanced(gl.TRIANGLES, 0, vertexCount, count);
       }
+      let reduceMotion = matchMedia("(prefers-reduced-motion)").matches;
       const _Particle = class _Particle {
         constructor(sourceInfo, source, target, isDelete) {
           __publicField(this, "dots");
@@ -3123,18 +3142,22 @@ void main() { outColor = vec4(v_color, 1.0); }
         physics(dt) {
           let allComplete = true;
           for (const dot of this.dots) {
-            let dest = Vec.add(this.dest, dot.local);
             dot.age += dt;
-            let accel = Vec.mulS(dot.accel, no(dot.age, 0.8, 2, true));
-            dot.vel = Vec.add(dot.vel, Vec.mulS(accel, 120 * dt));
-            dot.pos = Vec.add(dot.pos, Vec.mulS(dot.vel, 120 * dt));
-            let goalT = ss(no(dot.age, 1.3, 3, true));
-            let goal = Vec.lerp(dot.start, dest, goalT);
-            let blendT = ss(no(dot.age, 1.3, 3, true));
-            dot.pos = Vec.lerp(dot.pos, goal, blendT);
-            if (dot.age > 2.5 && this.applyEarly) {
-              this.applyEarly = false;
-              this.target.applyChange(this.sourceInfo.change);
+            let dest = Vec.add(this.dest, dot.local);
+            if (reduceMotion) {
+              if (dot.age > 2) dot.pos = dest;
+            } else {
+              let accel = Vec.mulS(dot.accel, no(dot.age, 0.8, 2, true));
+              dot.vel = Vec.add(dot.vel, Vec.mulS(accel, 120 * dt));
+              dot.pos = Vec.add(dot.pos, Vec.mulS(dot.vel, 120 * dt));
+              let goalT = ss(no(dot.age, 1.3, 3, true));
+              let goal = Vec.lerp(dot.start, dest, goalT);
+              let blendT = ss(no(dot.age, 1.3, 3, true));
+              dot.pos = Vec.lerp(dot.pos, goal, blendT);
+              if (dot.age > 2.5 && this.applyEarly) {
+                this.applyEarly = false;
+                this.target.applyChange(this.sourceInfo.change);
+              }
             }
             dot.size = clip(dot.age - 1);
             dot.size *= no(dot.age, 4, 2.5, true);
@@ -3253,7 +3276,7 @@ void main() { outColor = vec4(v_color, 1.0); }
         }
         isEditing() {
           if (this.editing && this.getIndex(this.editing) < 0) {
-            console.log("YES");
+            console.log("Confirmed this has happened!");
             this.editing = null;
           }
           return this.editing != null;
@@ -3265,7 +3288,6 @@ void main() { outColor = vec4(v_color, 1.0); }
           this.overflowElm.textContent = `${todos.length - limit} more\u2026`;
           this.overflowElm.classList.toggle("hidden", !overflow);
           const keepElms = /* @__PURE__ */ new Map();
-          let prevElm = null;
           for (let i = 0; i < visibleCount; i++) {
             const todo = todos[i];
             let elms = this.elements.get(todo.id) ?? this.makeTodoElms(todo.id);
@@ -3277,11 +3299,27 @@ void main() { outColor = vec4(v_color, 1.0); }
             if (todo.text.length > 0) elms.item.setAttribute("had-text", "");
             elms.box.classList.toggle("hide", elms.item.getAttribute("had-text") == null);
             elms.box.checked = todo.done;
-            if (!this.editing || this.editing !== todo.id) elms.input.value = todo.text;
-            if (elms.item.previousElementSibling != prevElm) {
-              this.listElm.insertBefore(elms.item, (prevElm == null ? void 0 : prevElm.nextSibling) ?? this.listElm.firstChild);
+            let start = null;
+            let end = null;
+            let path = [
+              "todos",
+              i,
+              "text"
+            ];
+            if (this.editing == todo.id) {
+              let selStart = idxToCursorPosition(elms.input.selectionStart, elms.input);
+              let selEnd = idxToCursorPosition(elms.input.selectionEnd, elms.input);
+              start = getCursor(this.doc, path, selStart);
+              end = getCursor(this.doc, path, selEnd);
             }
-            prevElm = elms.item;
+            elms.input.value = todo.text;
+            if (start != null) {
+              end ?? (end = start);
+              let startPos = getCursorPosition(this.doc, path, start);
+              let endPos = getCursorPosition(this.doc, path, end);
+              elms.input.setSelectionRange(startPos, endPos);
+            }
+            elms.item;
           }
           this.elements.forEach(({ item: div }, id) => {
             if (!keepElms.has(id)) {
@@ -3335,6 +3373,7 @@ void main() { outColor = vec4(v_color, 1.0); }
         const input = createElement("input", className, parent);
         input.setAttribute("spellcheck", "false");
         input.type = type;
+        input.maxLength = 64;
         return input;
       }
       function getChangeInfo(doc, before, change2) {
@@ -3413,6 +3452,11 @@ void main() { outColor = vec4(v_color, 1.0); }
           todoIndex
         };
       }
+      const idxToCursorPosition = (n, elm) => {
+        if (!n || n <= 0) return "start";
+        if (n >= elm.value.length - 1) return "end";
+        return n;
+      };
       let rootDoc = change(init(), (doc) => doc.todos = []);
       let desktop = new Client("a", clone(rootDoc, {
         actor: "01"
@@ -3427,7 +3471,8 @@ void main() { outColor = vec4(v_color, 1.0); }
         action,
         time: (performance.now() + delay) / 1e3
       });
-      let timeSinceAction = 0;
+      let timeBetweenActions = 5;
+      let timeUntilNextAction = timeBetweenActions;
       let s = performance.now() / 1e3;
       function update(ms) {
         let t = ms / 1e3;
@@ -3436,9 +3481,9 @@ void main() { outColor = vec4(v_color, 1.0); }
         requestAnimationFrame(update);
         if (!running || document.hidden) return;
         if (queuedActions.size == 0) {
-          timeSinceAction += dt;
-          if (timeSinceAction > 6) {
-            timeSinceAction = 0;
+          timeUntilNextAction -= dt;
+          if (timeUntilNextAction <= 0) {
+            timeUntilNextAction = timeBetweenActions;
             nextAction();
           }
         } else {

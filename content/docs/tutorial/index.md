@@ -1,5 +1,5 @@
 ---
-title: "Tutorial: An Automerge todo list"
+title: Tutorial: An Automerge todo list
 template: docs
 ---
 

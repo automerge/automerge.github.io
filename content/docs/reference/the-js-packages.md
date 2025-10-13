@@ -1,9 +1,7 @@
 ---
-sidebar_position: 3
+title: The JavaScript packages
 template: docs
 ---
-
-# The JavaScript packages
 
 The javascript API has been through several iterations and is currently split over a few libraries. In greenfield applications, here's how the library is intended to be used:
 

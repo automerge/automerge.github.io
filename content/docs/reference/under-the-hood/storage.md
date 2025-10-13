@@ -1,9 +1,7 @@
 ---
-sidebar_position: 1
+title: Storage
 template: docs
 ---
-
-# Storage
 
 In the [tutorial](/docs/tutorial) section we introduced a simple task list which synchronizes a todo list between any number of tabs. If you close all the tabs and open a new one you will see that the value of the todo list is persisted. How is this working? What's going on?
 

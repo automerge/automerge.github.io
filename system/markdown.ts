@@ -9,8 +9,7 @@ import { splitOnce, trimAll } from "./util.ts"
 
 // If you need to add more languages, import them here:
 import "prismjs/components/prism-bash"
-import "prismjs/components/prism-json"
-import "prismjs/components/prism-jsx"
+import "prismjs/components/prism-jsx" // We don't use jsx, but need to import it for tsx to work
 import "prismjs/components/prism-mermaid"
 import "prismjs/components/prism-tsx"
 import "prismjs/components/prism-typescript"

@@ -1,5 +1,5 @@
 ---
-title: "Local Storage & Sync"
+title: Local Storage & Sync
 template: docs
 ---
 

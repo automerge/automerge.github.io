@@ -14,12 +14,12 @@ For everyone else, let's start with a demo, before moving on to discuss what ric
 
 ## Demo
 
-<iframe src="https://automerge.org/automerge-prosemirror">
+<iframe style="height:440px" src="https://automerge.org/automerge-prosemirror"></iframe>
 
 On its own, this should seem pretty boring: it's a rich text editor which  supports most of the features users typically expect from a rich text editor. What makes this demo interesting is the support for real time collaboration which means that we can manage concurrent changes to complex formatting, like this:
 
 <video controls playsinline autoplay muted loop>
-  <source src="/img/automerge-formatting-change.webm" type="video/webm" />
+  <source src="automerge-formatting-change.webm" type="video/webm" />
   Merging formatting and structure changes in Automerge
 </video>
 
@@ -34,7 +34,7 @@ In this context, rich text poses a problem. As we discuss at length in our past 
 For a real-world example of the kind of data-loss that is difficult to avoid with traditional approaches, here's an example using the yjs prosemirror bindings:
 
 <video controls playsinline autoplay muted loop>
-  <source src="/img/yjs-structure-change.webm" type="video/webm" />
+  <source src="yjs-structure-change.webm" type="video/webm" />
   Conflicting structure changes in yjs can cause loss of text
 </video>
 
@@ -64,7 +64,7 @@ These elements map quite closely to user actions whilst editing. Typically a tex
 Choosing operations on the underlying data structure which map well to typical actions performed while editing text means we can provide accurate representations of the difference between two versions of the text. Here's the same  structure change example in automerge
 
 <video controls playsinline autoplay muted loop>
-  <source src="/img/automerge-structure-change.webm" type="video/webm" />
+  <source src="automerge-structure-change.webm" type="video/webm" />
   Structure change in Automerge preserves edits
 </video>
 

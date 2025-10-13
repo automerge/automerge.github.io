@@ -1,9 +1,7 @@
 ---
-sidebar_position: 4
+title: Text
 template: docs
 ---
-
-# Text
 
 Automerge provides support for collaborative text editing. Under the hood, whenever you create a `string` in Automerge you are creating a collaborative text object which supports merging concurrent changes to the `string`.
 
@@ -70,6 +68,8 @@ handle.on("change", () => {
 })
 ```
 
-:::warning
+<div class="caution">
+
 `updateText` works best when you call it as frequently as possible. If the text has changed a lot between calls to `updateText` (for example if you were calling it in `onchange`) the diff will not merge well with concurrent changes. The best case is to call it after every keystroke.
-:::
+
+</div>

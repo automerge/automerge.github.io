@@ -1,5 +1,5 @@
 ---
-title: "Multiple Task Lists"
+title: Multiple Task Lists
 template: docs
 ---
 
@@ -87,7 +87,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
 
 Now, we're passing the URL of the root document to the `App` component, but the `App` component is still expecting a `TaskList` document, not a `RootDocument`. Let's fix that; add this code to the `App` component:
 
-```ts
+```tsx
 // ..
 import { TaskList } from "./TaskList";
 // highlight-start
@@ -425,7 +425,7 @@ Here's how we'll do it:
 
 First, let's update our initialization logic. Remove the lines highlighted in red in the following code snippet, and replace them with the single line `window.handle = repo.create({ taskLists: []})` that follows.
 
-```typescript title="src/main.tsx"
+```tsx title="src/main.tsx"
 // ..
 
 // highlight-red-start
@@ -455,7 +455,7 @@ npm install react-use
 
 Then, update the `App` component to use the `useHash` hook:
 
-```typescript title="src/components/App.tsx"
+```tsx title="src/components/App.tsx"
 // ..
 // highlight-start
 import { type AutomergeUrl, isValidAutomergeUrl } from "@automerge/react";
@@ -518,7 +518,7 @@ This is almost there. Loading the app now you'll see that creating new task list
 
 We'll fix this in the `DocumentList` as this is the component responsible for managing the list of task lists. We need to ensure that when a new task list is created or looked up, it is also registered in the root document. Update `DocumentList.tsx` to include the registration logic:
 
-```typescript title="src/components/DocumentList.tsx"
+```tsx title="src/components/DocumentList.tsx"
 // ..
 /
 // highlight-next-line

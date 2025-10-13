@@ -31,11 +31,12 @@ The code in the example above creates a repository and adds a storage and networ
 
 In this example we're connecting to the public test server hosted by the Automerge team, but you can also run your own sync server. In fact, our [sync server](https://github.com/automerge/automerge-repo-sync-server) runs almost the same code as above, but with a different network and storage adapter.
 
-:::note
+<div class="note">
 
+#### Worth Noting
 The Automerge project provides a public sync server for you to experiment with `sync.automerge.org`. This is not a private instance, and as an experimental service has no reliability or data safety guarantees. Basically, it's good for demos and prototyping, but run your own sync server for production uses.
 
-:::
+</div>
 
 Next, create a document and make some changes to it:
 

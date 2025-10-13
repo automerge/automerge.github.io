@@ -1,5 +1,5 @@
 ---
-title: "Load documents by URL"
+title: Load documents by URL
 template: docs
 ---
 

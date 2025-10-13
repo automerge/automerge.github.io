@@ -1,9 +1,7 @@
 ---
-sidebar_position: 1000
+title: Glossary
 template: docs
 ---
-
-# Glossary
 
 ## CRDTs
 

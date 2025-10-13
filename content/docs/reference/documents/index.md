@@ -1,8 +1,7 @@
 ---
+title: Document Data Model
 template: docs
 ---
-
-# Document Data Model
 
 Automerge documents are quite similar to JSON objects. A document always consists of a root map which is a map from strings to other automerge values, which can themselves be composite types.
 

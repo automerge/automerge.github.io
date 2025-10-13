@@ -1,9 +1,7 @@
 ---
-sidebar_position: 5
+title: Rich Text
 template: docs
 ---
-
-# Rich Text
 
 As well as [supporting](../text) plain text Automerge supports rich text editing. The rich text APIs are extensions of the plain text API. In addition to using `splice` and `updateText` to modify a string, we also provide functions to manipulate two extra data types which are associated with a string:
 
@@ -12,7 +10,7 @@ As well as [supporting](../text) plain text Automerge supports rich text editing
 
 ## Marks
 
-Marks represent things like bold or italic text, or inline elements such as hyperlinks. Every mark has a name - such as "bold" - and a value, which must be a primitive value such as a boolean or string. 
+Marks represent things like bold or italic text, or inline elements such as hyperlinks. Every mark has a name - such as "bold" - and a value, which must be a primitive value such as a boolean or string.
 
 When you create a mark you must decide how that mark will behave when characters are inserted at its boundaries. For example, bold marks typically expand when characters are inserted at the boundaries whilst a hyperlink normally wouldn't.
 
@@ -57,7 +55,7 @@ let doc = Automerge.from({text: ""})
 doc = Automerge.change(doc, d => {
     // Insert an opening paragraph block
     Automerge.splitBlock(d, ["text"], 0, {type: "paragraph", parents: []})
-    // Note that the block markers appear inline in the text and so to insert 
+    // Note that the block markers appear inline in the text and so to insert
     // _after_ the block marker we need to insert at position 1
     Automerge.splice(d, ["text"], 1, 0, "Hello")
     // Insert another paragraph
@@ -88,11 +86,13 @@ Here you can see that the text has been broken up into sections with distinct sp
 
 ### Updating spans
 
-When writing an editor integration it's often difficult to capture exactly what change has been made by the underlying editor you are integrating with. In these cases you can use `Automerge.updateSpans` to update the block structure of the text. This function takes a sequence of spans and block markers - just like that output by `Automege.spans` - and attempts to perform a minimal diff to update the text to the new structure. 
+When writing an editor integration it's often difficult to capture exactly what change has been made by the underlying editor you are integrating with. In these cases you can use `Automerge.updateSpans` to update the block structure of the text. This function takes a sequence of spans and block markers - just like that output by `Automege.spans` - and attempts to perform a minimal diff to update the text to the new structure.
 
-:::warning
+<div class="caution">
+
 One important note: `Automerge.updateSpans` does not yet update the formatting spans of the text, just the block structure. You will need to separately reconcile the formatting span changes.
-:::
+
+</div>
 
 For example, let's say we want to add a new paragraph marker in the string "hello world".
 

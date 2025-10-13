@@ -1,9 +1,7 @@
 ---
-sidebar_position: 6
+title: Conflicts
 template: docs
 ---
-
-# Conflicts
 
 Automerge allows different nodes to independently make arbitrary changes to their respective copies
 of a document. In most cases, those changes can be combined without any trouble. For example, if

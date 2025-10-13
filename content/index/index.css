@@ -6,7 +6,7 @@ section {
   margin-inline: auto;
   padding-inline: 1em;
 
-  /* On super-narrow screens, some of our SVGs might poke *slightly* past the edge — this is fine. */
+  /* On super-narrow screens, some of our SVGs might poke *slightly* past the edge — this is fine. */
   overflow-x: hidden;
 }
 
@@ -27,11 +27,22 @@ footer {
 /* BACKGROUNDS ************************************************************************************/
 
 .demo-bg {
+  position: relative;
   border-bottom: 2px solid var(--fg);
-  background-image: url("autodots-bg.png");
-  background-size: auto 351.5px;
-  background-position: bottom;
-  background-repeat: repeat-x;
+}
+
+.demo-bg::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  mask-image: url("autodots-bg.png");
+  mask-size: auto 351.5px;
+  mask-position: bottom;
+  mask-repeat: repeat-x;
+  background-color: var(--fg);
   image-rendering: pixelated;
 }
 
@@ -44,7 +55,6 @@ footer {
 }
 
 .team-bg, footer {
-  --mid: #33322e;
   --fg: var(--white);
   --bg: var(--mid);
   --bg: light-dark(var(--mid), var(--slate));
@@ -68,6 +78,7 @@ footer {
   position: relative;
   margin-top: 5rem;
   font-size: min(1.388vw, 16px);
+  fill: var(--fg);
 }
 
 #illustration .full {
@@ -76,6 +87,10 @@ footer {
 }
 
 #illustration .chop {
+  display: none;
+}
+
+#illustration .dashers {
   display: none;
 }
 
@@ -108,8 +123,8 @@ footer {
 
 .cursor.hello {
   position: absolute;
-  top: 480px;
-  left: calc(50% + 26em);
+  top: 100%;
+  right: 0;
 }
 
 @media (width <= 1024px) {
@@ -131,11 +146,6 @@ footer {
   .versioned.unit { top: 73em; }
   .compact.unit { top: 92em; }
   .fast.unit { top: 108em; }
-  .cursor.hello {
-    position: absolute;
-    top: 40em;
-    left: calc(50% + 15em);
-  }
 }
 
 @media (width <= 700px) {
@@ -150,13 +160,16 @@ footer {
     margin: 2.5em auto 5em;
   }
   #illustration .unit {
-    position: static;
+    position: relative;
     left: auto;
     right: auto;
     top: 0;
     margin: 0 auto;
     max-width: 19em;
   }
+
+  #illustration .dashers { display: inline; }
+
   #illustration .chop.versioned { margin-block: 0 1em; }
   #illustration .chop.compact { margin-block: 1em; }
 
@@ -170,9 +183,10 @@ footer {
     margin-bottom: -1em;
   }
   #illustration .cursor.hello {
-    left: 6.5em;
-    top: -4em;
-    margin-top: -4em;
+    position: absolute;
+    top: 36em;
+    left: 11em;
+    margin: 0;
   }
 }
 

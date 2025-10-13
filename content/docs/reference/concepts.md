@@ -1,15 +1,13 @@
 ---
-sidebar_position: 2
+title: Concepts
 template: docs
 ---
 
-# Concepts
+<div class="note">
 
-:::info
+This documentation is mostly focused on the javascript implementation of automerge. Some things will translate to other languages but some things — in particular the "repository" concept and `automerge-repo` library — will not.
 
-This documentation is mostly focused on the javascript implementation of automerge. Some things will translate to other languages but some things - in particular the "repository" concept and `automerge-repo` library - will not.
-
-:::
+</div>
 
 ## Core concepts
 

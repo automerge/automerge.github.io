@@ -133,29 +133,23 @@
   padding: 6px 6px 0;
   border: 2px solid var(--fg);
   border-bottom: 0;
-  border-radius: 48px 48px 0 0;
-
-  background-image: url("autodots-phone.png");
-  background-size: auto 350px;
-  background-position: top;
-  background-repeat: repeat-x;
-  image-rendering: pixelated;
+  border-radius: 56px 56px 0 0;
 }
 
 #demo .phone .inner {
   border: 2px solid var(--fg);
   border-bottom: 0;
-  border-radius: 40px 40px 0 0;
+  border-radius: 48px 48px 0 0;
   color: var(--fg);
   background: var(--bg);
 }
 
 #demo .phone .speaker {
-  width: 48px;
-  height: 12px;
-  margin: 8px auto 8px;
+  width: 88px;
+  height: 20px;
+  margin: 6px auto 10px;
   border: 2px solid var(--fg);
-  border-radius: 8px;
+  border-radius: 24px;
 }
 
 #demo .phone .users {
@@ -187,6 +181,7 @@
   gap: 2px;
   margin: 0;
   padding-left: 20px;
+  cursor: pointer;
 }
 
 #demo .entry .plus {
@@ -296,6 +291,7 @@
   background-image: url('data:image/svg+xml,<svg fill="%23222" xmlns="http://www.w3.org/2000/svg"><circle cx="1" cy="1" r=".5"/><circle cx="3" cy="3" r=".5"/></svg>');
   background-size: 4px 4px;
   background-repeat: repeat;
+  image-rendering: pixelated;
 }
 
 html[theme="dark"] #demo .svg-dots {

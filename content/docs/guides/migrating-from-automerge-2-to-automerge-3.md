@@ -1,9 +1,7 @@
 ---
-sidebar_position: 2
+title: Migrating from Automerge 2 to Automerge 3
 template: docs
 ---
-
-# Migrating from Automerge 2 to Automerge 3
 
 Automerge 3 is a major update to the Automerge library which enormously reduces memory usage and in many cases improves performance. It is however, almost entirely backwards compatible with Automerge 2. The main difference is that we have deprecated the old `Text` based API for collaborative string.
 

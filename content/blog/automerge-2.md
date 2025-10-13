@@ -131,9 +131,3 @@ Today the best way to remove something from an Automerge document's history is t
 # Conclusion
 
 Automerge 2.0 is here, it’s ready for you, and we’re tremendously excited to share it with you. We’ve made Automerge faster, more memory efficient, and we’re bringing it to more platforms than ever. We’re adding features, making it easier to adopt, and have begun growing a team to support it. There has never been a better moment to start building local-first software: why not [give it a try](https://automerge.org/docs/hello/), and please feel welcome to [join us in the Automerge Slack](https://join.slack.com/t/automerge/shared_invite/zt-e4p3760n-kKh7r3KRH1YwwNfiZM8ktw), too.
-
-:::caution
-
-A note to existing users: Automerge 2.0 is found on npm at `@automerge/automerge`. We have deprecated the `automerge` package.
-
-:::

@@ -1,9 +1,7 @@
 ---
-sidebar_position: 2
+title: Networking
 template: docs
 ---
-
-# Networking
 
 There are many ways to talk to other peers. In `automerge-repo` this is captured by the [`NetworkAdapter`](https://automerge.org/automerge-repo/classes/_automerge_automerge_repo.NetworkAdapter.html) interface. Unlike `StorageAdapter`s a repository can have many (or zero) `NetworkAdapter`s.
 
