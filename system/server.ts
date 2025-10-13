@@ -34,6 +34,7 @@ const mimeTypes: Record<string, string> = {
   png: "image/png",
   rss: "text/xml",
   svg: "image/svg+xml",
+  txt: "text/txt",
   wasm: "application/wasm",
   webm: "video/webm",
   webp: "image/webp",

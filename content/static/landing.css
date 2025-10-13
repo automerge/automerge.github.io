@@ -5,6 +5,13 @@ html {
   --bg: light-dark(var(--yellow), var(--slate));
 }
 
+/* <section> is usually surrounded by a full-width div with a BG color */
+section {
+  max-width: var(--page-width);
+  margin-inline: auto;
+  padding-inline: 1.375em;
+}
+
 h1 {
   line-height: 1;
   font: 200 48px / 1 "Overpass";

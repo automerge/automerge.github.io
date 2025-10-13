@@ -1,7 +1,7 @@
 #demo {
   position: relative;
   display: flex;
-  gap: 5rem clamp(20px, 10vw, 150px);
+  gap: 3.5rem clamp(20px, 10vw, 150px);
   align-items: end;
   width: max-content;
   margin-inline: auto;

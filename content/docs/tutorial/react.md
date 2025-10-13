@@ -65,7 +65,7 @@ First modify the `TaskList` component:
 
 ```tsx title="src/components/TaskList.tsx"
 // ..
-// higlight-next-line
+// highlight-next-line
 import { type AutomergeUrl } from "@automerge/react";
 
 // ..
@@ -214,7 +214,7 @@ export const TaskList: React.FC<{
 }> = ({ docUrl }) => {
   const [doc, changeDoc] = useDocument<TaskList>(docUrl, {
     // This hooks the `useDocument` into reacts suspense infrastructure so the whole component
-    // only renderes once the document is loaded
+    // only renders once the document is loaded
     suspense: true,
   });
 
@@ -270,7 +270,7 @@ export const TaskList: React.FC<{
 }> = ({ docUrl }) => {
   const [doc, changeDoc] = useDocument<TaskList>(docUrl, {
     // This hooks the `useDocument` into reacts suspense infrastructure so the whole component
-    // only renderes once the document is loaded
+    // only renders once the document is loaded
     suspense: true,
   });
 
@@ -342,7 +342,7 @@ export const TaskList: React.FC<{
 }> = ({ docUrl }) => {
   const [doc, changeDoc] = useDocument<TaskList>(docUrl, {
     // This hooks the `useDocument` into reacts suspense infrastructure so the whole component
-    // only renderes once the document is loaded
+    // only renders once the document is loaded
     suspense: true,
   });
 
@@ -399,6 +399,6 @@ export const TaskList: React.FC<{
 
 ## Checking your work
 
-We've finished wiring up the UI, we've got link sharing via the URL hash and storage and synchronisation between tabs. If you open the application in one tab, then copy the URL and open it in another you should be able to create new tasks, toggle their done state, and update the description and see the changes synchronise between tabs.
+We've finished wiring up the UI, we've got link sharing via the URL hash and storage and synchronization between tabs. If you open the application in one tab, then copy the URL and open it in another you should be able to create new tasks, toggle their done state, and update the description and see the changes synchronize between tabs.
 
 Next, to sync over the network.

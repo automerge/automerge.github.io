@@ -1,15 +1,5 @@
 /* Note: the home page also uses landing.css and demo.css */
 
-/* <section> is usually surrounded by a full-width div with a BG color */
-section {
-  max-width: var(--page-width);
-  margin-inline: auto;
-  padding-inline: 1em;
-
-  /* On super-narrow screens, some of our SVGs might poke *slightly* past the edge — this is fine. */
-  overflow-x: hidden;
-}
-
 footer {
   padding-block: 0 3em;
 }
@@ -62,21 +52,40 @@ footer {
   background: var(--bg);
 }
 
+footer {
+  position: relative;
+}
+
+footer::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: env(safe-area-inset-bottom);
+  background: var(--bg);
+  pointer-events: none;
+}
+
 /* TAG ********************************************************************************************/
 
 #tag {
-  margin-bottom: 4em;
+  margin-bottom: 3em;
 }
 
 /* DEMO *******************************************************************************************/
 
 /* See /content/index/demo.css */
 
+.demo-bg {
+  margin-bottom: 4rem;
+}
+
 /* ILLUSTRATION ***********************************************************************************/
 
 #illustration {
   position: relative;
-  margin-top: 5rem;
+  margin-top: 1rem;
   font-size: min(1.388vw, 16px);
   fill: var(--fg);
 }
@@ -138,14 +147,14 @@ footer {
   #illustration .unit {
     left: 50%;
     margin-left: 5em;
-    max-width: 24em;
+    max-width: 19rem;
   }
-  .multiplayer.unit { top: 5em; }
-  .offline.unit { top: 29em; }
-  .conflict.unit { top: 52em; }
-  .versioned.unit { top: 73em; }
-  .compact.unit { top: 92em; }
-  .fast.unit { top: 108em; }
+  .multiplayer.unit { top: 6em; }
+  .offline.unit { top: 30em; }
+  .conflict.unit { top: 53em; }
+  .versioned.unit { top: 74em; }
+  .compact.unit { top: 93em; }
+  .fast.unit { top: 109em; }
 }
 
 @media (width <= 700px) {
@@ -221,6 +230,7 @@ footer {
   }
   #devs .unit {
     margin: 0 auto 3em;
+    max-width: 19em;
   }
 }
 

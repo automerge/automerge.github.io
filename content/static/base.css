@@ -16,6 +16,7 @@ html {
   /* These are all the colors we use across the site */
   --true-white: #fff;
   --white: #fcfcfc;
+  --off-white: #f2f2f2;
   --cream: hsl(45, 70%, 90%);
   --silver: #ddd;
   --yellow: #fc3;
@@ -39,19 +40,20 @@ html {
   --footer-fg: var(--white);
   --footer-bg: var(--slate);
   --stark-bg: var(--true-white);
-  --stark-shadow: var(--silver);
+  --stark-shadow: var(--off-white);
 
   /* And, somewhat redundantly (sigh), here are the colors for light and dark themes. */
   --bg: light-dark(var(--white), var(--slate));
   --fg: light-dark(var(--slate), var(--white));
   --hover-bg: light-dark(var(--slate), var(--yellow));
-  --current: light-dark(var(--cream), var(--mid));
+  --current: light-dark(#eee, #333);
   --inactive: light-dark(var(--grey), var(--grey));
-  --separator: light-dark(var(--silver), var(--grey));
+  --separator: light-dark(var(--silver), #404040);
   --footer-fg: light-dark(var(--white), var(--yellow));
   --footer-bg: light-dark(var(--slate), var(--black));
   --stark-bg: light-dark(var(--true-white), var(--deep));
-  --stark-shadow: light-dark(var(--silver), var(--black));
+  --stark-shadow: light-dark(var(--off-white), transparent);
+  --stark-sep: light-dark(var(--off-white), var(--slate));
 
   /* Use these colors */
   background: var(--bg);
@@ -69,7 +71,7 @@ h2   { font: 400 24px / 32px "Overpass", sans-serif; }
 h3   { font: 500 20px / 24px "Overpass", sans-serif; }
 h4   { font: 600 16px / 24px "Overpass", sans-serif; }
 body { font: 400 16px / 24px "Overpass", sans-serif; }
-code { font-family: "Overpass Mono", monospace; }
+code { font: 400 14px / 24px "Overpass Mono", monospace; }
 strong { font-weight: 650; }
 
 /* Specify all fonts here. Remember, the browser will only load the ones actually used on each page. */
@@ -373,20 +375,22 @@ code {
 
 pre, .code-title {
   overflow: auto;
-  border-radius: 6px;
+  border-radius: 4px;
   background: var(--stark-bg);
-  box-shadow: 0 2px 4px var(--stark-shadow);
+  border: 1px solid var(--stark-shadow);
+  border-bottom-width: 2px;
   padding-block: 1rem;
 }
 
 .code-title {
   padding: .5rem 1rem;
-  border-radius: 6px 6px 0 0;
-  border-bottom: 1px solid var(--separator);
+  border-radius: 4px 4px 0 0;
+  border-bottom: 1px solid var(--stark-sep);
 }
 
 .code-title + pre {
   margin-top: 0;
+  border-top: 0;
   border-top-left-radius: 0;
   border-top-right-radius: 0;
 }
@@ -422,7 +426,7 @@ pre code > * {
 :not(pre) > code {
   border: 1px solid var(--stark-shadow);
   padding: .1em .2em 0em;
-  border-radius: .2em;
+  border-radius: 1px;
   background: var(--stark-bg);
 }
 
