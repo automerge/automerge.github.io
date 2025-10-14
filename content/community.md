@@ -22,10 +22,10 @@ Every month we host a 1-hour call to share behind-the-scenes info about the deve
 * Subscribe to the [Luma](https://luma.com/automerge)
 
 ### Upcoming Events
-* [Sync Conf](https://syncconf.dev) on Nov 12th, 2025 in San Francisco
+* [Sync Conf](https://syncconf.dev) on Nov 12th, 2025 in San Francisco — relevant for anyone interested in local-first software.
 
 ### Ink & Switch
-Automerge was created by the industrial research lab Ink & Switch, and it serves as the foundation for many of their subsequent prototypes and explorations. Visit their website to read essays and lab notes about local-first software, malleable software, universal version control, and more.
+Automerge was created by the industrial research lab Ink & Switch, and it serves as the foundation for many of their prototypes and explorations. Visit their website to read essays and lab notes about local-first software, malleable software, universal version control, and more.
 * Visit [Ink & Switch](https://www.inkandswitch.com)
 
 
