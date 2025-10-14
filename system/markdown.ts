@@ -8,11 +8,11 @@ import { log, yellow } from "./logging.ts"
 import { splitOnce, trimAll } from "./util.ts"
 
 // If you need to add more languages, import them here:
-import "prismjs/components/prism-bash"
-import "prismjs/components/prism-jsx" // We don't use jsx, but need to import it for tsx to work
-import "prismjs/components/prism-mermaid"
-import "prismjs/components/prism-tsx"
-import "prismjs/components/prism-typescript"
+import "prismjs/components/prism-bash.js"
+import "prismjs/components/prism-jsx.js" // We don't use jsx, but need to import it for tsx to work
+import "prismjs/components/prism-mermaid.js"
+import "prismjs/components/prism-tsx.js"
+import "prismjs/components/prism-typescript.js"
 
 export const Markdown = MarkdownIt({ html: true, typographer: true }).use(MarkdownItFootnote)
 
