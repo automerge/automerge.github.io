@@ -117,7 +117,7 @@ export const compileEverything = () => {
   // Now we take everything that's not a page and hardlink it into the public folder.
   // We use hardlinks, rather than copying, because it's much faster.
   // We use path.replace(), rather than the replace({}) helper, because there can be subfolders named "content"
-  glob("content/**/*.!(md|html)").forEach((path) => linkFile(path, path.replace("content/", "public/")))
+  glob("content/**/*.!(md|html)", "content/CNAME").forEach((path) => linkFile(path, path.replace("content/", "public/")))
 
   // Now that the public folder is fully populated, we can run a few validity checks
   runValidityChecks(pages)
