@@ -13,7 +13,7 @@ import { anchorize, flatJoin, getValuesOfAttributes, indent, plainify, replaceHt
 
 export const compilePage = (page: Page, pages: Page[]) => {
   // First, we compile the page body. The body is then used for the html output, but also for RSS and other output.
-  page.body = compileBody(page, pages)
+  page.compiledBody = compileBody(page, pages)
 
   // Finally, we compile the html output.
   page.html = compileHtml(page, pages)
@@ -23,7 +23,7 @@ function compileBody(page: Page, pages: Page[]) {
   let { body, path, template } = page
 
   // Process markdown in <md> tags
-  body = replaceHtmlTag(body, "md", (md, attrs, spaces) => {
+  let compiledBody = replaceHtmlTag(body, "md", (md, attrs, spaces) => {
     // TODO: maybe tweak the output based on whether the md is one line or multi-line
     let res = Markdown.renderInline(md)
     if (res.includes("<pre") && !md.includes("<pre")) log(`Warning: possible syntax error in an <md> in ${path}`)
@@ -32,13 +32,13 @@ function compileBody(page: Page, pages: Page[]) {
   })
 
   // Render markdown pages
-  if (path.endsWith("md")) body = Markdown.render(body)
+  if (path.endsWith("md")) compiledBody = Markdown.render(compiledBody)
 
   // Clean up a bit of mess left by markdown conversion
-  body = body.replaceAll("<p></p>", "")
-  body = body.replaceAll(/<p>({{.*?}})<\/p>/gs, (_, capture) => capture) // markdownit sometimes wraps our macros in <p>
+  compiledBody = compiledBody.replaceAll("<p></p>", "")
+  compiledBody = compiledBody.replaceAll(/<p>({{.*?}})<\/p>/gs, (_, capture) => capture) // markdownit sometimes wraps our macros in <p>
   // De-indent and otherwise clean up <pre> tags
-  body = body.replace(/<pre>(.+?)<\/pre>/gs, (_, content) => {
+  compiledBody = compiledBody.replace(/<pre>(.+?)<\/pre>/gs, (_, content) => {
     const lines = splitLines(content)
     const spaces = lines
       .filter((l) => l.trim().length > 0) // Ignore empty lines
@@ -52,14 +52,14 @@ function compileBody(page: Page, pages: Page[]) {
   // Convert all h2-h4 into anchors
   if (template.frontmatter.header_anchors == "true") {
     for (const tag of ["h2", "h3", "h4"]) {
-      body = replaceHtmlTag(body, tag, (content, attrs) => {
+      compiledBody = replaceHtmlTag(compiledBody, tag, (content, attrs) => {
         const id = anchorize(plainify(content))
         return `<${tag}${attrs} id="${id}"><a class="plain" href="#${id}">${content}</a></${tag}>`
       })
     }
   }
 
-  return expandMacros(body, page, pages)
+  return expandMacros(compiledBody, page, pages)
 }
 
 function compileHtml(page: Page, pages: Page[]) {

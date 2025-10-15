@@ -11,7 +11,7 @@ import { compact, compare, flatJoin, getValuesOfAttributes, plainify, splitAfter
 
 // Expand all macros found in text, in the context of the given page
 export function expandMacros(text: string, page: Page, pages: Page[]) {
-  let { frontmatter, body, path } = page
+  let { frontmatter, path } = page
   let limit = 100
 
   while (text.indexOf("{{") !== -1) {
@@ -30,17 +30,20 @@ export function expandMacros(text: string, page: Page, pages: Page[]) {
         switch (macro) {
           // {{content}} — marks where page content should be inserted into the template
           case "content":
-            return body // Note: don't change indentation, because that messes up <pre> tags
+            return page.compiledBody // Note: don't change indentation, because that messes up <pre> tags
 
           // {{include:FILENAME}} — replaced with the content of /template/includes/FILENAME.{html,md}
+          // {{include:FILENAME.md inline}} — same as above, but using Markdown.renderInline()
           case macro.startsWith("include") && macro: {
-            let name = stripName(macro, "include")
+            let [name, flag] = stripName(macro, "include").split(" ")
 
             let mdFile = `template/includes/${name}.md`
             let htmlFile = `template/includes/${name}.html`
 
             try {
-              let content = exists(mdFile) ? Markdown.render(read(mdFile)) : read(htmlFile)
+              let isMd = exists(mdFile)
+              let content = isMd ? read(mdFile) : read(htmlFile)
+              if (isMd) content = flag == "inline" ? Markdown.renderInline(content) : Markdown.render(content)
               // We prepend spaces so that inline includes (eg: {{contact-info}}) don't slam into the text right before them.
               return spaces + content
             } catch (err: any) {

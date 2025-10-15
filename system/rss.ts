@@ -35,7 +35,7 @@ export const generateRssFeeds = (pages: Page[]) => {
           `      <guid isPermaLink="true">${page.url}</guid>`,
           `      <pubDate>${new Date(page.frontmatter.date + "T00:00:00Z").toUTCString()}</pubDate>`,
           `      <description>${cdata(page.frontmatter.description)}</description>`,
-          `      <content:encoded>${cdata(page.body)}</content:encoded>`,
+          `      <content:encoded>${cdata(page.compiledBody)}</content:encoded>`,
           `    </item>`,
         ]),
       `  </channel>`,

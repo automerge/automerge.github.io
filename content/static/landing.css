@@ -36,6 +36,11 @@ p {
   margin: 0;
 }
 
+@media (width <= 1024px) {
+  h1   { font: 220 42px / 1 "Overpass", sans-serif; }
+  h2   { font: 300 30px / 1.4 "Overpass", sans-serif; }
+}
+
 @media (width <= 500px) {
   h1   { font: 220 40px / 1 "Overpass", sans-serif; }
   h2   { font: 300 28px / 1.4 "Overpass", sans-serif; }

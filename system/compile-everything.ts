@@ -8,6 +8,7 @@ import { Env } from "./env.ts"
 import { generateFontSubsets } from "./font.ts"
 import { extractFrontmatter, hasFrontmatter, validateFrontmatter } from "./frontmatter.ts"
 import { basename, copyPage, glob, linkFile, read, rm, stats, write, writePage } from "./io.ts"
+import { generateLLMsTxt } from "./llms.ts"
 import { green, log, logError, yellow } from "./logging.ts"
 import { generateRedirectPages } from "./redirects.ts"
 import { generateRssFeeds } from "./rss.ts"
@@ -80,8 +81,9 @@ export const compileEverything = () => {
     // We'll fill these in when we do the full compile. Initializing to a blank values just simplifies the Page type. It's fine.
     const html = ""
     const children: Page[] = []
+    const compiledBody = body
 
-    return { path, source, stats, frontmatter, body, dest, url, template, html, children }
+    return { path, source, stats, frontmatter, body, dest, url, template, html, children, compiledBody }
   })
 
   // Only compile published pages
@@ -105,6 +107,7 @@ export const compileEverything = () => {
   }
 
   generateRssFeeds(pages)
+  generateLLMsTxt(pages)
   generateSitemap(pages)
   generateRobots()
 

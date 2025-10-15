@@ -26,8 +26,9 @@ export type PageSource = {
 
 export type Page = PageSource & {
   frontmatter: Frontmatter
-  body: string
-  html: string
+  body: string // The raw markdown source
+  compiledBody: string // Compiled HTML for the body
+  html: string // Compiled HTML for the entire page (body wrapped with template)
   dest: string
   url: URL
   parent?: Page

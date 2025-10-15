@@ -1,10 +1,6 @@
 /* Note: the home page also uses landing.css and demo.css */
 
-footer {
-  padding-block: 0 3em;
-}
-
-@media (width <= 700px) {
+@media (width <= 500px) {
   /* These titles are really big, and we want a little extra space around them on narrow screens. */
   h1 { margin: 0 .3em 2rem }
   h2 { margin-inline: 1em }
@@ -138,11 +134,14 @@ footer::after {
 
 @media (width <= 1024px) {
   #illustration {
-    font-size: 1.5625vw;
+    font-size: min(1.5625vw, 12px);
   }
   #illustration .full {
-    margin-left: 0;
-    width: 50vw;
+    position: relative;
+    margin-left: auto;
+    margin-right: 0;
+    right: 50%;
+    width: 32em;
   }
   #illustration .unit {
     left: 50%;
@@ -158,9 +157,10 @@ footer::after {
 }
 
 @media (width <= 700px) {
-  #illustration { font-size: 16px }
-
-  #illustration h2 { margin-bottom: 3rem; }
+  #illustration {
+    margin-top: 3rem;
+    font-size: 16px;
+  }
 
   #illustration .full { display: none }
 
@@ -179,8 +179,7 @@ footer::after {
 
   #illustration .dashers { display: inline; }
 
-  #illustration .chop.versioned { margin-block: 0 1em; }
-  #illustration .chop.compact { margin-block: 1em; }
+  #illustration .chop.offline { margin-bottom: 8rem; }
 
   #illustration .cursor {
     position: relative;
@@ -240,7 +239,7 @@ footer::after {
   display: grid;
   align-items: start;
   gap: 4em 2em;
-  padding-block: 6em;
+  padding-block: 6em 1em;
 }
 
 #team h2 {

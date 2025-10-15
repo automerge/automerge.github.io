@@ -37,6 +37,11 @@ export const splitAfter = (str: string, char: string) => {
   return [str.slice(0, splitIndex), str.slice(splitIndex)]
 }
 
+// Returns tuples with the link text and href
+export const extractMdLinks = (sourceText: string): [string, string][] => {
+  return Array.from(sourceText.matchAll(/\[(.*?)\]\((.*?)\)/g)).map(([_, linkText, linkUrl]) => [linkText, linkUrl])
+}
+
 export const getValuesOfAttributes = (src: string, attr: string) =>
   compact([
     src.match(new RegExp(`${attr}="[^"]+"`, "g")), // double quotes

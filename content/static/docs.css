@@ -82,8 +82,8 @@ aside nav {
   gap: .7em;
 }
 
-.api span,
-.subscribe span {
+.api strong,
+.subscribe strong {
   font: 500 14px / 14px "Overpass Mono";
   color: var(--inactive);
 }
