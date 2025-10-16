@@ -281,7 +281,6 @@ footer::after {
   position: absolute;
   inset: 0;
   mix-blend-mode: lighten;
-  image-rendering: pixelated;
 }
 
 [js-dither] canvas + img {
