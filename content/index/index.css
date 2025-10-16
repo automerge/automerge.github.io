@@ -264,11 +264,25 @@ footer::after {
 
 @media (width <= 700px) {
   #team .photos { display: none; }
-  #team img { margin: 0 0 1rem; }
+  #team img, #team canvas { margin: 0 0 1rem; }
 }
 
 @media (width > 700px) {
   #team { grid-template-columns: auto auto; }
   #team img { max-width: 460px; }
-  #team .text img { display: none; }
+  #team .text div { display: none; }
+}
+
+[js-dither] {
+  position: relative;
+}
+
+[js-dither] canvas {
+  position: absolute;
+  inset: 0;
+  mix-blend-mode: lighten;
+}
+
+[js-dither] canvas + img {
+  visibility: hidden;
 }
