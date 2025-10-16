@@ -2,6 +2,7 @@ const setupDitherFor = (elm, img) => {
   const aspect = img.naturalHeight / img.naturalWidth
   const canvas = document.createElement("canvas")
   const ctx = canvas.getContext("2d", { willReadFrequently: true })
+  canvas.innerText = img.alt
   elm.prepend(canvas)
   let width = 0
 
