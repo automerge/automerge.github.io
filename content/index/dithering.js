@@ -14,10 +14,10 @@ const setupDitherFor = (elm, img) => {
       const newWidth = Math.round(rect.width)
       if (newWidth == width || newWidth <= 0) return
       width = newWidth
-      const height = width * aspect | 0
-      const dpr = Math.min(window.devicePixelRatio, 2)
-      const w = canvas.width = width * dpr
-      const h = canvas.height = height * dpr
+      const height = Math.round(width * aspect)
+      const dpr = Math.min(Math.round(window.devicePixelRatio) || 1, 2)
+      const w = canvas.width = Math.round(width * dpr)
+      const h = canvas.height = Math.round(height * dpr)
       canvas.style.width = width + "px"
       ctx.drawImage(img, 0, 0, w, h)
 
