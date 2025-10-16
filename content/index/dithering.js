@@ -3,20 +3,22 @@ const setupDitherFor = (elm, img) => {
   const canvas = document.createElement("canvas")
   const ctx = canvas.getContext("2d", { willReadFrequently: true })
   elm.prepend(canvas)
-  let w = 0
+  let width = 0
 
   const render = () => {
     try {
-      const start = performance.now()
+      // const start = performance.now()
       if(getComputedStyle(elm).display == "none") return
       if(getComputedStyle(elm.parentNode).display == "none") return
       const rect = img.getBoundingClientRect()
-      const newW = Math.round(rect.width)
-      if (newW == w || newW <= 0) return
-      w = newW
-      const h = w * aspect | 0
-      canvas.width = w
-      canvas.height = h
+      const newWidth = Math.round(rect.width)
+      if (newWidth == width || newWidth <= 0) return
+      width = newWidth
+      const height = width * aspect | 0
+      const dpr = Math.min(window.devicePixelRatio, 2)
+      const w = canvas.width = width * dpr
+      const h = canvas.height = height * dpr
+      canvas.style.width = width + "px"
       ctx.drawImage(img, 0, 0, w, h)
 
       const imgData = ctx.getImageData(0, 0, w, h)
@@ -48,7 +50,7 @@ const setupDitherFor = (elm, img) => {
       }
 
       ctx.putImageData(imgData, 0, 0)
-      console.log(performance.now() - start)
+      // console.log(performance.now() - start)
     } catch (e) {
       // Sometimes the dither fails. That's fine.
     }
