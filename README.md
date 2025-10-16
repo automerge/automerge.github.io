@@ -2,6 +2,8 @@
 
 This repository holds the [Automerge website](https://automerge.org), including all the docs, blog posts, and other site **content**, the **templates** that give pages their structure and styling, and a custom build **system** that weaves it all together.
 
+We welcome all contributions. If you see any mistakes or glitches on the website, or have any trouble building the site locally, please [file an issue](https://github.com/automerge/website/issues) or [open a pull request](https://github.com/automerge/website/pulls). Thank you.
+
 <br><br>
 
 # Getting Started
@@ -14,12 +16,6 @@ Henceforth:
 * Run `site help` to see other available commands.
 
 > If `site` doesn't work, use `./site` instead (or add `.` to your $PATH)
-
-<br>
-
-### Contributions & Issues
-
-If you see any issues with the website, or have any trouble running the build system yourself, please [file an issue](https://github.com/automerge/website/issues).
 
 <br><br>
 
@@ -45,17 +41,18 @@ If you see any issues with the website, or have any trouble running the build sy
 Here's the folder structure:
 
 * `content` — html and markdown files for every page, plus a few lightweight assets; see [pages](#pages)
-* `demo` — source files for the interactive demo on the home page.
+* `demo` — source files for the interactive demo on the home page
 * `fonts` — uncompressed source files for fonts used on the site; see [fonts](#fonts)
 * `public` — automatically generated when building the site
 * `system` — the build system source code; see [system](#system)
 * `template` — html files that define different types of page on the site; see [templates](#templates)
+* `Redirects.txt` — Cool URIs don't change; see [redirects](#redirects)
 
 This site is powered by our own custom build system, which we can adapt and extend as our needs change.
 
 The build system takes HTML and Markdown files in the `content` folder, parses and transforms them with rules defined in `system`, combines the result with various templates in `template`, and finally saves the fully-assembled page to `public`.
 
-In short, the `content` folder should feel like an FTP server. You put stuff in there, and it shows up on the website. The file path becomes the URL. There's more, of course — macros and templates and other behaviour that we'll get to in a second. But all that fanciness is *opt-in*. If you stick to plain HTML and simple assets, `/content` acts just like FTP.
+In short, the `content` folder should feel like an FTP server. You put stuff in there, and it shows up on the website. The file path becomes the URL. There's more, of course — macros and templates and other behaviour that we'll get to in a second. But all that fanciness is *opt-in*. If you stick to plain HTML and simple assets, `/content` feels just like FTP.
 
 <br><br>
 
