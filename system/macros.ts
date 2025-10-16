@@ -189,7 +189,7 @@ export function expandMacros(text: string, page: Page, pages: Page[]) {
           }
 
           case "og-image":
-            return frontmatter.image || toFullUrl("/static/favicons/196x196.png")
+            return frontmatter.image || toFullUrl("/static/og-image.png")
 
           case "og-description":
             return plainify(frontmatter.description || Env.description)
