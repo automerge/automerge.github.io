@@ -1,4 +1,5 @@
-# Please don't auto-format CSS and HTML files.
+# Please don't auto-format CSS, HTML, and MD files.
 # They've been nicely formatted by hand.
 **/*.css
 **/*.html
+**/*.md
