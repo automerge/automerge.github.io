@@ -55,4 +55,4 @@ resolved, and the conflict disappears from the object returned by `Automerge.get
 
 Automerge uses a combination of LWW (last writer wins) and multi-value register. By default, if you read from `doc.foo` you will get the LWW semantics, but you can also see the conflicts by calling `Automerge.getConflicts(doc, 'foo')` which has multi-value semantics.
 
-Note that "last writer wins" here is based on the internal ID of the opeartion, not a wall clock time. The internal ID is a unique operation ID that is the combination of a counter and the actorId that generated it. Conflicts are ordered based on the counter first (using the actorId only to break ties when operations have the same counter value).
+Note that "last writer wins" here is based on the internal ID of the operation, not a wall clock time. The internal ID is a unique operation ID that is the combination of a counter and the actorId that generated it. Conflicts are ordered based on the counter first (using the actorId only to break ties when operations have the same counter value).
