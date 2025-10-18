@@ -11,7 +11,7 @@ export const unique = <T>(arr: T[]) => Array.from(new Set(arr))
 type Existing<T> = T extends null | undefined | void ? never : T
 export const compact = <T>(arr: (T | null)[]): Existing<T>[] => arr.filter(nonnull)
 export const nonnull = <T>(v: T): v is Existing<T> => v != null
-export const indent = (str: string, spaces = "  ") => splitLines(str).map((line) => spaces + line).join("\n") // prettier-ignore
+export const indent = (str = "", spaces = "  ") => splitLines(str).map((line) => spaces + line).join("\n") // prettier-ignore
 export const splitOnce = (str: string, sep: string) => {
   const i = str.indexOf(sep)
   return i === -1 ? [str] : [str.slice(0, i), str.slice(i + sep.length)]

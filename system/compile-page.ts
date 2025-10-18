@@ -68,22 +68,15 @@ function compileHtml(page: Page, pages: Page[]) {
   let html = template.body
 
   // Add extra CSS or scripts
-  frontmatter.styles ??= frontmatter.style ?? ""
-  frontmatter.styles += template.frontmatter.styles ?? template.frontmatter.style ?? ""
-  if (frontmatter.styles) {
-    for (const style of trimAll(frontmatter.styles.split(","))) {
-      const styleTag = `<link rel="stylesheet" href="${style}">`
-      html = html.replace("</head>", `${indent(styleTag)}\n</head>`)
-    }
-  }
-  frontmatter.scripts ??= frontmatter.script ?? ""
-  frontmatter.scripts += template.frontmatter.scripts ?? template.frontmatter.script ?? ""
-  if (frontmatter.scripts) {
-    for (const script of trimAll(frontmatter.scripts.split(","))) {
-      const scriptTag = `<script defer src="${script}"></script>`
-      html = html.replace("</body>", `${indent(scriptTag)}\n</body>`)
-    }
-  }
+  // We accept both the singular and the plural, from both the page and the template
+  let styles = [frontmatter.styles, frontmatter.style, template.frontmatter.styles, template.frontmatter.style]
+  let scripts = [frontmatter.scripts, frontmatter.script, template.frontmatter.scripts, template.frontmatter.script]
+  // combine and then filter empty values
+  styles = trimAll(styles.join(",").split(",")).filter((v) => v)
+  scripts = trimAll(scripts.join(",").split(",")).filter((v) => v)
+  // insert at the end of the head
+  for (const style of styles) html = html.replace("</head>", `  <link rel="stylesheet" href="${style}">\n</head>`)
+  for (const script of scripts) html = html.replace("</head>", `  <script defer src="${script}"></script>\n</head>`)
 
   html = expandMacros(html, page, pages)
 
