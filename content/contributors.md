@@ -13,7 +13,7 @@ template: landing
 * Blaine Cook ([blaine](https://github.com/blaine))
 * Brooklyn Zelenka ([expede](https://github.com/expede)) - [notes.brooklynzelenka.com](https://notes.brooklynzelenka.com)
 * Conrad Irwin ([conradirwin](https://github.com/conradirwin)) - [cirw.in](https://cirw.in/)
-* Chee Rabbits ([chee](https://github.com/chee)) - [chee.party](https://chee.party/)
+* chee rabbits ([chee](https://github.com/chee)) - [chee.party](https://chee.party/)
 * Dylan MacKenzie ([ecstatic-morse](https://github.com/ecstatic-morse))
 * Geoffrey Litt ([geoffreylitt](https://github.com/geoffreylitt)) - [geoffreylitt.com](https://www.geoffreylitt.com/)
 * George Su ([georgewsu](https://github.com/georgewsu))
