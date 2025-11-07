@@ -9,7 +9,7 @@ Thus far, we've been using the BroadcastChannel NetworkAdapter to move data betw
 
 One straightforward way of getting data to other people is to send it to the cloud; then they can come along and fetch the data at their leisure.
 
-When you configure automerge to run on an internet server, listen for connections, and store data on disk, then we call that a "sync server". There's nothing really special about a sync server: it runs the exact same version of Auotmerge as you run locally. With a little configuration work, you could even connect to multiple sync servers and choose what data you want to send.
+When you configure automerge to run on an internet server, listen for connections, and store data on disk, then we call that a "sync server". There's nothing really special about a sync server: it runs the exact same version of Automerge as you run locally. With a little configuration work, you could even connect to multiple sync servers and choose what data you want to send.
 
 The Automerge team provides a public community sync server at `wss://sync.automerge.org`. For production software, you should run your own server, but for prototyping and development you are welcome to use ours on an "as-is" basis.
 
