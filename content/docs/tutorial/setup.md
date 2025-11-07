@@ -17,9 +17,9 @@ $ git clone https://github.com/automerge/automerge-repo-quickstart
 # Cloning into 'automerge-repo-quickstart'...
 $ cd automerge-repo-quickstart
 $ git checkout without-automerge
-$ npm install
+$ pnpm install
 # ...installing dependencies...
-$ npm run dev
+$ pnpm dev
 ```
 
 Visit [localhost:5173/](http://localhost:5173/) to see the app in its "starter" state, as a basic React app not yet using Automerge: the task list can be edited, but changes are not synced between users, and all local changes are lost when the page is closed or reloaded.
