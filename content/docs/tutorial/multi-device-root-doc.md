@@ -97,7 +97,7 @@ export const SyncControls: React.FC<SyncControlsProps> = ({ docUrl }) => {
               }}
               placeholder="Paste your account token URL here"
             />
-            {error && <p style=&lbrace;&lbrace; color: "red" &rbrace;&rbrace;>{error}</p>}
+            {error && <p style={{ color: "red" }}>{error}</p>}
             <footer>
               <button onClick={handleImport}>Import</button>
               <button onClick={closeDialog}>Cancel</button>
