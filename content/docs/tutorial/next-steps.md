@@ -22,7 +22,7 @@ While the URL-based sharing mechanism we implemented is great for prototyping, t
 If you're hungry for more:
 
 - Look at the [Cookbook](/docs/cookbook/modeling-data/) section for tips on how to model your app's data in Automerge
-- Dive deeper into how Automerge [stores](https://automerge.org/docs/under-the-hood/storage/) and [merges](https://automerge.org/docs/under-the-hood/merge_rules/) documents in the 'Under the Hood' section
+- Dive deeper into how Automerge [stores](/docs/reference/under-the-hood/storage/) and [merges](/docs/reference/under-the-hood/merge-rules/) documents in the 'Under the Hood' section
 - Explore advanced features like:
   - [Rich Text Editing](/docs/cookbook/rich-text-prosemirror-vanilla/)
   - [Custom Network Adapters](/docs/reference/repositories/networking/)
