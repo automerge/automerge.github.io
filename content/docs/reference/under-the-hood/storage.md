@@ -26,11 +26,11 @@ Let's mess around with this in the browser. First, clear your local IndexedDB fo
 
 Open the browser tools and take a look at IndexedDB you'll see a database called `automerge` and within that an object store called `automerge`. For me, in Firefox, this looks like:
 
-![IndexedDB browser tools](indexeddb-screenshot.png)
+![IndexedDB browser tools](../indexeddb-screenshot.png)
 
 You can see that there is a key which looks roughly like our document URL (it doesn't have the `automerge:` prefix) and some kind of value. If we expand that we see:
 
-![IndexedDB detailed](indexedb-screenshot-detailed.png)
+![IndexedDB detailed](../indexedb-screenshot-detailed.png)
 
 If you're not familiar with IndexedDB this might be a little confusing. IndexedDB is a sort of key/value store where the keys are arrays. So what we are seeing here is a binary array (the `binary: Object` part in the above screenshot) stored under the key `["3RFyJzsLsZ7MsbG98rcuZ4FqtGW7", "incremental", "0290cdc2dcebc1ecb3115c3635bf1cb0f857ce971d9aab1c44a0d3ab19a88cd8"]`.
 
@@ -38,13 +38,13 @@ Okay, so creating a document (which is what happens when we load the page) store
 
 Now, make some change to the task list and take another look at IndexedDb.
 
-![IndexedDB snapshot](indexeddb-screenshot-snapshot.png)
+![IndexedDB snapshot](../indexeddb-screenshot-snapshot.png)
 
 Well, there's still one entry, but it's changed. The `[.., "incremental", ..]` key has been deleted and replaced with `[.., "snapshot", ..]`. What's happened here? Every time you make a change automerge-repo saves that change to your storage adapters. Occasionally automerge-repo will decide that it's time to "compact" the document, it will take every change that has been written to storage so far (in this case, every key beginning with `[<document URL>, .., ..]` and combine them into a single snapshot and then save it as this `[.., "snapshot", ..]` key.
 
 All well and good in one tab. Open a new tab with the same URL (including the hash) and click the count button a few times in both tabs. If you look at the IndexedDB browser tools (in either tab, it's shared between them) you'll something like this:
 
-![IndexedDB many keys](indexeddb-screenshot-manykeys.png)
+![IndexedDB many keys](../indexeddb-screenshot-manykeys.png)
 
 You can see here that there are two snapshot files. This is because when each tab compacts incremental changes and then deletes the original incremental files, it only deletes the incremental changes it had previously loaded. This is what makes it safe to use concurrently, because it only deletes data which is incorporated into the compacted document. But the real magic comes with how this is loaded. If you load another tab with the same URL it will sum the counts from both the previous tabs. This works because when the repo starts up it loads all the changes it can find in storage and merges them which it can do because automerge is a CRDT.
 
