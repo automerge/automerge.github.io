@@ -30,7 +30,7 @@ Open the browser tools and take a look at IndexedDB you'll see a database called
 
 You can see that there is a key which looks roughly like our document URL (it doesn't have the `automerge:` prefix) and some kind of value. If we expand that we see:
 
-![IndexedDB detailed](indexedb-screenshot-detailed.png)
+![IndexedDB detailed](indexeddb-screenshot-detailed.png)
 
 If you're not familiar with IndexedDB this might be a little confusing. IndexedDB is a sort of key/value store where the keys are arrays. So what we are seeing here is a binary array (the `binary: Object` part in the above screenshot) stored under the key `["3RFyJzsLsZ7MsbG98rcuZ4FqtGW7", "incremental", "0290cdc2dcebc1ecb3115c3635bf1cb0f857ce971d9aab1c44a0d3ab19a88cd8"]`.
 
