@@ -97,6 +97,10 @@ html {
 
   /* Reserve space for a scroll bar */
   scrollbar-gutter: stable;
+
+  /* Allow periods and commas to hang — useful when a <code> inline-block renders at the end of a line. */
+  /* Only works in Safari, but that's fine. */
+  hanging-punctuation: allow-end;
 }
 
 body {
