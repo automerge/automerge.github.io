@@ -59,7 +59,7 @@ What's happening here to make all this work? `automerge-repo` wraps the core Aut
 
 ## Key Concepts & Basic Usage
 
-Let's go into a bit more detail. For full documentation please see [the docs](https://automerge.org/docs/repositories/).
+Let's go into a bit more detail. For full documentation please see [the docs](/docs/reference/repositories/).
 
 ### Repo
 
@@ -137,7 +137,7 @@ The `Repo` calls `DocHandle.on("change")` whenever the document is modified – 
 
 ### React Integration
 
-[`@automerge/automerge-repo-react-hooks`](https://www.npmjs.com/package/@automerge/automerge-repo-react-hooks) makes it easy to use `automerge-repo` in a React application. Once you've constructed a `Repo` you can make it available to your React application using [`RepoContext`](https://automerge.org/automerge-repo/variables/_automerge_automerge_repo_react_hooks.RepoContext.html). Once available, call `useHandle` to obtain a `DocHandle`:
+[`@automerge/automerge-repo-react-hooks`](https://www.npmjs.com/package/@automerge/automerge-repo-react-hooks) makes it easy to use `automerge-repo` in a React application. Once you've constructed a `Repo` you can make it available to your React application using [`RepoContext`](https://automerge.org/automerge-repo/variables/_automerge_react..RepoContext.html). Once available, call `useHandle` to obtain a `DocHandle`:
 
 ```typescript
 function TodoList(listUrl: AutomergeUrl) {

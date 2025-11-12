@@ -29,7 +29,7 @@ you to edit files and commit changes offline.
   kind of network you use. It works with any connection-oriented network protocol, which could be
   client/server (e.g. WebSocket), peer-to-peer (e.g. WebRTC), or entirely local (e.g. Bluetooth).
   Bindings to particular networking technologies are handled by separate libraries;
-  Automerge provides [automerge-repo](https://automerge.org/automerge-repo/index.html) for a common collection of these libraries.
+  Automerge provides [automerge-repo](https://automerge.org/automerge-repo/) for a common collection of these libraries.
   It also works with unidirectional messaging: you can send an Automerge file as email attachment,
   or on a USB drive in the mail, and the recipient will be able to merge it with their version.
 - **Immutable state**. An Automerge object is an immutable snapshot of the application state at one
@@ -42,11 +42,10 @@ you to edit files and commit changes offline.
   central server. The conflict resolution approach is described
   [in the documentation](/docs/reference/documents/conflicts/).
 - **Portable**. The [JavaScript implementation](https://github.com/automerge/automerge) of
-  Automerge is compatible with Node.js, [Electron](https://electron.atom.io/), and modern browsers.
+  Automerge is compatible with Node.js, [Electron](https://www.electronjs.org), and modern browsers.
   The [Rust implementation](https://github.com/automerge/automerge-rs) compiles to WebAssembly
   for use in browsers, and it exposes a C API through which it can be used on iOS and other
-  platforms without requiring a JavaScript engine. For TypeScript users, Automerge comes with
-  [type definitions](https://github.com/automerge/automerge/blob/main/@types/automerge/index.d.ts)
+  platforms without requiring a JavaScript engine. For TypeScript users, Automerge comes with type definitions
   that allow you to use Automerge in a type-safe way.
 
 Automerge is designed for creating [local-first software](https://www.inkandswitch.com/local-first/),

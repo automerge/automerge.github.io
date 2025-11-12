@@ -20,7 +20,7 @@ This means you should be able to conveniently use Automerge in vanilla JS applic
 If you find a place where none of our approaches work for you then please let us know by inquring [in our Discord](https://discord.gg/TrgN9FkYSa) or by filing a (GitHub issue)[https://github.com/automerge/automerge].
 
 ## How to use it
-We've collected of examples showing how to initialize automerge in specific environments in [a new documentation page](https://automerge.org/docs/library_initialization/). If you had trouble with Automerge in your environment before, try again without changing anything first. This new release improved support for a few edge cases within the old API, so you might find everything just starts working on its own.
+We've collected of examples showing how to initialize automerge in specific environments in [a new documentation page](/docs/reference/library-initialization/). If you had trouble with Automerge in your environment before, try again without changing anything first. This new release improved support for a few edge cases within the old API, so you might find everything just starts working on its own.
 
 If you do need to use the new manual initialization code you'll need to to make a couple of small changes:
 1. Import the `/slim` variant of automerge and separately, the WebAssembly blob.

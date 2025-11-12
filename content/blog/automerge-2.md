@@ -33,7 +33,7 @@ To deliver this new version, lab members Alex Good and Orion Henry teamed up wit
 
 ## Documenting Automerge
 
-With Automerge 2.0 we've made a big investment in improving documentation. In addition to [sample code](https://github.com/automerge/automerge-rs/tree/main/javascript/examples), we now have a [quick-start guide](https://automerge.org/docs/tutorial/) that supports both Vite and create-react-app, as well as [internals](https://automerge.org/docs/how-it-works/backend/) documentation, [file format](https://alexjg.github.io/automerge-storage-docs/) and [sync protocol](https://automerge.org/docs/how-it-works/sync/) documentation. This work was led by lab alumnus Rae McKelvey and we hope it helps make getting started with Automerge much easier. Please let us know if there are other topics or areas you'd like to see covered!
+With Automerge 2.0 we've made a big investment in improving documentation. In addition to [sample code](https://github.com/automerge/automerge-rs/tree/main/javascript/examples), we now have a [quick-start guide](/docs/tutorial/) that supports both Vite and create-react-app, as well as [internals](/docs/how-it-works/backend/) documentation, [file format](https://automerge.org/automerge-binary-format-spec/) and [sync protocol](/docs/how-it-works/sync/) documentation. This work was led by lab alumnus Rae McKelvey and we hope it helps make getting started with Automerge much easier. Please let us know if there are other topics or areas you'd like to see covered!
 
 ## Supporting Automerge
 
@@ -72,7 +72,7 @@ Of course, even the most productive authors struggle to type an entire paper qui
 | automerge 2.0  | 129,062     |
 | automerge 0.14 | 146,406,415 |
 
-The binary format works wonders in this example, encoding a full history for the document with only 30% overhead. That's less than one additional byte per character! The naive JSON encoding often used circa automerge 0.14 could exceed 1,300 bytes _per character_. If you'd like to learn more about the file format, we have a [specification](https://alexjg.github.io/automerge-storage-docs/) document.
+The binary format works wonders in this example, encoding a full history for the document with only 30% overhead. That's less than one additional byte per character! The naive JSON encoding often used circa automerge 0.14 could exceed 1,300 bytes _per character_. If you'd like to learn more about the file format, we have a [specification](https://automerge.org/automerge-binary-format-spec/) document.
 
 | Load ~260k operations    | Timing (ms) |
 | ------------------------ | ----------- |
@@ -130,4 +130,4 @@ Today the best way to remove something from an Automerge document's history is t
 
 # Conclusion
 
-Automerge 2.0 is here, it’s ready for you, and we’re tremendously excited to share it with you. We’ve made Automerge faster, more memory efficient, and we’re bringing it to more platforms than ever. We’re adding features, making it easier to adopt, and have begun growing a team to support it. There has never been a better moment to start building local-first software: why not [give it a try](https://automerge.org/docs/hello/), and please feel welcome to [join us in the Automerge Slack](https://join.slack.com/t/automerge/shared_invite/zt-e4p3760n-kKh7r3KRH1YwwNfiZM8ktw), too.
+Automerge 2.0 is here, it’s ready for you, and we’re tremendously excited to share it with you. We’ve made Automerge faster, more memory efficient, and we’re bringing it to more platforms than ever. We’re adding features, making it easier to adopt, and have begun growing a team to support it. There has never been a better moment to start building local-first software: why not [give it a try](/docs/hello/), and please feel welcome to [join us in the Automerge Slack](https://join.slack.com/t/automerge/shared_invite/zt-e4p3760n-kKh7r3KRH1YwwNfiZM8ktw), too.
