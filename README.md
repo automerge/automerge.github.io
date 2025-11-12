@@ -15,7 +15,7 @@ Henceforth:
 * Run `site` to build the website and spin up a live-reloading dev server.
 * Run `site help` to see other available commands.
 
-> If `site` doesn't work, use `./site` instead (or add `.` to your $PATH)
+> If `site` doesn't work, use `./site` instead (or add `.` to your `$PATH`)
 
 <br><br>
 
@@ -101,7 +101,7 @@ template: landing
 All the fanciness of the build system is *opt-in*. Frontmatter is the primary way for a page to opt-in to special processing.
 
 * For an HTML file with no frontmatter, no processing is applied (including the aforementioned [clean-URL renaming](#clean-urls)).
-* All markdown files in `/content` get processing special whether they have frontmatter or not.
+* All markdown files in `/content` get special processing whether they have frontmatter or not.
 
 #### Template
 
@@ -121,7 +121,7 @@ If a page is given a `date`, it'll be included in RSS feeds. The date must be in
 
 #### Others
 
-* `title` will be used for <title> and for RSS.
+* `title` will be used for `<title>` and for RSS.
 * `description` will be used for OG and RSS. Can include inline markdown.
 * `image` for the rich preview whenever someone shares a link to the page.
 * `styles` and `scripts`, which accept comma-separated lists of relative or absolute paths.
@@ -168,7 +168,7 @@ For instance, the Automerge logo lives in `/template/includes/logo.html`, and ca
 
 ### Assets
 
-Git is *fine* for version control of text. It's *awful* for images and videos — it remembers ever version of every asset that's ever been committed, and they slow down clones, diff, and other actions. Before adding images, videos, and other non-text assets to the repo, please do the following:
+Git is *fine* for version control of text. It's *awful* for images and videos — they slow down clones, diff, and other actions. Before you commit images, videos, and other non-text assets to the repo, please do the following:
 
 1. **Resize** — if an image is only going to display at 1000px wide (at most), it should be no more than 2000px wide, and ideally closer to 1200px. (A tiny bit of extra detail is often enough to give the illusion of a crisp 2x retina image).
 2. **Format** — line art and screenshots should be PNG or WebP, photos should be WebP or JPG.
@@ -182,7 +182,7 @@ In typical web development, you'd put a `woff2` font file alongside your other a
 
 Instead, to add fonts to our website, you place `ttf` or `otf` files in the `/fonts` folder. The build system can then:
 
-1. Scan every page of the site, and collect every unique character of text.
+1. Scan every page of the site and collect every unique character of text.
 2. Create a **subset** of data in the `ttf` / `otf` files with just the characters we use.
 3. Create optimized `woff2` files of those subset fonts, and save them to `/content/static/fonts/`.
 
@@ -241,7 +241,7 @@ The website includes the `site` CLI tool.
 
 You can run `site help` to list all the available commands.
 
-> If `site` doesn't work, use `./site` instead (or better yet, add `.` to your $PATH)
+> If `site` doesn't work, use `./site` instead (or better yet, add `.` to your `$PATH`)
 
 `site` is a little shell script at the root of the repo. It executes `system/app.ts` using the fastest available Node-compatible runtime (bun, deno, or node).
 
