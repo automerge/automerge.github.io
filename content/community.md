@@ -21,8 +21,12 @@ Follow along as we develop Automerge, see cool projects made by other folks in t
 Every month we host a 1-hour call to share behind-the-scenes info about the development of Automerge, preview new features, and spotlight demos made by members of the community. This is your chance to see what's coming next for Automerge.
 * Subscribe to the [Luma](https://luma.com/automerge)
 
+{{# Commenting this out since we have no upcoming events
+
 ### Upcoming Events
 * [Sync Conf](https://syncconf.dev) on Nov 12th, 2025 in San Francisco — relevant for anyone interested in local-first software.
+
+}}
 
 ### Ink & Switch
 Automerge was created by the industrial research lab Ink & Switch, and it serves as the foundation for many of their prototypes and explorations. Visit their website to read essays and lab notes about local-first software, malleable software, universal version control, and more.
