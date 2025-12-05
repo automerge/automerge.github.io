@@ -3,7 +3,7 @@ title: Rich Text Schema
 template: docs
 ---
 
-The [rich text](../../documents/rich_text) API provides a set of primitives for annotating a sequence of characters with formatting information. The two primitives in question are
+The [rich text](../../documents/rich-text) API provides a set of primitives for annotating a sequence of characters with formatting information. The two primitives in question are
 
 * Marks - formatting spans which apply to a range of characters and can overlap
 * Block markers which divide the text into blocks
@@ -119,7 +119,7 @@ If an application encounters an unknown embed block it should render the block u
 
 ## Putting It All Together
 
-When retrieving the current value of a rich text document via the [Spans API](../../documents/rich_text#the-spans-api), you will get an array of Spans with the following structure:
+When retrieving the current value of a rich text document via the [Spans API](../../documents/rich-text#the-spans-api), you will get an array of Spans with the following structure:
 
 ```typescript
 {

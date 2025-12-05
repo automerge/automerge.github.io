@@ -3,11 +3,11 @@ title: DocHandles
 template: docs
 ---
 
-Once you have a `Repo` with a `NetworkAdapter` and a `StorageAdapter` you can get down to the business of creating and working with [`DocHandle`](https://automerge.org/automerge-repo/classes/_automerge_automerge_repo.DocHandle.html)s.
+Once you have a `Repo` with a `NetworkAdapter` and a `StorageAdapter` you can get down to the business of creating and working with [`DocHandle`](https://automerge.org/automerge-repo/classes/_automerge_automerge-repo.DocHandle.html)s.
 
 It's useful to understand a little about why we need a `DocHandle`. `@automerge/automerge` documents are fairly inert data structures. You can create a document, you can mutate it, you can generate sync messages to send elsewhere and you can receive sync messages from elsewhere. None of this is very "live" though. Because the document has no concept of a network, or of storage, you can't say "every time I change a document, tell everyone else about it and save the change to storage". This "live document" is what a `DocHandle` is. A `DocHandle` is a wrapper around a document managed by a `Repo`. It provides the following kinds of "liveness":
 
-- Whenever you change the document using [`DocHandle.change`](https://automerge.org/automerge-repo/classes/_automerge_automerge_repo.DocHandle.html#change) or [`DocHandle.changeAt`](https://automerge.org/automerge-repo/classes/_automerge_automerge_repo.DocHandle.html#changeAt) the changes will be saved to the attached `StorageAdapter` and sent to any connected `NetworkAdapter`s
+- Whenever you change the document using [`DocHandle.change`](https://automerge.org/automerge-repo/classes/_automerge_automerge-repo.DocHandle.html#change) or [`DocHandle.changeAt`](https://automerge.org/automerge-repo/classes/_automerge_automerge-repo.DocHandle.html#changeat) the changes will be saved to the attached `StorageAdapter` and sent to any connected `NetworkAdapter`s
 - Whenever a change is received from a connected peer the `DocHandle` will fire a "change" event
 - There is a concept of an ephemeral message, which you can send using `DocHandle.broadcast`. Whenever a `DocHandle` receives an ephemeral message it will fire a `"ephemeral-message"` event
 - You can wait for a `DocHandle` to be loaded, or to be retrieved from another peer
@@ -17,11 +17,11 @@ It's useful to understand a little about why we need a `DocHandle`. `@automerge/
 
 ## Creating a `DocHandle`
 
-This is the easy one, just call [`Repo.create`](https://automerge.org/automerge-repo/classes/_automerge_automerge_repo.Repo.html#create). This creates a new document, stores it, and then enqueues messages to all connected peers informing them of the new document.
+This is the easy one, just call [`Repo.create`](https://automerge.org/automerge-repo/classes/_automerge_automerge-repo.Repo.html#create). This creates a new document, stores it, and then enqueues messages to all connected peers informing them of the new document.
 
 ## Waiting for a `DocHandle`
 
-Typically you are _not_ creating a new document, but working with an existing one. Maybe the document URL was stored in `localStorage`, maybe the URL was in the hash fragment of the browser, etc. In this case you use [`Repo.find`](https://automerge.org/automerge-repo/classes/_automerge_automerge_repo.Repo.html#find) to lookup the document. This means the `DocHandle` can be in several different states, to understand this we'll first look at the states in detail, then some convenience methods `DocHandle` exposes for waiting for different states.
+Typically you are _not_ creating a new document, but working with an existing one. Maybe the document URL was stored in `localStorage`, maybe the URL was in the hash fragment of the browser, etc. In this case you use [`Repo.find`](https://automerge.org/automerge-repo/classes/_automerge_automerge-repo.Repo.html#find) to lookup the document. This means the `DocHandle` can be in several different states, to understand this we'll first look at the states in detail, then some convenience methods `DocHandle` exposes for waiting for different states.
 
 ### `DocHandle` states
 
@@ -65,7 +65,7 @@ Note that every state can transition to `DELETED`, either via `DocHandle.delete`
 
 One other point to note is that a `DocHandle` can be unavailable because we didn't have it in storage and no peers responded to our request for it, but then another peer comes online and sends us sync messages for the document and so it transitions to `READY`.
 
-You can check what state a handle is in using [`DocHandle.inState`](https://automerge.org/automerge-repo/classes/_automerge_automerge_repo.DocHandle.html#inState).
+You can check what state a handle is in using [`DocHandle.inState`](https://automerge.org/automerge-repo/classes/_automerge_automerge-repo.DocHandle.html#instate).
 
 ### Waiting for a handle to be ready
 
