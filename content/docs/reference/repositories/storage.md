@@ -3,7 +3,7 @@ title: Storage
 template: docs
 ---
 
-In `automerge-repo` "storage" refers to any implementation of [`StorageAdapter`](https://automerge.org/automerge-repo/classes/_automerge_automerge_repo.StorageAdapter.html). You _can_ run a `Repo` without a `StorageAdapter` but it will be entirely transient and will have to load all its data from remote peers on every restart.
+In `automerge-repo` "storage" refers to any implementation of [`StorageAdapter`](https://automerge.org/automerge-repo/classes/_automerge_automerge-repo.StorageAdapter.html). You _can_ run a `Repo` without a `StorageAdapter` but it will be entirely transient and will have to load all its data from remote peers on every restart.
 
 `StorageAdapter` is designed to be safe to use concurrently, that is to say it is safe to have multiple `Repo`s talking to the same storage.
 
@@ -19,13 +19,13 @@ import { IndexedDBStorageAdapter } from "@automerge/automerge-repo-storage-index
 const storage = new IndexedDBStorageAdapter()
 ```
 
-You can customize the object database and object store the storage uses, see [the docs](https://automerge.org/automerge-repo/classes/_automerge_automerge_repo_storage_indexeddb.IndexedDBStorageAdapter.html#constructor)
+You can customize the object database and object store the storage uses, see [the docs](https://automerge.org/automerge-repo/classes/_automerge_automerge-repo-storage-indexeddb.IndexedDBStorageAdapter.html#constructor)
 
-As noted above, this is safe for concurrent use so you can have multiple tabs pointing at the same storage. Note that they will not live update (you may want to use a [`MessageChannel`](https://automerge.org/automerge-repo/modules/_automerge_automerge_repo_network_messagechannel.html) or [`BroadcastChannel`](https://automerge.org/automerge-repo/modules/_automerge_automerge_repo_network_broadcastchannel.html) based `NetworkAdapter` for that) but on refresh the concurrent changes will be merged as per the normal merge rules.
+As noted above, this is safe for concurrent use so you can have multiple tabs pointing at the same storage. Note that they will not live update (you may want to use a [`MessageChannel`](https://automerge.org/automerge-repo/modules/_automerge_automerge-repo-network-messagechannel.html) or [`BroadcastChannel`](https://automerge.org/automerge-repo/modules/_automerge_automerge-repo-network-broadcastchannel.html) based `NetworkAdapter` for that) but on refresh the concurrent changes will be merged as per the normal merge rules.
 
 ## File system
 
-[`@automerge/automerge-repo-storage-nodefs`](https://www.npmjs.com/package/@automerge/automerge-repo-storage-nodefs) is a `StorageAdapter` which stores its data in a directory on the local filesystem. The location can be customized as per [the docs](https://automerge.org/automerge-repo/classes/_automerge_automerge_repo_storage_nodefs.NodeFSStorageAdapter.html#constructor)
+[`@automerge/automerge-repo-storage-nodefs`](https://www.npmjs.com/package/@automerge/automerge-repo-storage-nodefs) is a `StorageAdapter` which stores its data in a directory on the local filesystem. The location can be customized as per [the docs](https://automerge.org/automerge-repo/classes/_automerge_automerge-repo-storage-nodefs.NodeFSStorageAdapter.html#constructor)
 
 ```typescript
 import { NodeFSStorageAdapter } from "@automerge/automerge-repo-storage-nodefs";

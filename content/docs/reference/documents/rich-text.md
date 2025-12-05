@@ -32,11 +32,11 @@ console.log(Automerge.marks(doc, ["text"]))
 
 Here we can see that the bold span applies to the "hello".
 
-It is up to your application to decide what different mark names mean, but if you are interested in interoperability consider adopting our [rich text schema](../../under-the-hood/rich_text_schema).
+It is up to your application to decide what different mark names mean, but if you are interested in interoperability consider adopting our [rich text schema](../../under-the-hood/rich-text-schema).
 
 ## Block Markers
 
-Block markers are maps which are inserted inline in the text. They are used to divide text into structural roles such as paragraphs, headings, or code blocks. The underlying primitive of a block marker is very flexible, so specific editor integrations can use it however they like. The `automerge-prosemirror` bindings use the [rich text schema](../../under-the-hood/rich_text_schema).
+Block markers are maps which are inserted inline in the text. They are used to divide text into structural roles such as paragraphs, headings, or code blocks. The underlying primitive of a block marker is very flexible, so specific editor integrations can use it however they like. The `automerge-prosemirror` bindings use the [rich text schema](../../under-the-hood/rich-text-schema).
 
 Block markers can be created using `Automerge.splitBlock` and updated using `Automerge.updateBlock` and you can find the active block at a given index using `Automerge.block`.
 
