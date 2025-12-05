@@ -3,24 +3,24 @@ title: Networking
 template: docs
 ---
 
-There are many ways to talk to other peers. In `automerge-repo` this is captured by the [`NetworkAdapter`](https://automerge.org/automerge-repo/classes/_automerge_automerge_repo.NetworkAdapter.html) interface. Unlike `StorageAdapter`s a repository can have many (or zero) `NetworkAdapter`s.
+There are many ways to talk to other peers. In `automerge-repo` this is captured by the [`NetworkAdapter`](https://automerge.org/automerge-repo/classes/_automerge_automerge-repo.NetworkAdapter.html) interface. Unlike `StorageAdapter`s a repository can have many (or zero) `NetworkAdapter`s.
 
 "network" is quite a broad term in `automerge-repo`. It really means "any other instance of `Repo` which I am communicating with by message passing". This means that as well as network adapters for obvious things like websockets, we also implement network adapters for less traditional channels such as [`MessageChannel`](https://developer.mozilla.org/en-US/docs/Web/API/MessageChannel) or [`BroadcastChannel`](https://developer.mozilla.org/en-US/docs/Web/API/BroadcastChannel).
 
 ## Websockets
 
-The websocket `NetworkAdapter` has two parts. This is because the websocket protocol requires a server and a client. The parts are named `NodeWSServerAdapter` and `BrowserWebsocketClientAdapter`, but don't take these names too seriously, they will both work in a browser or in Node.
+The websocket `NetworkAdapter` has two parts. This is because the websocket protocol requires a server and a client. The parts are named `WebSocketServerAdapter` and `WebSocketClientAdapter`, but don't take these names too seriously, they will both work in a browser or in Node.
 
 ### Server
 
-The server side of the adapter is [`NodeWSServerAdapter`](https://automerge.org/automerge-repo/classes/_automerge_automerge_repo_network_websocket.NodeWSServerAdapter.html), which should be used in combination with the [`ws`](https://www.npmjs.com/package/ws) library.
+The server side of the adapter is [`WebSocketServerAdapter`](https://automerge.org/automerge-repo/classes/_automerge_automerge-repo-network-websocket.WebSocketServerAdapter.html), which should be used in combination with the [`ws`](https://www.npmjs.com/package/ws) library.
 
 ```typescript
 import { WebSocketServer } from "ws";
-import { NodeWSServerAdapter } from "@automerge/automerge-repo-network-websocket";
+import { WebSocketServerAdapter } from "@automerge/automerge-repo-network-websocket";
 
 const wss = new WebSocketServer({ port: 8080 });
-const adapter = new NodeWSServerAdapter(wss);
+const adapter = new WebSocketServerAdapter(wss);
 ```
 
 #### Usage with `express`
@@ -29,7 +29,7 @@ Often you aren't running the websocket server as a standalone thing but instead 
 
 ```typescript
 import { WebSocketServer } from "ws";
-import { NodeWSServerAdapter } from "@automerge/automerge-repo-network-websocket";
+import { WebSocketServerAdapter } from "@automerge/automerge-repo-network-websocket";
 import express from "express";
 
 const wss = new WebSocketServer({ noServer: true });
@@ -39,23 +39,23 @@ server.on("upgrade", (request, socket, head) => {
     wss.emit("connection", socket, request);
   });
 });
-const adapter = new NodeWSServerAdapter(wss);
+const adapter = new WebSocketServerAdapter(wss);
 server.listen(8080);
 ```
 
 ### Client
 
-The client side of the connection is [`BrowserWebsocketClientAdapter`](https://automerge.org/automerge-repo/classes/_automerge_automerge_repo_network_websocket.BrowserWebSocketClientAdapter.html).
+The client side of the connection is [`WebSocketClientAdapter`](https://automerge.org/automerge-repo/classes/_automerge_automerge-repo-network-websocket.WebSocketClientAdapter.html).
 
 ```typescript
-import { BrowserWebSocketClientAdapter } from "@automerge/automerge-repo-network-websocket";
+import { WebSocketClientAdapter } from "@automerge/automerge-repo-network-websocket";
 
-const network = new BrowserWebSocketClientAdapter("ws://localhost:3030");
+const network = new WebSocketClientAdapter("ws://localhost:3030");
 ```
 
 ## MessageChannel
 
-[`@automerge/automerge-repo-network-messagechannel`](https://automerge.org/automerge-repo/modules/_automerge_automerge_repo_network_messagechannel.html) is a `NetworkAdapter` for communicating between processes within the same browser using a [`MessageChannel`](https://developer.mozilla.org/en-US/docs/Web/API/MessageChannel).
+[`@automerge/automerge-repo-network-messagechannel`](https://automerge.org/automerge-repo/modules/_automerge_automerge-repo-network-messagechannel.html) is a `NetworkAdapter` for communicating between processes within the same browser using a [`MessageChannel`](https://developer.mozilla.org/en-US/docs/Web/API/MessageChannel).
 
 ```typescript
 import { MessageChannelNetworkAdapter } from "@automerge/automerge-repo-network-messagechannel";
@@ -75,7 +75,7 @@ const right = new Repo({
 
 ## BroadcastChannel
 
-[`@automerge/automerge-repo-network-broadcastchannel`](https://automerge.org/automerge-repo/modules/_automerge_automerge_repo_network_broadcastchannel.html) is a `NetworkAdapter` for communicating between processes in the same browser using a [`BroadcastChannel`](https://developer.mozilla.org/en-US/docs/Web/API/BroadcastChannel). This will in general be quite inefficient because the sync protocol is point-to-point so even though `BroadcastChannel` is a _broadcast_ channel, we still have to duplicate each message for every peer in the channel. It's better to use `MessageChannel` if you can, but `BroadcastChannel` is good in a pinch.
+[`@automerge/automerge-repo-network-broadcastchannel`](https://automerge.org/automerge-repo/modules/_automerge_automerge-repo-network-broadcastchannel.html) is a `NetworkAdapter` for communicating between processes in the same browser using a [`BroadcastChannel`](https://developer.mozilla.org/en-US/docs/Web/API/BroadcastChannel). This will in general be quite inefficient because the sync protocol is point-to-point so even though `BroadcastChannel` is a _broadcast_ channel, we still have to duplicate each message for every peer in the channel. It's better to use `MessageChannel` if you can, but `BroadcastChannel` is good in a pinch.
 
 ```typescript
 import { BroadcastChannelNetworkAdapter } from "@automerge/automerge-repo-network-broadcastchannel";
