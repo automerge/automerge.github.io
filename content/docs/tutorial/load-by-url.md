@@ -109,4 +109,4 @@ You should see that the title in the second tab has been updated to "My task lis
 
 ### Next Step
 
-Now that we can easily share documents by URL it's time to update our React application to store it's state in Automerge.
+Now that we can easily share documents by URL, it's time to update our React application to store its state in Automerge.
