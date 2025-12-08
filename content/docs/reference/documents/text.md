@@ -57,7 +57,7 @@ input.oninput = (e) => {
         // @ts-ignore
         const newValue: string = e.target.value
         console.log("newValue", newValue)
-        am.updateText(doc, ["text"], newValue)
+        Automerge.updateText(doc, ["text"], newValue)
     })
 }
 
