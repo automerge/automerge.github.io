@@ -27,11 +27,12 @@ let doc1 = Automerge.change(Automerge.init(), (doc) => {
 let doc2 = Automerge.change(Automerge.init(), (doc) => {
   doc.x = 2;
 });
-doc1 = Automerge.merge(doc1, doc2);
-doc2 = Automerge.merge(doc2, doc1);
-// Now, we can't tell which value doc1.x and doc2.x are going to assume --
+let doc1_merged_with_doc2 = Automerge.merge(doc1, doc2);
+let doc2_merged_with_doc1 = Automerge.merge(doc2, doc1);
+
+// Now, we can't tell which value x will assume in the new, merged docs --
 // the choice is arbitrary, but deterministic and equal across both documents.
-assert.deepEqual(doc1, doc2);
+assert.deepEqual(doc1_merged_with_doc2, doc2_merged_with_doc1);
 ```
 
 Although only one of the concurrently written values shows up in the object, the other values are
@@ -39,10 +40,12 @@ not lost. They are merely relegated to a conflicts object. Suppose `doc.x = 2` i
 "winning" value:
 
 ```js
-doc1; // {x: 2}
+doc1; // {x: 1}
 doc2; // {x: 2}
-Automerge.getConflicts(doc1, "x"); // {'1@01234567': 1, '1@89abcdef': 2}
-Automerge.getConflicts(doc2, "x"); // {'1@01234567': 1, '1@89abcdef': 2}
+doc1_merged_with_doc2; // {x: 2}
+doc2_merged_with_doc1; // {x: 2}
+Automerge.getConflicts(doc1_merged_with_doc2, "x"); // {'1@01234567': 1, '1@89abcdef': 2}
+Automerge.getConflicts(doc2_merged_with_doc1, "x"); // {'1@01234567': 1, '1@89abcdef': 2}
 ```
 
 Here, we've recorded a conflict on property `x`. The object returned by `getConflicts` contains the
