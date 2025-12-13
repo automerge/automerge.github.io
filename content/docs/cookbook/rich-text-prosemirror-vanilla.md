@@ -43,13 +43,11 @@ Now, we'll store the automerge URL for the document we are editing in the browse
 // a new document and update the URL fragment to match.
 const docUrl = window.location.hash.slice(1)
 if (docUrl && isValidAutomergeUrl(docUrl)) {
-  handle = repo.find(docUrl)
+  handle = await repo.find(docUrl)
 } else {
   handle = repo.create({ text: "" })
   window.location.hash = handle.url
 }
-// Wait for the handle to be available
-await handle.whenReady()
 ```
 
 At this point we have a document handle with a fully loaded automerge document, now we need to wire up a prosemirror editor.
