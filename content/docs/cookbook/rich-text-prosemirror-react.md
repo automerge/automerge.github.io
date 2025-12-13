@@ -26,7 +26,7 @@ Now, the app created by `@automerge/vite-app` creates a document which contains 
 ...
 let handle
 if (isValidAutomergeUrl(rootDocUrl)) {
-  handle = repo.find(rootDocUrl)
+  handle = await repo.find(rootDocUrl)
 } else {
   handle = repo.create({text: ""})
 }

@@ -10,7 +10,7 @@ Ephemeral data is associated with a particular document, which means you need to
 ## Sending
 
 ```typescript
-const handle = Repo.find("<some url>");
+const handle = await repo.find("<some url>");
 handle.broadcast({
   some: "message",
 });
@@ -23,7 +23,7 @@ The object passed to `broadcast` will be CBOR encoded so you can send whatever y
 To receive you listen to the `"ephemeral-message"` event on the `DocHandle`
 
 ```typescript
-const handle = Repo.find("<some url>")
+const handle = await repo.find("<some url>")
 handle.on("ephemeral-message", (message: any) => {
     console.log("got an ephemeral message: ", message)
 })
