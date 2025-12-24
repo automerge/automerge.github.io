@@ -7,9 +7,9 @@ The javascript API has been through several iterations and is currently split ov
 
 Install both the `@automerge/automerge` and `@automerge/automerge-repo` packages. Then install the networking and storage plugins you need (typically `@automerge/automerge-repo-network-*` and `@automerge/automerge-repo-storage-*`) packages. Take a look at the cookbook for examples of different ways of using these.
 
-## `@automerge/react` and `@automerge/vanilla`
+## `@automerge/react` and `@automerge/vanillajs`
 
-For React and vanilla JS applications we offer the `@automerge/react` and `@automerge/vanilla` packages respectively. These packages just re-export the public items from `automerge` and `automerge-repo` and several common network and storage adapters for your convenience.
+For React and vanilla JS applications we offer the [`@automerge/react`](https://www.npmjs.com/package/@automerge/react) and [`@automerge/vanillajs`](https://www.npmjs.com/package/@automerge/vanillajs) packages respectively. These packages re-export the public items from `automerge` and `automerge-repo` and several common network and storage adapters for your convenience.
 
 
 ## Relationship between `@automerge/automerge` and `@automerge/automerge-repo`
