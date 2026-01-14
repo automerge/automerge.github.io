@@ -12,5 +12,6 @@ Automerge has implementations, ports, and bindings for a handful of other langua
 
 - [C](https://github.com/automerge/automerge/tree/main/rust/automerge-c)
 - [Python](https://github.com/automerge/automerge-py)
+- [R](https://posit-dev.github.io/automerge-r/)
 - [Rust](https://github.com/automerge/automerge-rs)
 - [Swift](https://automerge.org/automerge-swift/documentation/automerge/)
