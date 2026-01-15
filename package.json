@@ -1,23 +1,26 @@
 {
   "type": "module",
-  "scripts": { "dev": "./site dev", "build": "./site build" },
+  "scripts": {
+    "dev": "./site dev",
+    "build": "./site build"
+  },
   "devDependencies": {
     "@types/highlightjs": "^9.12.6",
     "@types/markdown-it": "^14.1.2",
     "@types/markdown-it-footnote": "^3.0.4",
-    "@types/node": "^24.0.4",
+    "@types/node": "^25.0.9",
     "@types/prismjs": "^1.26.5",
     "@types/ws": "^8.18.0",
     "chokidar": "^4.0.1",
-    "glob": "^11.0.0",
+    "glob": "^13.0.0",
     "markdown-it": "^14.1.0",
     "markdown-it-footnote": "^4.0.0",
     "prismjs": "^1.30.0",
     "typescript": "^5.8.2",
-    "ws": "^8.18.1"
+    "ws": "^8.19.0"
   },
   "engines": {
     "node": ">=24.0.0"
   },
-  "packageManager": "npm@10.0.0"
+  "packageManager": "npm@11.0.0"
 }
