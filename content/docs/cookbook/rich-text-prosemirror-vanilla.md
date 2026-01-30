@@ -5,9 +5,10 @@ template: docs
 
 Automerge supports rich text using [ProseMirror](https://prosemirror.net/). This guide will show you how to set up a simple collaborative rich text editor in a vanilla JS app; where "vanilla" means plain JavaScript without any frameworks or libraries.
 
-We _do_ need a bundler in order to use Automerge, so we'll assume you have set up something like Vite and that you have two files, `index.html` and `main.js`.
+Because Automerge uses WebAssembly, [library initialization](/docs/reference/library-initialization/) can be tricky in some
+environments. Once you have that set up, we'll assume you have two files, `index.html` and `main.js`.
 
-First, put the following in `index.html`
+First, put the following in `index.html`:
 
 ```html title="index.html"
 <!doctype html>
@@ -22,7 +23,7 @@ First, put the following in `index.html`
 </html>
 ```
 
-First, we need to get `automerge-repo` set up:
+Then, we need to get `automerge-repo` set up:
 
 ```js title="main.js"
 import { DocHandle, Repo, isValidAutomergeUrl } from "@automerge/automerge-repo"
