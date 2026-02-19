@@ -16,7 +16,7 @@ import { debounce, toSorted, unique } from "./util.ts"
 const dotfiles = /(^|[\/\\])\../
 
 // After anything inside the given paths changes, wait for things to calm down, then run the given actions.
-export function runWatcher(paths: string[], actions: () => any, debounceTime = 50) {
+export function runWatcher(paths: string[], actions: () => any, debounceTime = 100) {
   const runActionsSoon = debounce(debounceTime, actions)
 
   Chokidar.watch(paths, { ignored: dotfiles, ignoreInitial: true })
@@ -24,9 +24,12 @@ export function runWatcher(paths: string[], actions: () => any, debounceTime = 5
     .on("all", (event, path) => {
       // There's a weird issue where empty files trigger a change event when used as the source of a hardlink.
       // This leads to infinite recompile loops. To mitigate, we ignore them.
-      if (event == "change" && FS.statSync(path).size == 0) {
-        if (Env.verbose) log(magenta(event) + " " + green(path) + " " + magenta("(ignoring)"))
-        return
+      if (event == "change") {
+        const stats = FS.statSync(path)
+        if (stats.size == 0 && stats.nlink > 1) {
+          if (Env.verbose) log(magenta(event) + " " + green(path) + " " + magenta("(ignoring)"))
+          return
+        }
       }
 
       if (Env.verbose) log(magenta(event) + " " + green(path))
