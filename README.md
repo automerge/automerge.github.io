@@ -33,6 +33,7 @@ Henceforth:
   * [Redirects](#redirects)
   * [Broken Links](#broken-links)
 * [System](#system)
+  * [Deployment](#deployment)
 
 <br><br>
 
@@ -246,3 +247,14 @@ You can run `site help` to list all the available commands.
 `site` is a little shell script at the root of the repo. It executes `system/app.ts` using the fastest available Node-compatible runtime (bun, deno, or node).
 
 `app.ts` is the main entrypoint to the build system. If you want to learn how it works, start reading from there. It's all extensively commented, and a lot of care was taken to make it easy to understand and hack on.
+
+<br>
+
+### Deployment
+
+If anyone on the core team needs to tweak the deployment, here's where to go looking.
+
+* DNS — Cloudflare
+* Host — GitHub pages, built using Actions.
+
+There's a lot of interaction between how this site is built and several other repos (with docs) in the AM GH org. For instance, some of the API docs (like [these](https://automerge.org/automerge/api-docs/js/)) come from other repos, and take advantage of Github-specific behaviour to end up with the right URLs.
