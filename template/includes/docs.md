@@ -41,6 +41,7 @@ Reference
   - [Networking](/docs/reference/repositories/networking/)
   - [DocHandles](/docs/reference/repositories/dochandles/)
   - [Ephemeral Data](/docs/reference/repositories/ephemeral/)
+  - [Refs](/docs/reference/repositories/refs/)
 - Under the hood
   - [Storage](/docs/reference/under-the-hood/storage/)
   - [Merge Rules](/docs/reference/under-the-hood/merge-rules/)
