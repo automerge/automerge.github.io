@@ -33,6 +33,10 @@ Networking and storage for a repository are pluggable. There are various ready-m
 
 A `DocHandle` is an object returned from the various methods on a repository which create or request a document. The `DocHandle` has methods on it to access the underlying automerge document and to create new changes which are stored locally and transmitted to connected peers.
 
+### Document Refs
+
+A `Ref` is an object referencing a specific subsection of a document. It can be obtained from a `DocHandle` or looked up through its URL from a Repository. The ref has methods to read and update the current value of the referenced subsection in its parent document.
+
 ### Document URLs
 
 Documents in a repository have a URL. An automerge URL looks like this:
