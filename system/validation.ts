@@ -35,25 +35,27 @@ const checkLink = (pages: Page[], page: Page, link: string) => {
     return
   }
 
-  // TODO: We don't yet support checking links that contain a dot. Eg:
-  //   <meta rel="stylesheet" href="….css">
-  //   <a href="/something.html"> — a plain html file, no frontmatter, not named index.html
-  //   <a href="https://some.other.site">
-  if (link.includes(".")) return
-
   // Initialize a URL object for this link, using the current page's absolute URL as a base for relative links.
-  let linkUrl = new URL(link, page.url)
   // Also, note, this ^ might throw. If it does, that's unexpected, so we let it bubble up.
+  const linkUrl = new URL(link, page.url)
+  // TODO: We don't yet support checking external links
+  const pageUrl = new URL(page.url)
+  if (linkUrl.host !== pageUrl.host) return
 
-  // Links are inconsistent about trailing slashes, so we normalize
-  let pathname = withTrailingSlash(linkUrl.pathname)
-
+  const normalizedPathname = withTrailingSlash(linkUrl.pathname)
+  let targetFile = "public" + linkUrl.pathname
   // Check that the target exists
-  const targetFile = "public" + pathname + "index.html"
-  if (!exists(targetFile)) return log(`Broken link in ${green(page.path)}: ${yellow(link)}`)
+  if (!exists(targetFile)) {
+    // It could be a directory link.
+    let targetFile = "public" + normalizedPathname + "index.html"
+    if (!exists(targetFile)) {
+      log(`Broken link in ${green(page.path)}: ${yellow(link)}`)
+      return
+    } 
+  }
 
   // If the target is a compiled page (not a static html file), we can do some extra checks
-  const targetPage = pages.find((p) => p.url.pathname === pathname)
+  const targetPage = pages.find((p) => p.url.pathname === normalizedPathname)
 
   // Warn if the target is a draft page
   if (targetPage?.frontmatter.publish == "draft") return log(`Warning: linking to a draft in ${green(page.path)}: ${yellow(link)}`)
