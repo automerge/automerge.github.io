@@ -427,6 +427,10 @@ pre code > * {
   background: #00f1;
 }
 
+.highlighted-red-line {
+  background: light-dark(#ffeef0, #3d1c1c);
+}
+
 :not(pre) > code {
   border: 1px solid var(--stark-shadow);
   padding: .1em .2em 0em;
