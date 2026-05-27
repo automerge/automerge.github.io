@@ -34,16 +34,25 @@ Markdown.renderer.rules.fence = (tokens, idx) => {
   // Process line highlight markers
   let lines = token.content.trim().split("\n")
   const highlightedLines = new Set<number>()
+  const highlightedRedLines = new Set<number>()
   let insideBlock = false
+  let insideRedBlock = false
   let highlightNext = false
   let out: string[] = []
   lines.forEach((line, i) => {
     if (/highlight-next-line/.test(line)) {
       highlightNext = true
+    } else if (/highlight-red-start/.test(line)) {
+      insideRedBlock = true
+    } else if (/highlight-red-end/.test(line)) {
+      insideRedBlock = false
     } else if (/highlight-start/.test(line)) {
       insideBlock = true
     } else if (/highlight-end/.test(line)) {
       insideBlock = false
+    } else if (insideRedBlock) {
+      highlightedRedLines.add(out.length)
+      out.push(line)
     } else if (insideBlock || highlightNext) {
       highlightNext = false
       highlightedLines.add(out.length)
@@ -66,6 +75,7 @@ Markdown.renderer.rules.fence = (tokens, idx) => {
   lines = highlightedBlock.split("\n").map((line, i) => {
     const classes = ["code-line"]
     if (highlightedLines.has(i)) classes.push("highlighted-line")
+    if (highlightedRedLines.has(i)) classes.push("highlighted-red-line")
     return `<div class="${classes.join(" ")}">${line}</div>`
   })
   lines = [`<pre><code class="language-${langName}">`, ...lines, "</code></pre>"]
