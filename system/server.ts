@@ -32,9 +32,9 @@ const mimeTypes: Record<string, string> = {
   mp4: "video/mp4",
   pdf: "application/pdf",
   png: "image/png",
-  rss: "text/xml",
+  rss: "application/rss+xml",
   svg: "image/svg+xml",
-  txt: "text/txt",
+  txt: "text/plain",
   wasm: "application/wasm",
   webm: "video/webm",
   webp: "image/webp",
@@ -83,7 +83,7 @@ async function createServer(root: string, host: string, port: number, name: stri
         server.close()
         server.listen({ host, port: ++port })
       } else {
-        logError("Unhandled server error", err)
+        logError(red("Unhandled server error"), err)
       }
     })
 
