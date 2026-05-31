@@ -93,6 +93,7 @@ aside nav {
   aside {
     position: relative;
     width: auto;
+    overscroll-behavior: auto;
   }
 
   aside nav {
