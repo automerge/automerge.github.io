@@ -44,7 +44,7 @@ In Automerge 3.0, we're fully committing to the new API—we've removed the `Tex
 
 ## Try it out
 
-Automerge 3.0 is used by default when installing the latest version (`2.1.0`) of `@automerge/automerge-repo` or `@automerge/react`. If you're new to automerge take a look at the [tutorial](/docs/tutorial/) to get started.
+Automerge 3.0 is used by default when installing the latest version (`2.1.0`) of `@automerge/automerge-repo` or `@automerge/react`. If you're new to Automerge take a look at the [tutorial](/docs/tutorial/) to get started.
 
 If you already have an Automerge codebase take a look at the [migration guide](/docs/guides/migrating-from-automerge-2-to-automerge-3) to see if you need to change anything other than the version number of Automerge you depend on. If you just depend on `@automerge/automerge-repo` you'll need to run `npm update @automerge/automerge` (or your package manager's equivalent) to pull in the new version.
 

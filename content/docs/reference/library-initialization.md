@@ -3,7 +3,7 @@ title: Library Initialization
 template: docs
 ---
 
-Automerge is implemented in Rust and compiled to WebAssembly for use in javascript environments. Unfortunately the way that WebAssembly modules are loaded varies across environments. In some situations this can be handled by your build tool, but in others you may need to manually load the module. This page describes how to load automerge in various environments, and also an [escape hatch](#the-escape-hatch) which should work everywhere.
+Automerge is implemented in Rust and compiled to WebAssembly for use in JavaScript environments. Unfortunately the way that WebAssembly modules are loaded varies across environments. In some situations this can be handled by your build tool, but in others you may need to manually load the module. This page describes how to load Automerge in various environments, and also an [escape hatch](#the-escape-hatch) which should work everywhere.
 
 ## Common Environments
 

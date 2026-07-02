@@ -72,7 +72,7 @@ Of course, even the most productive authors struggle to type an entire paper qui
 | automerge 2.0  | 129,062     |
 | automerge 0.14 | 146,406,415 |
 
-The binary format works wonders in this example, encoding a full history for the document with only 30% overhead. That's less than one additional byte per character! The naive JSON encoding often used circa automerge 0.14 could exceed 1,300 bytes _per character_. If you'd like to learn more about the file format, we have a [specification](https://automerge.org/automerge-binary-format-spec/) document.
+The binary format works wonders in this example, encoding a full history for the document with only 30% overhead. That's less than one additional byte per character! The naive JSON encoding often used circa Automerge 0.14 could exceed 1,300 bytes _per character_. If you'd like to learn more about the file format, we have a [specification](https://automerge.org/automerge-binary-format-spec/) document.
 
 | Load ~260k operations    | Timing (ms) |
 | ------------------------ | ----------- |
@@ -86,7 +86,7 @@ While we are proud of these results, we will continue to invest in improved perf
 
 A few notes about methodology before we move on. The particular implementation we used to run the benchmarks can be found [here](https://github.com/alexjg/automerge-perf-comparisons). These numbers were produced on Ryzen 9 7900X. The "timing" column is how long it takes to apply every single edit in the trace, whilst the "memory" common is the peak memory usage during this process.
 
-The improvements found in "2.0.2-unstable" mostly result from an upcoming improved API for text. Also note that the "automerge 1.0.1" here is actually the `automerge@1.0.1-preview-7` release. Automerge 1.0.1 was a significant rewrite from 0.14 and has a similar architecture to the Rust implementation. Improvements between 1.0.1 and 2.0.1 are a result of both optimization and adopting WebAssembly rather than an architectural change.
+The improvements found in "2.0.2-unstable" mostly result from an upcoming improved API for text. Also note that the "Automerge 1.0.1" here is actually the `automerge@1.0.1-preview-7` release. Automerge 1.0.1 was a significant rewrite from 0.14 and has a similar architecture to the Rust implementation. Improvements between 1.0.1 and 2.0.1 are a result of both optimization and adopting WebAssembly rather than an architectural change.
 
 ## Portability & Mobile Devices
 
@@ -114,7 +114,7 @@ It's under active development, and available in beta right now. We'll talk more 
 
 ## Rust Developer Experience Improvements
 
-We've seen tremendous enthusiasm for the native Rust experience of Automerge, and the current Rust API is powerful and fast. Unfortunately, it's also low-level and can be difficult to work with directly. To make building Rust applications against automerge easier, Alex built [Autosurgeon](https://github.com/automerge/autosurgeon), a library that helps bind Rust data structures to Automerge documents, and we'll continue to listen to our Rust users and improve on that experience.
+We've seen tremendous enthusiasm for the native Rust experience of Automerge, and the current Rust API is powerful and fast. Unfortunately, it's also low-level and can be difficult to work with directly. To make building Rust applications against Automerge easier, Alex built [Autosurgeon](https://github.com/automerge/autosurgeon), a library that helps bind Rust data structures to Automerge documents, and we'll continue to listen to our Rust users and improve on that experience.
 
 ## Improved Synchronization
 
