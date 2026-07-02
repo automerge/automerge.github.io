@@ -83,7 +83,7 @@ The `parents` array of a block represents the blocks which it appears inside. Fo
 }
 ```
 
-Represents a paragraph which is inside a blockquote. We call the `path` of a block marker the array `[...parents, type]`. The children of some block `a` are all the blocks following that marker for which the path of `a` is a proper prefix of the child block's path. Note that because a blocks contents are always after it and before it's next sibling, paths don't need to be unique - they only need to provide enough information to clearly match where in the hierarchy a block sits.
+Represents a paragraph which is inside a blockquote. We call the `path` of a block marker the array `[...parents, type]`. The children of some block `a` are all the blocks following that marker for which the path of `a` is a proper prefix of the child block's path. Note that because a blocks contents are always after it and before its next sibling, paths don't need to be unique - they only need to provide enough information to clearly match where in the hierarchy a block sits.
 
 <div class="note">
 
@@ -109,7 +109,7 @@ blockquote:
 paragraph
 ```
 
-Note that the "blockquote" and "ordered-list-item" blocks are generated because they are parent's of the first two paragraphs, even though they aren't explicitly listed.
+Note that the "blockquote" and "ordered-list-item" blocks are generated because they are parents of the first two paragraphs, even though they aren't explicitly listed.
 
 ### Embeds
 
@@ -144,7 +144,7 @@ For example, I could take the following rich text document:
 ```typescript
 [
     {
-        type: "text", value: "From the automerge docs:"
+        type: "text", value: "From the Automerge docs:"
     },
     {
         type: "block",
@@ -175,7 +175,7 @@ For example, I could take the following rich text document:
 
 Which I could render like so:
 
-> From the automerge docs
+> From the Automerge docs
 >
 > > The requirements we have for this schema are:
 > >

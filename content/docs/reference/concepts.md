@@ -5,23 +5,23 @@ template: docs
 
 <div class="note">
 
-This documentation is mostly focused on the javascript implementation of automerge. Some things will translate to other languages but some things — in particular the "repository" concept and `automerge-repo` library — will not.
+This documentation is mostly focused on the JavaScript implementation of Automerge. Some things will translate to other languages but some things — in particular the "repository" concept and `automerge-repo` library — will not.
 
 </div>
 
 ## Core concepts
 
-Using automerge means storing your data in automerge [documents](#documents). Documents have [URL](#document-urls)s which you can use to share or request documents with/from other peers using a [repository](#repositories). Repositories give you [`DocHandle`](#dochandles)s which you use to make changes to the document and listen for changes from other peers.
+Using Automerge means storing your data in Automerge [documents](#documents). Documents have [URL](#document-urls)s which you can use to share or request documents with/from other peers using a [repository](#repositories). Repositories give you [`DocHandle`](#dochandles)s which you use to make changes to the document and listen for changes from other peers.
 
-Automerge as used in javascript applications is actually a composition of two libraries. [`automerge-repo`](https://www.npmjs.com/package/@automerge/automerge-repo) which provides the networking and storage plumbing, and [`automerge`](https://www.npmjs.com/package/@automerge/automerge) which provides the CRDT implementation, a transport agnostic [sync protocol](#sync-protocol), and a compressed [storage format](#storage-format) which `automerge-repo` uses to implement various networking and storage plugins.
+Automerge as used in JavaScript applications is actually a composition of two libraries. [`automerge-repo`](https://www.npmjs.com/package/@automerge/automerge-repo) which provides the networking and storage plumbing, and [`automerge`](https://www.npmjs.com/package/@automerge/automerge) which provides the CRDT implementation, a transport agnostic [sync protocol](#sync-protocol), and a compressed [storage format](#storage-format) which `automerge-repo` uses to implement various networking and storage plugins.
 
 ### Documents
 
-A document is the "unit of change" in automerge. It's like a combination of a JSON object and a git repository. What does that mean?
+A document is the "unit of change" in Automerge. It's like a combination of a JSON object and a git repository. What does that mean?
 
-Like a JSON object, an automerge document is a map from strings to values, where the values can be maps, arrays, or simple types like strings or numbers. See the [data model](/docs/reference/documents/) section for more details.
+Like a JSON object, an Automerge document is a map from strings to values, where the values can be maps, arrays, or simple types like strings or numbers. See the [data model](/docs/reference/documents/) section for more details.
 
-Like a git repository, an automerge document has a history made up of commits. Every time you make a change to a document you are adding to the history of the document. The combination of this history and some rules about how to handle conflicts means that any two automerge documents can always be merged. See [merging](/docs/reference/under-the-hood/merge-rules) for the gory details.
+Like a git repository, an Automerge document has a history made up of commits. Every time you make a change to a document you are adding to the history of the document. The combination of this history and some rules about how to handle conflicts means that any two Automerge documents can always be merged. See [merging](/docs/reference/under-the-hood/merge-rules) for the gory details.
 
 ### Repositories
 
@@ -31,7 +31,7 @@ Networking and storage for a repository are pluggable. There are various ready-m
 
 ### DocHandles
 
-A `DocHandle` is an object returned from the various methods on a repository which create or request a document. The `DocHandle` has methods on it to access the underlying automerge document and to create new changes which are stored locally and transmitted to connected peers.
+A `DocHandle` is an object returned from the various methods on a repository which create or request a document. The `DocHandle` has methods on it to access the underlying Automerge document and to create new changes which are stored locally and transmitted to connected peers.
 
 ### Document Refs
 
@@ -39,7 +39,7 @@ A `Ref` is an object referencing a specific subsection of a document. It can be 
 
 ### Document URLs
 
-Documents in a repository have a URL. An automerge URL looks like this:
+Documents in a repository have a URL. An Automerge URL looks like this:
 
 ```
 automerge:2akvofn6L1o4RMUEMQi7qzwRjKWZ

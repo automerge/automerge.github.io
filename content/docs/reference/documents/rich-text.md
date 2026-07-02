@@ -3,7 +3,7 @@ title: Rich Text
 template: docs
 ---
 
-As well as [supporting](../text) plain text Automerge supports rich text editing. The rich text APIs are extensions of the plain text API. In addition to using `splice` and `updateText` to modify a string, we also provide functions to manipulate two extra data types which are associated with a string:
+As well as [supporting](../text) plain text, Automerge supports rich text editing. The rich text APIs are extensions of the plain text API. In addition to using `splice` and `updateText` to modify a string, we also provide functions to manipulate two extra data types which are associated with a string:
 
 * Marks: formatting spans which apply to a range of characters and can overlap
 * Block markers which divide the text into blocks

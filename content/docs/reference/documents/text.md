@@ -45,7 +45,7 @@ Then with this HTML you can use `updateText` to make the text box collaborative:
 
 ```typescript
 
-const handle: DocHandle<{text: string}> = ... // some how get a DocHandle
+const handle: DocHandle<{text: string}> = ... // somehow get a DocHandle
 
 const input = document.getElementById("input")!
 

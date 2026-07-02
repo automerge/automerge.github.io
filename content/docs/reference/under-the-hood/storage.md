@@ -36,13 +36,13 @@ If you're not familiar with IndexedDB this might be a little confusing. IndexedD
 
 Okay, so creating a document (which is what happens when we load the page) stores a binary array under some key in the object database. This binary array is a single "incremental" change. An incremental change is not the entire history of the document but just some set of changes to the document. In this case it's the change that initializes the document with a `"counter"` field.
 
-Now, make some change to the task list and take another look at IndexedDb.
+Now, make some change to the task list and take another look at IndexedDB.
 
 ![IndexedDB snapshot](indexeddb-screenshot-snapshot.png)
 
 Well, there's still one entry, but it's changed. The `[.., "incremental", ..]` key has been deleted and replaced with `[.., "snapshot", ..]`. What's happened here? Every time you make a change automerge-repo saves that change to your storage adapters. Occasionally automerge-repo will decide that it's time to "compact" the document, it will take every change that has been written to storage so far (in this case, every key beginning with `[<document URL>, .., ..]` and combine them into a single snapshot and then save it as this `[.., "snapshot", ..]` key.
 
-All well and good in one tab. Open a new tab with the same URL (including the hash) and click the count button a few times in both tabs. If you look at the IndexedDB browser tools (in either tab, it's shared between them) you'll something like this:
+All well and good in one tab. Open a new tab with the same URL (including the hash) and click the count button a few times in both tabs. If you look at the IndexedDB browser tools (in either tab, it's shared between them) you'll see something like this:
 
 ![IndexedDB many keys](indexeddb-screenshot-manykeys.png)
 
