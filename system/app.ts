@@ -6,7 +6,7 @@ import { parseArgs } from "node:util"
 import { build } from "./build.ts"
 import { Env } from "./env.ts"
 import { exec, isSafeInvocation, rm, runWatcher } from "./io.ts"
-import { bold, grey, red, yellow } from "./logging.ts"
+import { bold, grey, log, magenta, red, yellow } from "./logging.ts"
 import Server from "./server.ts"
 
 const commands = {
@@ -17,6 +17,7 @@ const commands = {
 
       runWatcher(Env.watchedPaths, () => {
         build()
+        if (Env.verbose) log(magenta(`Server.reload()`))
         Server.reload()
       })
 
