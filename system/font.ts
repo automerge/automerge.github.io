@@ -19,6 +19,9 @@ export const generateFontSubsets = (text: string): boolean => {
     // The chars file was missing — that's good, it means we're regenerating from scratch.
   }
 
+  // Don't count nbsps, which tend to get added accidentally
+  text = text.replaceAll(" ", "")
+
   // Get every unique char in every page, sorted, as a string
   const everyChar = Array.from(text)
   const newChars = unique(everyChar).sort().join("").toWellFormed()
