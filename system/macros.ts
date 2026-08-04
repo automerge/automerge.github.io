@@ -200,6 +200,9 @@ export function expandMacros(text: string, page: Page, pages: Page[]) {
           case "og-url":
             return page.url.toString()
 
+          case "og-published_time":
+            return frontmatter.date ? `<meta property="article:published_time" content="${frontmatter.date}">` : ""
+
           case "domain":
             return Env.domain
 
