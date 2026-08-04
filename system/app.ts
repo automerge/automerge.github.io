@@ -58,6 +58,11 @@ const commands = {
     },
   },
 
+  test: {
+    help: "Run the build system test suite.",
+    cmd: () => exec("node --experimental-strip-types --disable-warning=ExperimentalWarning --test"),
+  },
+
   help: {
     help: "Show this help info.",
     cmd: () => {
