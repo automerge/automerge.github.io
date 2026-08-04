@@ -5,7 +5,7 @@
 import { parseArgs } from "node:util"
 import { build } from "./build.ts"
 import { Env } from "./env.ts"
-import { exec, isSafeInvocation, runWatcher } from "./io.ts"
+import { exec, isSafeInvocation, rm, runWatcher } from "./io.ts"
 import { bold, grey, red, yellow } from "./logging.ts"
 import Server from "./server.ts"
 
@@ -69,8 +69,36 @@ const commands = {
       console.log(bold("\n  Automerge Website CLI\n"))
       console.log(grey("  Usage:\n"))
       let longestName = Object.keys(commands).reduce((l, name) => Math.max(l, name.length), 0)
-      for (const [name, { help }] of Object.entries(commands)) console.log(`    site ${name.padEnd(longestName)}  ${grey(help)}`)
+      for (const [name, { help }] of Object.entries(commands)) {
+        if (help) console.log(`    site ${name.padEnd(longestName)}  ${grey(help)}`)
+      }
       console.log("")
+    },
+  },
+
+  // This is a hidden command you use BEFORE you make changes to the site design or build system.
+  // It will do a build, then copy whatever is in "public" to "public-snapshot".
+  // Then you can run `site diff` (see below).
+  kiss: {
+    help: "",
+    cmd: () => {
+      Env.useRealBuildDates = false
+      build()
+      rm("public-snapshot")
+      exec("cp -r public public-snapshot")
+    },
+  },
+
+  // This is a hidden command you use AFTER you make changes to the site design or build system.
+  // This will build the site, then diff "public" and "public-snapshot".
+  // That way you can see how your changes have affected the final website.
+  diff: {
+    help: "",
+    cmd: () => {
+      Env.useRealBuildDates = false
+      build()
+      exec("git diff --no-index --stat public-snapshot public || true")
+      exec("git diff --no-index public-snapshot public || true")
     },
   },
 } satisfies Record<string, { help: string; cmd: () => void }>

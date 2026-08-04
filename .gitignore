@@ -1,5 +1,6 @@
-.DS_Store
 .direnv
+.DS_Store
 node_modules
 public
+public-snapshot
 result
