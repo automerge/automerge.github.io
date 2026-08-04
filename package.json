@@ -5,7 +5,6 @@
     "build": "./site build"
   },
   "devDependencies": {
-    "@types/highlightjs": "^9.12.6",
     "@types/markdown-it": "^14.1.2",
     "@types/markdown-it-footnote": "^3.0.4",
     "@types/node": "^25.0.9",
@@ -21,6 +20,9 @@
   },
   "engines": {
     "node": ">=24.0.0"
+  },
+  "overrides": {
+    "mdurl": "2.0.0"
   },
   "packageManager": "npm@11.0.0"
 }
