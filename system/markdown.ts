@@ -2,6 +2,7 @@
 // Here, we initialize and configure the markdown renderer.
 
 import MarkdownIt from "markdown-it"
+// @ts-expect-error — markdown-it-footnote doesn't ship types, and @types/markdown-it-footnote is incompatible with markdown-it v15
 import MarkdownItFootnote from "markdown-it-footnote"
 import Prism from "prismjs"
 import { log, yellow } from "./logging.ts"
@@ -18,8 +19,9 @@ export const Markdown = MarkdownIt({ html: true, typographer: true }).use(Markdo
 
 // Override the default markdown renderer to provide our own footnote style.
 Markdown.renderer.rules.footnote_caption = (tokens, idx) => {
-  let n = tokens[idx].meta.id + 1 // calculate the footnote number
-  if (tokens[idx].meta.subId > 0) n += ":" + tokens[idx].meta.subId // incorporate subIds
+  let meta = tokens[idx].meta as any // markdown-it v15 types this as Record<string, unknown> | null
+  let n = meta.id + 1 // calculate the footnote number
+  if (meta.subId > 0) n += ":" + meta.subId // incorporate subIds
   return `${n}` // our footnote style is just the number
 }
 
