@@ -83,7 +83,7 @@ async function createServer(root: string, host: string, port: number, name: stri
         server.close()
         server.listen({ host, port: ++port })
       } else {
-        logError(red("Unhandled server error"), err)
+        logError("Unhandled server error", err)
       }
     })
 
