@@ -82,8 +82,9 @@ export const compileEverything = () => {
     const html = ""
     const children: Page[] = []
     const compiledBody = body
+    const scannable = ""
 
-    return { path, source, stats, frontmatter, body, dest, url, template, html, children, compiledBody }
+    return { path, source, stats, frontmatter, body, dest, url, template, html, children, compiledBody, scannable }
   })
 
   // Only compile published pages

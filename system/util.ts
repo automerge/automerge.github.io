@@ -44,11 +44,11 @@ export const extractMdLinks = (sourceText: string): [string, string][] => {
 
 export const getValuesOfAttributes = (src: string, attr: string) =>
   compact([
-    src.match(new RegExp(`${attr}="[^"]+"`, "g")), // double quotes
-    src.match(new RegExp(`${attr}='[^']+'`, "g")), // single quotes
+    src.match(new RegExp(`\\s${attr}="[^"]+"`, "g")), // double quotes
+    src.match(new RegExp(`\\s${attr}='[^']+'`, "g")), // single quotes
   ])
     .flat()
-    .map((match) => match.slice(attr.length + 2, -1)) // attr="foo" -> foo
+    .map((match) => match.slice(attr.length + 3, -1)) // _attr="foo" -> foo
 
 // A tiny DSL for string replacement
 export const replace = (str: string, kvs: Record<string, string>) => {
