@@ -216,8 +216,9 @@ const expander = (macro: string, spaces: string, page: Page, pages: Page[]) => {
     case "og-description":
       return plainify(frontmatter.description || Env.description)
 
+    // A page with a date is an "article" — the same signal the RSS feed uses to decide what's a post
     case "og-type":
-      return ["blog"].includes(frontmatter.template) ? "article" : "website"
+      return frontmatter.date ? "article" : "website"
 
     case "og-url":
       return page.url.toString()
