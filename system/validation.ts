@@ -4,7 +4,7 @@
 import { exists, read } from "./io.ts"
 import { green, log, yellow } from "./logging.ts"
 import type { Page } from "./types.ts"
-import { getValuesOfAttributes, trimAll, withTrailingSlash } from "./util.ts"
+import { getValuesOfAttributes, stripIgnoredHtml, trimAll, withTrailingSlash } from "./util.ts"
 
 export function runValidityChecks(pages: Page[]) {
   // When we check for broken links and asset paths, we want to ignore anything inside <pre>, <code>, and <!-- comments -->
@@ -15,7 +15,6 @@ export function runValidityChecks(pages: Page[]) {
   checkForBrokenAssets(pages)
 }
 
-const stripIgnoredHtml = (html: string) => html.replace(/<pre[\s>][\s\S]*?<\/pre>|<code[\s>][\s\S]*?<\/code>|<!--[\s\S]*?-->/g, "")
 
 const checkForInvalidHtml = (pages: Page[]) => {
   for (const page of pages) {

@@ -68,6 +68,10 @@ export const cdata = (s: string) => `<![CDATA[${s}]]>`
 // TODO: make this smart enough to ignore code blocks inside <pre>
 export const plainify = (s: string) => s.replace(/<[^>]+>/g, "")
 
+// Some chunks of html — code samples and comments — should be ignored when scanning a page for macros, links, etc.
+export const ignoredHtml = /<pre[\s>][\s\S]*?<\/pre>|<code[\s>][\s\S]*?<\/code>|<!--[\s\S]*?-->/g
+export const stripIgnoredHtml = (html: string) => html.replace(ignoredHtml, "")
+
 // Replace all instances of an html tag in a string, using a given replacement function
 type ReplaceTagFn = (contents: string, attrs: string, spaces: string) => string
 export const replaceHtmlTag = (html: string, tag: string, cb: ReplaceTagFn) => {
