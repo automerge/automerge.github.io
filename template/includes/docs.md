@@ -49,6 +49,6 @@ Reference
 - [API Docs](/docs/reference/api/)
 - [Glossary](/docs/reference/glossary/)
 
-Keyhive (Coming Soon!)
+Coming Soon
 
 - [automerge-repo-keyhive API Guide](/docs/keyhive/ark-api-guide/)
