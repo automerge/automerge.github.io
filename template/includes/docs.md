@@ -48,3 +48,7 @@ Reference
   - [Rich Text Schema](/docs/reference/under-the-hood/rich-text-schema/)
 - [API Docs](/docs/reference/api/)
 - [Glossary](/docs/reference/glossary/)
+
+Coming Soon
+
+- [automerge-repo-keyhive API Guide](/docs/keyhive/ark-api-guide/)
