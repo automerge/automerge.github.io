@@ -1,6 +1,6 @@
 ---
 title: "This Month in Automerge: August '26"
-description: Automerge 3.4.1, sturdier sync servers, a new access control guide, and Onomancy — a local-first name system.
+description: Automerge 3.4.1, sturdier sync servers, a new access control guide, and news from around the ecosystem.
 date: 2026-08-31
 template: blog
 ---
@@ -94,22 +94,15 @@ Until next time 👋
 [ARK guide]: /docs/keyhive/ark-api-guide/
 [Alex Good]: https://github.com/alexjg
 [Automerge crate]: https://crates.io/crates/automerge
-[BeeKEM preprint]: https://eprint.iacr.org/2026/1434
-[DNSSEC]: https://www.rfc-editor.org/rfc/rfc4033
 [I&S email]: mailto:hello@inkandswitch.com
-[John Mumm]: https://github.com/jtfmumm
 [July hexane]: /blog/2026-july/#hexane
 [July post]: /blog/2026-july/
-[July subduction]: /blog/2026-july/#subduction
 [Keyhive]: https://github.com/inkandswitch/keyhive
 [Orion Henry]: https://github.com/orionz
-[Subduction]: https://github.com/inkandswitch/subduction
 [Todo demo]: https://github.com/inkandswitch/keyhive-todo-app-demo
 [anonymizer]: https://github.com/automerge/automerge/tree/main/rust/automerge-cli#anonymize-a-document
 [automerge-r]: https://posit-dev.github.io/automerge-r/
 [awarth]: https://github.com/alexwarth
-[bijoux]: https://crates.io/crates/bijoux
-[cargo-mutants]: https://mutants.rs/
 [darcyparker]: https://github.com/darcyparker
 [fintan]: https://github.com/FintanH
 [ingalls]: https://en.wikipedia.org/wiki/Dan_Ingalls
@@ -120,18 +113,7 @@ Until next time 👋
 [lm-04]: https://www.inkandswitch.com/livelymerge/notebook/lm-04/
 [lm-05]: https://www.inkandswitch.com/livelymerge/notebook/lm-05/
 [msakrejda]: https://github.com/msakrejda
-[onomancy demo]: https://github.com/inkandswitch/onomancy/tree/main/onomancy_wasm/demo
-[onomancy design]: https://github.com/inkandswitch/onomancy/tree/main/design
-[onomancy npm]: https://www.npmjs.com/package/@inkandswitch/onomancy
-[onomancy limitations]: https://github.com/inkandswitch/onomancy/blob/main/design/limitations.md
-[zooko]: https://en.wikipedia.org/wiki/Zooko%27s_triangle
-[onomancy]: https://github.com/inkandswitch/onomancy
 [pvh]: https://github.com/pvh
-[repo releases]: https://github.com/automerge/automerge-repo/releases
 [shikokuchuo]: https://github.com/shikokuchuo
 [autosurgeon]: https://github.com/automerge/autosurgeon
 [samod]: https://github.com/alexjg/samod
-[peat]: https://github.com/defenseunicorns/peat-node
-[defense unicorns]: https://defenseunicorns.com/
-[iroh]: https://www.iroh.computer/
-[subduction design]: https://github.com/inkandswitch/subduction/tree/main/design
