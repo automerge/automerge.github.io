@@ -27,7 +27,7 @@ None of that changes the public Automerge API, but it makes a huge difference in
 
 [Alex Good] added a [benchmark battery](https://github.com/automerge/automerge/tree/main/rust/benchmark-battery) to the Rust workspace: a standard set of documents and operations we can run against every change.
 
-Combined with the [document anonymizer][anonymizer], you can now submit documents without having to worry that you're publishing your data to the entire interner. The anonymizer strips your content while preserving the exact structure that causes the problem, so you can share a pathological document without sharing anything private.
+Combined with the [document anonymizer][anonymizer], you can now submit documents without having to worry that you're publishing your data to the entire internet. The anonymizer strips your content while preserving the exact structure that causes the problem, so you can share a pathological document without sharing anything private.
 
 **Please send us your slow, buggy, or haunted documents.** [The Discord][AM Discord] or [an issue][AM issues], whichever you prefer. Real-world documents that behave badly are incredibly useful as they let us focus on the optimizations that will actually help in the wild!
 
@@ -39,7 +39,7 @@ Also for the Nix users out there: Fintan got the JavaScript test suite and CI ru
 
 ## 📦 automerge-repo
 
-Thanks once again to [Darcy Parker][darcyparker], who has been continuing his push for better stability. There's also a  **memory profiling harness** in the repo now, so the next leak gets measured instead of guessed at.
+Thanks once again to [Darcy Parker][darcyparker], who has been continuing his push for better stability. There's also a **memory profiling harness** in the repo now, so the next leak gets measured instead of guessed at.
 
 Thanks also to [Maciek Sakrejda][msakrejda] for tightening up the storage adapter contract, and to [Alex Good] for rebuilding the release process so that publishing a new version no longer requires a ceremony.
 
@@ -58,29 +58,6 @@ For a worked example, see the [Keyhive Todo MVC demo][Todo demo]:
     <img src="keyhive-demo.png" width="1835" height="1026" alt="The Keyhive Todo MVC demo, showing a shared todo list with per-document access control" />
   </a>
 </figure>
-
-## 🪄📇 Onomancy Sneak Peek!
-
-A new _highly experimental_ project that we're excited to give a sneak peek of: [Onomancy][onomancy] is a **local-first name system**. "Onomancy" is the term for [name divination](https://en.wikipedia.org/wiki/Onomancy).
-
-Name systems have a tradeoff: they can't be **secure**, **decentralized**, and **human-meaningful** all at the same time. [Zooko's triangle][zooko] says you can have at most two at a time. For good reason, usually in local-first systems that means using cryptographic identifiers, which don't read well to humans.
-
-<figure style="background: #fff; padding: 1rem 0; border-radius: 8px; text-align: center">
-  <img src="zookos-triangle.svg" width="450" height="390" style="max-width: min(100%, 300px)" alt="A triangle with its corners labelled Secure, Decentralized, and Human-meaningful" />
-</figure>
-<figcaption style="text-align: center; font-size: .85em; opacity: .7; margin-top: -.5rem">
-  Zooko's triangle, by <a href="https://commons.wikimedia.org/wiki/File:Zooko%27s_Triangle.svg">Dominic Scheirlinck</a> via Wikimedia Commons (public domain).
-</figcaption>
-
-One way to handle this is [petnames](https://files.spritely.institute/papers/petnames.html), and we want those too, but making them sharable ("edgenames") and easy to look up would be even better!
-
-[ATProto](https://en.wikipedia.org/wiki/AT_Protocol) (the protocol underneath Bluesky) popularized a way to compromise around this dilemma: your handle is a domain name that you control, and you can put a TXT record in it to bind it to your key. From this perspective, the name is a label with a pointer to the identity, not the identity itself.
-
-Onomancy takes that shape and makes it work local-first (under partition) by using some clever tricks to bind Keyhive identities through Automegre documents back to DNSSEC. Names verify locally and updates (and their proofs) can be gossiped between peers.
-
-We have a lot more to write about Onomancy, but hopefully this piques your interest! You can look at [our proof-of-concept code](https://github.com/inkandswitch/onomancy), but note that we expect many changes in the near-to-medium term.
-
-<figure><img src="onomancy_demo.png" width="W" height="H" alt="…" /></figure>
 
 ## 🌱 Around the Ecosystem
 
