@@ -73,6 +73,10 @@ The best part of this work is watching what people build. A few things that we'd
 
 We'd particularly point you at the note just before those, [_Convergence Is Not Enough_][lm-02], because it's a property we talk about a great deal internally. Automerge guarantees convergence: exchange changes, and every peer deterministically reaches the same state. Livelymerge points out that convergence is not the same as correctness. This is a good criticism! It doesn't have a widely agreed upon general solution today. In some ways it's an argument for merge-aware data types that encode what the programmer _meant_ rather than the structure they happened to use.
 
+### Prototype Using Keyhive with ATProto
+
+[Jedi Wright][jediwright] has been prototyping [governed publishing from a Keyhive-protected Automerge document to Bluesky][substrate-crossing]. The Keyhive grant acts as the gate: before a post goes out, an intent record (with a hash of the authorized content) is written into the document itself; the post is published as a [WhiteWind][whtwnd] blog entry carrying a back-pointer to the source document; and a completion record closes the loop. If the document changes between intent and publish, the hash mismatch blocks the publish, and every step is auditable from the Automerge side. It's an early prototype against the ARK alpha, but it's the first thing we've seen combining Keyhive with ATProto, and the [implementation notes][substrate-crossing] surfaced some useful rough edges in our packaging along the way.
+
 # 📬 Get in Touch
 
 Are you building something with Automerge? We'd love to hear about it — drop us a line in [the Discord][AM Discord]. Knowing how Automerge gets used in the wild is genuinely how we decide what to build next.
@@ -106,6 +110,7 @@ Until next time 👋
 [darcyparker]: https://github.com/darcyparker
 [fintan]: https://github.com/FintanH
 [ingalls]: https://en.wikipedia.org/wiki/Dan_Ingalls
+[jediwright]: https://github.com/jediwright
 [jeroen]: https://github.com/jeroen
 [livelymerge]: https://www.inkandswitch.com/livelymerge/notebook/
 [lm-02]: https://www.inkandswitch.com/livelymerge/notebook/lm-02/
@@ -115,5 +120,7 @@ Until next time 👋
 [msakrejda]: https://github.com/msakrejda
 [pvh]: https://github.com/pvh
 [shikokuchuo]: https://github.com/shikokuchuo
+[substrate-crossing]: https://github.com/jediwright/employment-seam/tree/main/substrate-crossing
+[whtwnd]: https://whtwnd.com
 [autosurgeon]: https://github.com/automerge/autosurgeon
 [samod]: https://github.com/alexjg/samod
