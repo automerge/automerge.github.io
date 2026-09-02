@@ -1,5 +1,5 @@
 ---
-title: Onomancy Names API Guide
+title: Onomancy (Name System) API Guide
 template: docs
 ---
 
