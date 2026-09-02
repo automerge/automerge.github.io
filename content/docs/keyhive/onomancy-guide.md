@@ -29,10 +29,10 @@ For the normative protocol, see [`specs/`](https://github.com/inkandswitch/onoma
   | Spelling                | Anchor kind | Rooted in                                           | Shareable |
   | ----------------------- | ----------- | --------------------------------------------------- | --------- |
   | `automerge:3RFyJz…/foo` | `doc`       | the Automerge URL itself (an ed25519 verifying key) | yes       |
-  | `~/bob/pics`            | `local`     | _your_ root document                                | no        |
+  | `~/john/pics`           | `local`     | _your_ root document                                | no        |
   | `@example.com/foo`      | `dns`       | a DNSSEC chain from the IANA root KSK               | yes       |
 
-- **Namestore.** A flat string-keyed map living at a reserved key (currently `onomancy`, provisional) inside an ordinary Automerge document. Keys are paths (`"team/john"`); values are bare references to other documents. Namestores are flat by specification: multi-segment reach uses multi-segment _keys_, never nesting.
+- **Namestore.** A flat string-keyed map living at a reserved key (currently `onomancy`, provisional) inside an ordinary Automerge document. Keys are paths (`"team/brooke"`); values are bare references to other documents. Namestores are flat by specification: multi-segment reach uses multi-segment _keys_, never nesting.
 - **The walk.** Resolution does a greedy longest-key match, consumes those segments, hops to the target document, and repeats. It never backtracks and never follows a name inside a value — there are no symlinks, which is what makes termination structural rather than a hop limit.
 - **Partial is normal.** A walk that reaches a document you have not synced yet returns `partial`, not an error. Under partition, unavailable is not wrong.
 - **Authority grade.** Every resolved verdict carries how much was actually checked: `trusted-substrate` (nothing verified beyond what the substrate enforced) or `carriage-verified` (the Keyhive delegation chain replayed and checked). Content authorship is not yet checkable — see [Verification status](#verification-status).
@@ -62,12 +62,12 @@ setup()
 ```ts
 import { Name } from "@inkandswitch/onomancy"
 
-const name = new Name("@example.com/team/john")
+const name = new Name("@example.com/team/brooke")
 
-name.value // "@example.com/team/john" (canonical form)
+name.value // "@example.com/team/brooke" (canonical form)
 name.anchorKind // "dns" | "local" | "doc"
 name.anchor // "@example.com"
-name.segments // ["team", "john"]
+name.segments // ["team", "brooke"]
 ```
 
 The constructor throws on a missing sigil, a malformed anchor, or an invalid segment. Segments may not be empty, `.`, `..`, or contain `/` or `#`. A doc anchor whose bs58check payload fails its checksum is a parse error, so transcription typos fail loudly instead of denoting some other valid key. A legacy 16-byte Automerge document ID is rejected with a distinct error: it is a valid Automerge URL, but it is not self-certifying, so it cannot anchor a name.
@@ -85,11 +85,11 @@ const held = new HeldDocuments()
 
 const root = held.createDocument() // mint under a fresh self-certifying anchor
 const team = held.createDocument()
-const john = held.createDocument()
+const alex = held.createDocument()
 
 held.bind(root, "team", team) // an edge: root names `team`
-held.bind(team, "john", john)
-held.setNote(john, "John's document")
+held.bind(team, "alex", alex)
+held.setNote(alex, "Alex's document")
 
 held.anchors // every held anchor, sorted
 held.edges(root) // [{ path: "team", target: "automerge:…" }]
@@ -110,20 +110,26 @@ held.edges(root) // [{ path: "team", target: "automerge:…" }]
 ### Resolving
 
 ```ts
-const verdict = await held.resolve(`${root}/team/john`)
-// { status: "resolved", authority: "trusted-substrate", document: "automerge:…", note: "John's document" }
+const verdict = await held.resolve(`${root}/team/alex`)
+// {
+//   status: "resolved",
+//   authority: "trusted-substrate",
+//   warning: "nothing checked — dev bridge",
+//   document: "automerge:…",
+//   note: "Alex's document"
+// }
 ```
 
 `~` names need the root document to resolve from, since the anchor is _you_:
 
 ```ts
-await held.resolve("~/bob/pics", myRootAnchor)
+await held.resolve("~/john/pics", myRootAnchor)
 ```
 
 `@hostname` names anchor live: the DNSSEC chain is fetched over DNS-over-HTTPS, validated from the IANA anchors baked into the Wasm, and the zone's attested document becomes the walk's root. Pass a third argument to use a DoH endpoint other than Cloudflare.
 
 ```ts
-await held.resolve("@example.com/team/john", undefined, "https://dns.google/dns-query")
+await held.resolve("@example.com/team/brooke", undefined, "https://dns.google/dns-query")
 ```
 
 ### Verdicts
@@ -139,6 +145,8 @@ A verdict is one of two shapes:
 { status: "partial", consumed: number, total: number,
   reason: "dangling segment" | "unsynced target", target?: "automerge:…" }
 ```
+
+`warning` is always present on a resolved verdict: it spells out in prose what the `authority` grade did and did not check, so a caller cannot read the grade without also seeing its caveat.
 
 `dangling segment` means no key matched: the name is wrong, or the edge was never written. `unsynced target` means the walk knows exactly which document it needs and does not have it — hold a replica (`holdAt`, or fetch and `hold` the bytes) and retry. An unheld _root_ is the same partial as any other unsynced hop, with `consumed: 0`.
 
@@ -165,12 +173,13 @@ Onomancy and [ARK](/docs/keyhive/ark-api-guide/) name documents identically, by 
 DNS zone (DNSSEC-signed)                  Keyhive document
   TXT _onomancy.<host>                      doc ID = ed25519 verifying key
     n=serial g=generation p=doc-id            │
-           │  verified from IANA root         │  delegation graph
-           ▼                                  │  (verification: partial)
+           │  verified from IANA root         │  delegation chain: replayed
+           ▼                                  │  and checked
   Onomancy certificate ───────────────────────┘
            │
            ▼
   root namestore ──"team"──▶ namestore ──"john"──▶ John's document
+                                                   graded trusted-substrate
 ```
 
 A working spike lives at [`onomancy_wasm/demo-ark`](https://github.com/inkandswitch/onomancy/tree/main/onomancy_wasm/demo-ark). Its shape:
@@ -180,13 +189,17 @@ import "@automerge/automerge-subduction" // Node: initSync on the shared Wasm mo
 import { initializeAutomergeRepoKeyhive } from "@automerge/automerge-repo-keyhive"
 import { ImmutableString } from "@automerge/automerge"
 import { Repo } from "@automerge/automerge-repo"
+import { NodeFSStorageAdapter } from "@automerge/automerge-repo-storage-nodefs"
 
 const { hive, repo } = await initializeAutomergeRepoKeyhive({
   createRepo: (config) => new Repo(config),
-  storage: new MemoryStorage(),
+  storage: new NodeFSStorageAdapter("./keyhive-state"),
   peerIdSuffix: "onomancy",
   syncServer: "none",
-  repo: { storage: new MemoryStorage(), subductionWebsocketEndpoints: [] },
+  repo: {
+    storage: new NodeFSStorageAdapter("./documents"),
+    subductionWebsocketEndpoints: [],
+  },
 })
 
 const john = await repo.create2({ note: "hi from ARK 🐝" })
