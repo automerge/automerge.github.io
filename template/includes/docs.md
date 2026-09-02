@@ -52,3 +52,4 @@ Reference
 Coming Soon
 
 - [automerge-repo-keyhive API Guide](/docs/keyhive/ark-api-guide/)
+- [Onomancy Names API Guide](/docs/keyhive/onomancy-guide/)
