@@ -162,15 +162,15 @@ Pass the bare hostname, without the `@` sigil. `freshness` is `"fresh"`, `"stale
 Onomancy and [ARK](/docs/keyhive/ark-api-guide/) name documents identically, by construction: a Keyhive document ID _is_ an ed25519 verifying key, and its `automerge:…` URL parses verbatim as an Onomancy doc anchor.
 
 ```
-  DNS zone (DNSSEC-signed)                Keyhive document
-    TXT _onomancy.<host>                    doc ID = ed25519 verifying key
-      n=serial g=generation p=doc-id                │
-           │  verified from IANA root               │  delegation graph
-           ▼                                        │  (verification: partial)
-    Onomancy certificate  ──────────────────────────┘
+DNS zone (DNSSEC-signed)                  Keyhive document
+  TXT _onomancy.<host>                      doc ID = ed25519 verifying key
+    n=serial g=generation p=doc-id            │
+           │  verified from IANA root         │  delegation graph
+           ▼                                  │  (verification: partial)
+  Onomancy certificate ───────────────────────┘
            │
            ▼
-    root namestore ──"team"──▶ namestore ──"john"──▶ John's document
+  root namestore ──"team"──▶ namestore ──"john"──▶ John's document
 ```
 
 A working spike lives at [`onomancy_wasm/demo-ark`](https://github.com/inkandswitch/onomancy/tree/main/onomancy_wasm/demo-ark). Its shape:
@@ -263,17 +263,17 @@ The [Keyhive TODO demo](https://github.com/inkandswitch/keyhive-todo-app-demo) c
 Onomancy replaces it with a directory whose entries are _resolved_ rather than asserted:
 
 ```
-  AccessEditor / ContactBook / AccountView
+AccessEditor · ContactBook · AccountView
               │  useDirectoryEntry(id)
               ▼
-        DirectoryProvider
+      DirectoryProvider
               │
-   ┌──────────┴───────────┐
-   │                      │
- phonebook           onomancy directory
- (today)             (in progress)
- unverified          per-entry: petname · verified · diverged
- one shared doc      the walk, over ARK documents
+   ┌──────────┴─────────────┐
+   │                        │
+phonebook                onomancy directory
+(today)                  (in progress)
+unverified               per-entry: petname · verified · diverged
+one shared doc           the walk, over ARK documents
 ```
 
 The pieces already in place:
