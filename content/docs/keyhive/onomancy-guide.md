@@ -30,7 +30,7 @@ For the normative protocol, see [`specs/`](https://github.com/inkandswitch/onoma
   | ----------------------- | ----------- | --------------------------------------------------- | --------- |
   | `automerge:3RFyJz…/foo` | `doc`       | the Automerge URL itself (an ed25519 verifying key) | yes       |
   | `~/bob/pics`            | `local`     | _your_ root document                                | no        |
-  | `@expede.wtf/foo`       | `dns`       | a DNSSEC chain from the IANA root KSK               | yes       |
+  | `@example.com/foo`      | `dns`       | a DNSSEC chain from the IANA root KSK               | yes       |
 
 - **Namestore.** A flat string-keyed map living at a reserved key (currently `onomancy`, provisional) inside an ordinary Automerge document. Keys are paths (`"team/john"`); values are bare references to other documents. Namestores are flat by specification: multi-segment reach uses multi-segment _keys_, never nesting.
 - **The walk.** Resolution does a greedy longest-key match, consumes those segments, hops to the target document, and repeats. It never backtracks and never follows a name inside a value — there are no symlinks, which is what makes termination structural rather than a hop limit.
@@ -62,11 +62,11 @@ setup()
 ```ts
 import { Name } from "@inkandswitch/onomancy"
 
-const name = new Name("@brooklynzelenka.com/team/john")
+const name = new Name("@example.com/team/john")
 
-name.value // "@brooklynzelenka.com/team/john" (canonical form)
+name.value // "@example.com/team/john" (canonical form)
 name.anchorKind // "dns" | "local" | "doc"
-name.anchor // "@brooklynzelenka.com"
+name.anchor // "@example.com"
 name.segments // ["team", "john"]
 ```
 
@@ -123,7 +123,7 @@ await held.resolve("~/bob/pics", myRootAnchor)
 `@hostname` names anchor live: the DNSSEC chain is fetched over DNS-over-HTTPS, validated from the IANA anchors baked into the Wasm, and the zone's attested document becomes the walk's root. Pass a third argument to use a DoH endpoint other than Cloudflare.
 
 ```ts
-await held.resolve("@brooklynzelenka.com/team/john", undefined, "https://dns.google/dns-query")
+await held.resolve("@example.com/team/john", undefined, "https://dns.google/dns-query")
 ```
 
 ### Verdicts
@@ -151,8 +151,8 @@ A verdict is one of two shapes:
 ```ts
 import { resolveHostname } from "@inkandswitch/onomancy"
 
-await resolveHostname("brooklynzelenka.com")
-// { hostname: "brooklynzelenka.com", links: 6, freshness: "fresh", records: ["v=ONO0;…"] }
+await resolveHostname("example.com")
+// { hostname: "example.com", links: 6, freshness: "fresh", records: ["v=ONO0;…"] }
 ```
 
 Pass the bare hostname, without the `@` sigil. `freshness` is `"fresh"`, `"stale"`, or `"deferred"` (the validity window has not begun). The transport is untrusted by construction — it is a byte courier, and all validation happens locally against anchors compiled into the Wasm. This works in windows, workers, and Node 18+ alike.
@@ -286,7 +286,7 @@ The pieces already in place:
 The pieces still missing:
 
 - A `NameDirectory` implementation over the walk, mapping Keyhive identifiers to resolved names.
-- The binding cache, which is where verified DNS bindings and introduction provenance belong. They must not go into the petname store: that document is signed by _you_, and writing "expede.wtf is key K" under your own signature is an attestation you have no basis to make.
+- The binding cache, which is where verified DNS bindings and introduction provenance belong. They must not go into the petname store: that document is signed by _you_, and writing "example.com is key K" under your own signature is an attestation you have no basis to make.
 - Per-entry status in the UI. A verified badge must be computed from the cache, never inferred from a label's spelling. One QR scan can plant `~/wellsfargo.com`, and the only honest thing an interface can say about that label is what the cache knows.
 - Public documents under ARK, so a stranger can resolve through a namestore at all.
 
