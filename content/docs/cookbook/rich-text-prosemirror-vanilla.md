@@ -37,7 +37,7 @@ const repo = new Repo({
 })
 ```
 
-Now, we'll store the automerge URL for the document we are editing in the browsers URL hash. This way, we can share the URL with others to collaborate on the document.
+Now, we'll store the Automerge URL for the document we are editing in the browsers URL hash. This way, we can share the URL with others to collaborate on the document.
 
 ```js title="main.js"
 // Get the document ID from the URL fragment if it's there. Otherwise, create
@@ -51,10 +51,10 @@ if (docUrl && isValidAutomergeUrl(docUrl)) {
 }
 ```
 
-At this point we have a document handle with a fully loaded automerge document, now we need to wire up a prosemirror editor.
+At this point we have a document handle with a fully loaded Automerge document, now we need to wire up a prosemirror editor.
 
 ```js title="main.js"
-// This is the integration with automerge.
+// This is the integration with Automerge.
 const { schema, doc, plugin } = init(handle, ["text"])
 
 const editorConfig = {

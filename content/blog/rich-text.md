@@ -61,7 +61,7 @@ Block markers have a type - such as "ordered list item" - and parents - such as 
 
 These elements map quite closely to user actions whilst editing. Typically a text editor allows you to highlight a sequence of characters and format them - regardless of whether they are in different regions of the document (try highlighting and bolding half of a list item and preceding paragraph in Google Docs for example). On the other hand, inserting a new list item is usually achieved by pressing Enter at the end of the current list item - inserting a block marker; and indenting a list item is done by pressing a button in the toolbar - inserting a new parent into the block parents.
 
-Choosing operations on the underlying data structure which map well to typical actions performed while editing text means we can provide accurate representations of the difference between two versions of the text. Here's the same  structure change example in automerge
+Choosing operations on the underlying data structure which map well to typical actions performed while editing text means we can provide accurate representations of the difference between two versions of the text. Here's the same structure change example in Automerge
 
 <video controls playsinline autoplay muted loop>
   <source src="automerge-structure-change.webm" type="video/webm" />

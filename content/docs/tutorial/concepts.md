@@ -16,13 +16,13 @@ Automerge is built in Rust, but stack-agnostic and useful for building apps on a
 
 <Figure
   src={amg-arch-KleppmannStrangeLoop2023.webp}
-  alt="Diagram of automerge project components, including automerge and automerge-repo"
+  alt="Diagram of Automerge project components, including automerge and automerge-repo"
   caption='Automerge system diagram from  "New algorithms for collaborative text editing" by Martin Kleppmann (Strange Loop 2023)'
 />
 
 </a>
 
-The foundational `Document` data structure & related algorithms are defined in the [`@automerge/automerge`](https://github.com/automerge/automerge) core library, which used under the hood by the [`@automerge/automerge-repo`](https://github.com/automerge/automerge-repo) library, which exposes the practical conveniences for managing documents via a `Repo`.
+The foundational `Document` data structure & related algorithms are defined in the [`@automerge/automerge`](https://github.com/automerge/automerge) core library, which is used under the hood by the [`@automerge/automerge-repo`](https://github.com/automerge/automerge-repo) library, which exposes the practical conveniences for managing documents via a `Repo`.
 
 ## Manage docs with a `Repo`
 

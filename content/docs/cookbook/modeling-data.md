@@ -9,7 +9,7 @@ In this section, we will discuss how to model data within a particular document,
 
 ## How many documents?
 
-You can decide which things to group together as one Automerge document (more fine grained or more coarse grained) based on what makes sense in your app. Having hundreds of docs should be fine — we've built prototypes of that scale. One major automerge project, [PushPin](https://github.com/automerge/pushpin), was built around very granular documents. This had a lot of benefits, but the overhead of syncing many thousands of documents was high.
+You can decide which things to group together as one Automerge document (more fine grained or more coarse grained) based on what makes sense in your app. Having hundreds of docs should be fine — we've built prototypes of that scale. One major Automerge project, [PushPin](https://github.com/automerge/pushpin), was built around very granular documents. This had a lot of benefits, but the overhead of syncing many thousands of documents was high.
 
 We believe on the whole there's an art to the granularity of data that is universal. When should you have two JSON documents or two SQLite databases or two rows? We suspect that an Automerge document is best suited to being a unit of collaboration between two people or a small group.
 

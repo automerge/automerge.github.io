@@ -5,11 +5,11 @@ template: docs
 
 <div class="note">
 
-It isn't important to understand this section to use automerge. You can just let automerge handle merging for you. But it may be interesting to understand.
+It isn't important to understand this section to use Automerge. You can just let Automerge handle merging for you. But it may be interesting to understand.
 
 </div>
 
-How does automerge merge concurent changes? Well, let's think about what kinds of concurrent changes are possible. Automerge documents always carry their history with them, so the way to think about two concurrent versions of a document is as the set of changes since some common ancestor.
+How does Automerge merge concurrent changes? Well, let's think about what kinds of concurrent changes are possible. Automerge documents always carry their history with them, so the way to think about two concurrent versions of a document is as the set of changes since some common ancestor.
 
 {{# Note — I tried to add Mermaid support to the build system, but it was a rabbit hole, so for now here's the original markup for reference, followed by a pre-compiled SVG. Sorry!
 graph LR
@@ -38,7 +38,7 @@ Note that "randomly choose" means "choose one arbitrarily, but in such a way tha
 
 ## List merge rules
 
-To understand the way lists merge you need to know a little about how the operations on lists are expressed. Every element in a list has an ID and operations on the list reference these IDs. When you update an index in a list (using `list[<index>] = <value>` in a `change` function in the JS library) the operation which is created references the ID of the element currently at `index`. Likewise when you delete an element from a list the delete operation which is created references the deleted element at the given index. When you _insert_ elements into a list the insert operation references the ID of the element you are inserting after
+To understand the way lists merge you need to know a little about how the operations on lists are expressed. Every element in a list has an ID and operations on the list reference these IDs. When you update an index in a list (using `list[<index>] = <value>` in a `change` function in the JS library) the operation which is created references the ID of the element currently at `index`. Likewise when you delete an element from a list the delete operation which is created references the deleted element at the given index. When you _insert_ elements into a list the insert operation references the ID of the element you are inserting after.
 
 In the following then when we say "index $x$" that really means "the ID of the element at index $x$ at the time the operation was created".
 
@@ -71,7 +71,7 @@ And on `B`
 | F            | `B`               | `f`   |
 | G            | `F`               | `g`   |
 
-Here you can see that while both `F` and `D` insert after the same reference element (`B`) the following operations reference the element that was just inserted on the local replica. That is, automerge must arbitrarily choose one of either `F` or `D` to be inserted after `B`, but after that the operations stay in the same order as they were inserted on each node. Let's say that `A` is chosen, then the final order of operations will be
+Here you can see that while both `F` and `D` insert after the same reference element (`B`) the following operations reference the element that was just inserted on the local replica. That is, Automerge must arbitrarily choose one of either `F` or `D` to be inserted after `B`, but after that the operations stay in the same order as they were inserted on each node. Let's say that `A` is chosen, then the final order of operations will be
 
 | Operation ID | Reference element | Value |
 | ------------ | ----------------- | ----- |

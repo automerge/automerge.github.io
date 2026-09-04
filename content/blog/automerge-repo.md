@@ -159,8 +159,8 @@ Note that when `Repo` receives changes over the network or registers local chang
 
   export let documentUrl: AutomergeUrl
 
-  // Doc is an automerge store with a `change` method which accepts
-  // a standard automerge change function
+  // Doc is an Automerge store with a `change` method which accepts
+  // a standard Automerge change function
   const doc = document<HasCount>(documentUrl)
   const increment = () => {
     doc.change((d: HasCount) => (d.count = (d.count || 0) + 1))
@@ -174,7 +174,7 @@ Note that when `Repo` receives changes over the network or registers local chang
 
 ## What about &lt;X&gt;?
 
-We'd love to help you make automerge work in your favorite development environment! Please reach out to us on GitHub or via [our Slack](https://join.slack.com/t/automerge/shared_invite/zt-e4p3760n-kKh7r3KRH1YwwNfiZM8ktw).
+We'd love to help you make Automerge work in your favorite development environment! Please reach out to us on GitHub or via [our Slack](https://join.slack.com/t/automerge/shared_invite/zt-e4p3760n-kKh7r3KRH1YwwNfiZM8ktw).
 
 ## Extending `automerge-repo`
 
@@ -194,7 +194,7 @@ The `automerge-repo` library provides network adapters for WebSocket, MessageCha
 
 ### Other languages/platforms
 
-This release of `automerge-repo` is just for javascript. Automerge is a multi-language library though and there are efforts under way to implement `automerge-repo` on other platforms. The most mature of these is [`automerge-repo-rs`](https://github.com/automerge/automerge-repo-rs). We welcome contributions and please reach out if you're starting to develop `automerge-repo` for a new platform.
+This release of `automerge-repo` is just for JavaScript. Automerge is a multi-language library though and there are efforts under way to implement `automerge-repo` on other platforms. The most mature of these is [`automerge-repo-rs`](https://github.com/automerge/automerge-repo-rs). We welcome contributions and please reach out if you're starting to develop `automerge-repo` for a new platform.
 
 ## Beta Quality
 
