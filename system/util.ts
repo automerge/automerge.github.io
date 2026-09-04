@@ -44,11 +44,11 @@ export const extractMdLinks = (sourceText: string): [string, string][] => {
 
 export const getValuesOfAttributes = (src: string, attr: string) =>
   compact([
-    src.match(new RegExp(`${attr}="[^"]+"`, "g")), // double quotes
-    src.match(new RegExp(`${attr}='[^']+'`, "g")), // single quotes
+    src.match(new RegExp(`\\s${attr}="[^"]+"`, "g")), // double quotes
+    src.match(new RegExp(`\\s${attr}='[^']+'`, "g")), // single quotes
   ])
     .flat()
-    .map((match) => match.slice(attr.length + 2, -1)) // attr="foo" -> foo
+    .map((match) => match.slice(attr.length + 3, -1)) // _attr="foo" -> foo
 
 // A tiny DSL for string replacement
 export const replace = (str: string, kvs: Record<string, string>) => {
@@ -67,6 +67,10 @@ export const cdata = (s: string) => `<![CDATA[${s}]]>`
 // Remove HTML tags — eg, for cleaning up the description frontmatter for inclusion in <meta>
 // TODO: make this smart enough to ignore code blocks inside <pre>
 export const plainify = (s: string) => s.replace(/<[^>]+>/g, "")
+
+// Some chunks of html — code samples and comments — should be ignored when scanning a page for macros, links, etc.
+export const ignoredHtml = /<pre[\s>][\s\S]*?<\/pre>|<code[\s>][\s\S]*?<\/code>|<!--[\s\S]*?-->/g
+export const stripIgnoredHtml = (html: string) => html.replace(ignoredHtml, "")
 
 // Replace all instances of an html tag in a string, using a given replacement function
 type ReplaceTagFn = (contents: string, attrs: string, spaces: string) => string

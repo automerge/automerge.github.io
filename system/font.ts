@@ -7,6 +7,20 @@ import { unique } from "./util.ts"
 
 let lastChars: string
 
+const features = [
+  // Automatically applied by the browser
+  "calt", // contextual alternates
+  "ccmp", // composing accented characters
+  "kern", // kerning
+  "liga", // common ligatures (fi, ffl, etc)
+  "mark", // positioning diacritics
+  "mkmk", // more positioning diacritics
+
+  // Can be activated by CSS
+  "zero", // slashed zero — font-variant-numeric: slashed-zero
+  // Other CSS features (small caps, fractions, stylistic sets, etc) can be added when we need them.
+]
+
 export const generateFontSubsets = (text: string): boolean => {
   // Generated fonts and metadata are placed in the template folder
   const outPath = "content/static/fonts"
@@ -18,6 +32,9 @@ export const generateFontSubsets = (text: string): boolean => {
   } catch {
     // The chars file was missing — that's good, it means we're regenerating from scratch.
   }
+
+  // Don't count nbsps, which tend to get added accidentally
+  text = text.replaceAll(" ", "")
 
   // Get every unique char in every page, sorted, as a string
   const everyChar = Array.from(text)
@@ -48,7 +65,7 @@ export const generateFontSubsets = (text: string): boolean => {
       const dest = `${outPath}/${base}.${ext}`
 
       if (["otf", "ttf"].includes(ext)) {
-        exec(`hb-subset "${file}" --text-file="${charFile}" --layout-features=kern -o "${dest}"`)
+        exec(`hb-subset "${file}" --text-file="${charFile}" --layout-features=${features.join(",")} -o "${dest}"`)
         exec(`woff2_compress ${dest}`)
         rm(dest) // Remove the subset (but non-woff) file
       } else if (base != "_README") {

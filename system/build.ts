@@ -13,7 +13,10 @@ let buildNum = 0
 // Either start building immediately if we can, or wait until things calm down then go.
 export const build = () => (!building ? buildNow() : buildSoon())
 
-const buildSoon = debounce(50, build)
+const buildSoon = debounce(50, () => {
+  if (Env.verbose) log(magenta(`buildSoon`))
+  build()
+})
 
 const buildNow = () => {
   building = true

@@ -29,6 +29,7 @@ export type Page = PageSource & {
   body: string // The raw markdown source
   compiledBody: string // Compiled HTML for the body
   html: string // Compiled HTML for the entire page (body wrapped with template)
+  scannable: string // Page HTML with <pre>, <code>, and <!-- comments --> stripped out, for validating assets and links
   dest: string
   url: URL
   parent?: Page

@@ -7,6 +7,7 @@ import type { Page } from "./types.ts"
 import { cdata, compare, toFullUrl } from "./util.ts"
 
 export const generateRssFeeds = (pages: Page[]) => {
+  let date = Env.useRealBuildDates ? new Date().toUTCString() : "Mon, 00 Jan 0000 00:00:00 GMT"
   write(
     `public/index.xml`,
     [
@@ -16,7 +17,7 @@ export const generateRssFeeds = (pages: Page[]) => {
       `    <title>Automerge</title>`,
       `    <link>${toFullUrl("/")}</link>`,
       `    <description>${Env.description}</description>`,
-      `    <lastBuildDate>${new Date().toUTCString()}</lastBuildDate>`,
+      `    <lastBuildDate>${date}</lastBuildDate>`,
       `    <atom:link href="${toFullUrl("/index.xml")}" rel="self" type="application/rss+xml" />`,
       ...pages
         .filter(

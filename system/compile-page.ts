@@ -68,9 +68,9 @@ function compileHtml(page: Page, pages: Page[]) {
   let html = template.body
 
   // Add extra CSS or scripts
-  // We accept both the singular and the plural, from both the page and the template
-  let styles = [frontmatter.styles, frontmatter.style, template.frontmatter.styles, template.frontmatter.style]
-  let scripts = [frontmatter.scripts, frontmatter.script, template.frontmatter.scripts, template.frontmatter.script]
+  // We accept both the singular and the plural, from both the template and the page
+  let styles = [template.frontmatter.styles, template.frontmatter.style, frontmatter.styles, frontmatter.style]
+  let scripts = [template.frontmatter.scripts, template.frontmatter.script, frontmatter.scripts, frontmatter.script]
   // combine and then filter empty values
   styles = trimAll(styles.join(",").split(",")).filter((v) => v)
   scripts = trimAll(scripts.join(",").split(",")).filter((v) => v)

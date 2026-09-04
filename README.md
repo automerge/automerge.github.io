@@ -34,6 +34,7 @@ Henceforth:
   * [Broken Links](#broken-links)
 * [System](#system)
   * [Deployment](#deployment)
+  * [Tests](#tests)
 
 <br><br>
 
@@ -258,3 +259,11 @@ If anyone on the core team needs to tweak the deployment, here's where to go loo
 * Host — GitHub pages, built using Actions.
 
 There's a lot of interaction between how this site is built and several other repos (with docs) in the AM GH org. For instance, some of the API docs (like [these](https://automerge.org/automerge/api-docs/js/)) come from other repos, and take advantage of Github-specific behaviour to end up with the right URLs.
+
+<br>
+
+### Tests
+
+Run tests with `site test`.
+
+You can add tests to the `system/test` folder. We're assuming node:test is the runner, since that likely minimizes dependencies.

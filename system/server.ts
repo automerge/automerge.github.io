@@ -1,7 +1,7 @@
 // Server
 // This is a super-simple live-reloading web server for local development,
 // using websockets & an injected <script> tag to trigger browser refresh.
-// For more, see the original: https://github.com/ivanreese/please-reload.
+// For more, see the original: https://github.com/ivyreese/please-reload.
 // If our needs change, it'll be easy to replace this with something else.
 
 import { Buffer } from "node:buffer"
@@ -83,7 +83,7 @@ async function createServer(root: string, host: string, port: number, name: stri
         server.close()
         server.listen({ host, port: ++port })
       } else {
-        logError(red("Unhandled server error"), err)
+        logError("Unhandled server error", err)
       }
     })
 

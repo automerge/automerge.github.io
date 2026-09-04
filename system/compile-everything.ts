@@ -82,8 +82,9 @@ export const compileEverything = () => {
     const html = ""
     const children: Page[] = []
     const compiledBody = body
+    const scannable = ""
 
-    return { path, source, stats, frontmatter, body, dest, url, template, html, children, compiledBody }
+    return { path, source, stats, frontmatter, body, dest, url, template, html, children, compiledBody, scannable }
   })
 
   // Only compile published pages
@@ -161,7 +162,7 @@ const generateSitemap = (pages: Page[]) => {
     ...pages
       .filter(({ frontmatter }) => frontmatter.index != "false")
       .toSorted((a, b) => compare(a.url.pathname, b.url.pathname))
-      .map((page) => [page.url, page.stats.modified.toISOString()])
+      .map((page) => [page.url, Env.useRealBuildDates ? page.stats.modified.toISOString() : "0000-00-00T00:00:00.000Z"])
       .map(([url, modified]) => `<url><loc>${url}</loc><lastmod>${modified}</lastmod></url>`),
     `</urlset>`,
   ].join("\n")

@@ -23,4 +23,9 @@ export const Env = {
 
   // Increase the amount of logging
   verbose: false, // enable with --verbose
+
+  // RUNTIME STATE
+
+  // Set to false when performing test builds, to reduce diff noise
+  useRealBuildDates: true,
 }
