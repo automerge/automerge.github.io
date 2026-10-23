@@ -19,18 +19,26 @@ const dotfiles = /(^|[\/\\])\../
 export function runWatcher(paths: string[], actions: () => any, debounceTime = 100) {
   const runActionsSoon = debounce(debounceTime, actions)
 
-  Chokidar.watch(paths, { ignored: dotfiles, ignoreInitial: true })
+  // Each build deletes /public and hardlinks static assets back into it, which changes the link count of
+  // their sources in /content. Some platforms (eg: Linux inotify) report that as a "change", which would
+  // trigger another build, forever. So we only count a change if the file's mtime actually moved.
+  const mtimes = new Map<string, number>()
+  let ready = false
+
+  Chokidar.watch(paths, { ignored: dotfiles, alwaysStat: true })
     .on("error", () => log(red(`Watching ${JSON.stringify(paths)} failed`)))
-    .on("all", (event, path) => {
-      // There's a weird issue where empty files trigger a change event when used as the source of a hardlink.
-      // This leads to infinite recompile loops. To mitigate, we ignore them.
-      if (event == "change") {
-        const stats = FS.statSync(path)
-        if (stats.size == 0 && stats.nlink > 1) {
-          if (Env.verbose) log(magenta(event) + " " + green(path) + " " + magenta("(ignoring)"))
+    .on("ready", () => (ready = true))
+    .on("all", (event, path, stats) => {
+      if (stats) {
+        const unchanged = event == "change" && mtimes.get(path) == stats.mtimeMs
+        mtimes.set(path, stats.mtimeMs)
+        if (unchanged) {
+          if (Env.verbose) log(magenta(event) + " " + green(path) + " " + magenta("(metadata only, ignoring)"))
           return
         }
-      }
+      } else if (event == "unlink") mtimes.delete(path)
+
+      if (!ready) return // Initial scan, just recording mtimes
 
       if (Env.verbose) log(magenta(event) + " " + green(path))
       runActionsSoon()
