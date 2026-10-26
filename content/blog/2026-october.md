@@ -58,7 +58,13 @@ Fintan made this fast too. Masked reads use Automerge's indexes instead of scann
 
 ## 📦 automerge-repo
 
-### automerge-repo 3.0 (Experimental)
+[Darcy Parker][darcyparker] kept up the steady stream of fixes:
+
+- Sync state is now saved per document, and removing `DocHandle` listeners works correctly ([#773][repo-773]).
+- `react-hooks` and `solid-primitives` no longer bundle their dependencies ([#758][repo-758]).
+- The minimum versions of `cbor-x` and `ws` went up to pick up fixes ([#756][repo-756]).
+
+### v3.0 (Experimental)
 
 [Alex Good] published [`v3.0.0-experimental.1` and `experimental.2`][repo releases], an early look at an automerge-repo built on [Subduction]. <!-- TODO: confirm framing and which npm tag these are published under --> The main changes are:
 
@@ -69,23 +75,17 @@ Fintan made this fast too. Masked reads use Automerge's indexes instead of scann
 
 This is experimental and the API will change. If you try it, we'd love to hear how it goes in [the Discord][AM Discord]!
 
-### On the 2.x Line
-
-[Darcy Parker][darcyparker] kept up the steady stream of fixes:
-
-- Sync state is now saved per document, and removing `DocHandle` listeners works correctly ([#773][repo-773]).
-- `react-hooks` and `solid-primitives` no longer bundle their dependencies ([#758][repo-758]).
-- The minimum versions of `cbor-x` and `ws` went up to pick up fixes ([#756][repo-756]).
-
 ## 🗝️🐝 Keyhive
 
-[Keyhive] is our access control and encryption layer for Automerge and other CRDTs.
+[Keyhive] is our access control and encryption layer for Automerge and other CRDTs. This month saw a lot of work that's been happening behind the scenes land in Keyhive!
 
 ### Keyline
 
-**Keyline is Keyhive's new authority graph** ([#230][kh-230]). It is a set of signed certificates over keys: _delegations_ that give a key some power over a subject, and _revocations_ that withdraw a delegation. A key's authority is worked out from that set alone. Every replica that holds the same certificates gets the same answer, in whatever order they arrived. [Brooke Zelenka] wrote [a detailed design][keyline design], including the alternatives we rejected and the edge cases.
+**Keyline is Keyhive's new authority graph** ([#230][kh-230]). This is something that used to live directly in `keyhive_core`, but we split out for symmetry with BeeKEM.
 
-Keyline is `no_std` and builds for Wasm. Its interface is async, so a backend can use a database, and signing can happen behind WebCrypto or a hardware key. Keyhive's membership now runs on Keyline ([#288][kh-288]).
+As before, it is a set of signed certificates over keys: _delegations_ that give a key some power over a subject, and _revocations_ that withdraw a delegation. There's [a detailed design][keyline design], including the alternatives we rejected, the edge cases, etc. Unlike the prior authority graph, capabilties are now given as a late binding (when we go to use them) rather than an early binding (at delegation time). This is a lesson we imported from UCAN and was a natural fit for a causally consistent system.
+
+One of the interesting things about Keyline is that it has clear semantics, and can be implemented in terms of SQL, Datalog, or DBSP. The first version is a fully in-memory implementation, but we plan on using databases for things like sync servers in the future. Keyline is also `no_std` and builds for Wasm. Its interface is async, so a backend can use a database, and signing can happen behind WebCrypto or a hardware key.
 
 ### CGKA Hardening
 
@@ -97,9 +97,9 @@ Keyline is `no_std` and builds for Wasm. Its interface is async, so a backend ca
 - The type system now prevents recording a root secret that hasn't been verified ([#263][kh-263]).
 - BeeKEM stays consistent when signing fails or a path secret is wrong ([#293][kh-293]).
 
-### Breaking: No More "Public" User
+### No More "Public" User
 
-Public documents used to be modeled as a well-known member whose secret any replica could hold. That special case reached into a lot of places, so we removed it. Public documents will be handled outside this layer. In JS, `Identifier.publicId()` and `bestAccessForDoc` are gone.
+The `Public` "user" was always a bit of a hack that we knew we wanted to get rid of. Public documents used to be modeled as a well-known member whose secret any replica could hold. That special case reached into a lot of places, so we removed it. Public documents will be handled outside this layer using `Read` and `Realy` capabilities and writing keys into applications to be more like "application keys" than "world keys" for content that's public.
 
 ## 🏔️ Subduction
 
