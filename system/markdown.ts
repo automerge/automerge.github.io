@@ -78,7 +78,8 @@ Markdown.renderer.rules.fence = (tokens, idx) => {
     const classes = ["code-line"]
     if (highlightedLines.has(i)) classes.push("highlighted-line")
     if (highlightedRedLines.has(i)) classes.push("highlighted-red-line")
-    return `<div class="${classes.join(" ")}">${line}</div>`
+    // An empty div has no height, so give blank lines a space to keep them visible
+    return `<div class="${classes.join(" ")}">${line || " "}</div>`
   })
   lines = [`<pre><code class="language-${langName}">`, ...lines, "</code></pre>"]
 
