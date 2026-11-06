@@ -1,6 +1,6 @@
 ---
 title: "This Month in Automerge: October '26"
-description: Our quarterly community call, masking changes by author, an experimental automerge-repo 3.0, and a big month for Keyhive with Keyline, causal encryption, and new integrations in automerge-repo-keyhive and Pushwork.
+description: Our Q4 community call, masking changes by author, an experimental automerge-repo 3.0 on Subduction, a big month for Keyhive (Keyline, causal encryption, a canonical codec), Automerge in Go, and Keyhive at J On The Beach.
 date: 2026-10-31
 template: blog
 ---
@@ -9,8 +9,7 @@ As always, the community hangs out in [the Automerge Discord][AM Discord]. Come 
 
 ## 📺 Community Call
 
-<!-- TODO: date of the call -->
-We held our Q4 community call in October, and the [recording is up on YouTube][AM call recording]. <!-- TODO: one or two lines on what was covered / who presented -->
+On October 8, [Brooke Zelenka] and [Alex Good] hosted our Q4 community call, and the [recording is up on YouTube][AM call recording].
 
 <iframe
   style="aspect-ratio: 16 / 9; border: 0;"
@@ -28,7 +27,7 @@ Want to join the next one? Follow [the Automerge calendar on Luma][AM luma] to h
 
 ### Masking Changes by Author
 
-In [September][September post], Automerge learned to record an _author_ for each change. In October, [Fintan Halpenny][fintan] built the next step on top of that: hiding an author's changes from your view of a document ([#1581][am-1581]).
+In [September][September post], Automerge learned to record an _author_ for each change. In October, [Fintan Halpenny][fintan] built the next step on top of that: hiding an author's changes from your view of a document ([#1581][am-1581]). It's on `main` now and will ship in the next release.
 
 ```js
 import * as Automerge from "@automerge/automerge"
@@ -56,74 +55,58 @@ Fintan made this fast too. Masked reads use Automerge's indexes instead of scann
 
 - [Aran Donohue][aran] fixed `list_range` on text, which returned the start and end of each mark as if they were characters ([#1608][am-1608]). For `"hello world"` with one mark, you now get eleven characters instead of thirteen items. Aran also added CI coverage for the `utf16-indexing` feature ([#1630][am-1630]).
 - Thanks to first-time contributor [Wahaj18][wahaj18], looking up a cursor against the wrong object now returns `InvalidCursor` instead of panicking ([#1597][am-1597]).
-- [Fintan Halpenny][fintan] moved more of the [benchmark battery][benchmark battery] off of Criterion.
+- [Fintan Halpenny][fintan] migrated another benchmark (`load_actors`) from Criterion into the [benchmark battery].
 
 ## 📦 automerge-repo
 
 [Darcy Parker][darcyparker] kept up the steady stream of fixes:
 
-- Sync state is now saved per document, and removing `DocHandle` listeners works correctly ([#773][repo-773]).
+- Sync state is now saved per document, and removing `DocHandle` listeners now works correctly ([#773][repo-773]).
 - `react-hooks` and `solid-primitives` no longer bundle their dependencies ([#758][repo-758]).
-- The minimum versions of `cbor-x` and `ws` went up to pick up fixes ([#756][repo-756]).
+- The minimum versions of `cbor-x` and `ws` were raised to pick up upstream fixes ([#756][repo-756]).
 - Importing an older copy of a document under the same ID can no longer delete newer stored changes during compaction ([#774][repo-774]).
 
 ### automerge-repo v3.0 (Experimental)
 
-[Alex Currie-Clark][acurrieclark] spent much of October rebuilding automerge-repo on top of [Subduction]. Instead of its own network and storage adapters, automerge-repo 3 talks to a _Sedimentree backend_, and the first one is a Subduction backend. The work went out as [`v3.0.0-experimental.1` and `.2`][repo releases] early in the month. Since then it has grown into [`v3.0.0-alpha.0` and `alpha.1`][repo releases], now on npm under the `next` tag.
-
-```ts
-import "@automerge/subduction" // initializes Subduction's Wasm
-import { Repo } from "@automerge/automerge-repo"
-import { SubductionBackend } from "@automerge/automerge-repo-subduction"
-import { IndexedDBSubductionStorageAdapter } from "@automerge/automerge-repo-subduction-storage-indexeddb"
-import { WebSocketSubductionNetworkAdapter } from "@automerge/automerge-repo-subduction-network-websocket"
-
-const backend = new SubductionBackend({
-  storage: new IndexedDBSubductionStorageAdapter(),
-  network: [new WebSocketSubductionNetworkAdapter("wss://subduction.sync.inkandswitch.com")],
-})
-const repo = new Repo({ backend })
-```
+[Alex Currie-Clark][acurrieclark] spent much of October rebuilding automerge-repo on top of [Subduction]. Instead of plugging network and storage adapters straight into the `Repo`, automerge-repo 3.0 talks to a _Sedimentree backend_ that owns them, and the first one is built on Subduction. The work went out early in the month as [`v3.0.0-experimental.1` and `.2`][repo releases], on npm under the `experimental` tag, and continued on its branch through the rest of October.
 
 Highlights:
 
-- **A simpler core.** The old scheduler is gone. Each document now owns its own state, and the Repo just maps document IDs to documents.
-- **New APIs.** `Repo.query()` returns an observable you can subscribe to, `DocHandle.hasHeads` checks whether a document has reached some heads, `DocHandle.changeAt` returns a `Promise` of the new heads. On the Subduction backend, a signal-based `syncPolicy` decides which documents sync with which peers.
+- **A simpler core.** The old scheduler is gone. Each document now owns its own state, and the `Repo` just maps document IDs to documents.
+- **New APIs.** `Repo.query()` returns an observable you can subscribe to, and `DocHandle.hasHeads` checks whether a document has reached some heads. `DocHandle.changeAt` now returns a `Promise` of the new heads.
 - **32-byte document IDs.** Existing 16-byte IDs still work in URLs.
 - **Faster loading.** Each document loads with a single storage read, and many documents load in parallel. New benchmarks cover large imports, long text histories, and documents with many authors.
-- **Clearer failures.** Edits are stored as loose commits and compacted later. If a write fails, the repo stops and reports it, instead of retrying silently.
+- **Clearer failures.** If a write fails, the repo stops and reports it, instead of retrying silently. Edits are now stored as loose commits and compacted later.
 
-This is an alpha, not ready for production, and the API will change. If you try it, we'd love to hear how it goes in [the Discord][AM Discord]!
+This is experimental, not ready for production, and the API will change. If you try it, we'd love to hear how it goes in [the Discord][AM Discord]!
 
 ## 🗝️🐝 Keyhive
 
 [Keyhive] is our access control and encryption layer for Automerge and other CRDTs. This was a big month for Keyhive: a lot of work that's been happening behind the scenes finally landed!
 
-In short: a new authority graph (Keyline), sturdier group keys, causal encryption, a stable custom codec, no more "World Public" user, and Keyhive 0.6 running in automerge-repo-keyhive.
+In short: a new authority graph (Keyline), sturdier group keys, causal encryption, a canonical custom codec (heading for a stable format), no more "World Public" user, and Keyhive 0.6 running in automerge-repo-keyhive. Everything below ships in [`@keyhive/keyhive` v0.6.0][keyhive npm] and [`keyhive_core` v0.10.0][keyhive crate].
 
 ### Keyline
 
-**Keyline is Keyhive's new authority graph** ([#230][kh-230]). This is something that used to live directly in `keyhive_core`, but we split out for symmetry with BeeKEM.
+**Keyline is Keyhive's new authority graph.** It used to live directly in `keyhive_core`, but we split it out into its own crate for symmetry with BeeKEM ([#230][kh-230]), and Keyhive's membership now runs on it ([#288][kh-288]).
 
-As before, it is a set of signed certificates over keys: _delegations_ that give a key some power over a subject, and _revocations_ that withdraw a delegation. There's [a detailed design][keyline design], including the alternatives we rejected, the edge cases, etc. Unlike the prior authority graph, capabilities are now given as a late binding (when we go to use them) rather than an early binding (at delegation time). This is a lesson we imported from [UCAN] and was a natural fit for a causally consistent system.
+As before, it is a set of signed certificates over keys: _delegations_ that give a key some power over a subject, and _revocations_ that withdraw a delegation. There's [a detailed design][keyline design], including the alternatives we rejected and the edge cases. Unlike the prior authority graph, capabilities are now bound late (when they're used) rather than early (at delegation time). That idea was inspired by [UCAN], and it's a natural fit for a causally consistent system.
 
-Keyline also does away with our old "dueling admins" problem. Previously, when two admins revoked each other concurrently, Keyhive broke the cycle by seniority, which was subtle and hard to predict. Keyline replaces that with a simpler, explicit model: you can never revoke the branch of the graph you're standing on, and when peers revoke each other, both revocations stand. You recover by rotating the role, not by a tiebreak, so the result is easy to reason about.
+Keyline also replaces our old answer to the "dueling admins" problem. Previously, when two admins revoked each other concurrently, Keyhive broke the tie with a deterministic but arbitrary order (seniority, then causal depth, then hash), which was hard to predict. Keyline's rules are simpler and explicit: you can never revoke the branch of the graph you're standing on, and when peers revoke each other, both revocations stand. Below the root role, you recover by rotating the role. A duel inside the root role can't be undone, so keep that role small.
 
-One of the interesting things about Keyline is that it has clear semantics, and can be implemented in terms of SQL, Datalog, or DBSP. The first version is a fully in-memory implementation, but we plan on using databases for things like sync servers in the future. Keyline is also `no_std` and builds for Wasm. Its interface is async, so a backend can use a database, and signing can happen behind WebCrypto or a hardware key.
+One of the interesting things about Keyline is that it has clear semantics and can be implemented in terms of SQL, Datalog, or DBSP. The first version is a fully in-memory implementation, but we plan to use databases for things like sync servers in the future. Keyline is also `no_std` and builds for Wasm. Its interface is async, so a backend can use a database, and signing can happen behind WebCrypto or a hardware key.
 
 Expect an [Ink & Switch lab note][keyhive notebook] all about Keyline in the near future!
 
 ### CGKA Hardening
 
-[John Mumm] continued hardening [BeeKEM][beekem crate], building on the work from [September][September post]. Group key operations now cite the certificates that authorize them and are checked against those certificates ([#295][kh-295], [#302][kh-302], [#303][kh-303]). Concurrent key updates are merged instead of replayed, with batches sorted by depth ([#256][kh-256], [#252][kh-252]), and merging skips duplicate operations and blanks any path node no member could decrypt ([#305][kh-305], [#306][kh-306]).
-
-Newly invited members can decrypt a document right away ([#262][kh-262]). BeeKEM also stays consistent when signing fails or a path secret is wrong ([#293][kh-293]), and the type system now rules out recording a root secret that hasn't been verified ([#263][kh-263]).
+[John Mumm] continued hardening [BeeKEM][beekem crate], Keyhive's group key agreement, building on the work from [September][September post]. For apps, that means membership changes made concurrently by different people now merge cleanly ([#252][kh-252], [#256][kh-256], [#305][kh-305], [#306][kh-306]), every key operation is checked against the certificates that authorize it ([#295][kh-295], [#302][kh-302], [#303][kh-303]), and newly invited members can decrypt a document right away ([#262][kh-262]). BeeKEM also stays consistent when signing fails or a secret is wrong, and refuses to record secrets it hasn't verified ([#263][kh-263], [#293][kh-293]).
 
 ### Causal Encryption
 
-Content encryption now lives in its own crate, `keyhive_content` ([#313][kh-313]), and causal encryption is exposed to both Rust and JS clients ([#317][kh-317]).
+[John Mumm] moved content encryption into its own crate, `keyhive_content` ([#313][kh-313]), and exposed causal encryption to both Rust and JS clients ([#317][kh-317]).
 
-Every encrypted block carries the keys of its direct causal ancestors. If you can open one point in a document's history, you can walk back from there and open everything before it, so a new member can read the full history without anyone having to hand over a pile of old keys. In JS, that's `tryEncryptWithAncestors` and `tryCausalDecrypt`. The [design doc][causal design] covers the trade-offs, including why this gives post-compromise security but not forward secrecy.
+Every encrypted block carries the keys of its direct causal ancestors. If you can open one point in a document's history, you can walk back from there and open everything before it, so a new member can read the full history without anyone having to hand over a pile of old keys. In JS, that's `tryEncrypt` (passing the predecessors) and `tryCausalDecrypt`. The [design doc][causal design] covers the trade-offs, including why this gives post-compromise security but not forward secrecy.
 
 <svg viewBox="0 0 680 380" role="img" aria-labelledby="causal-title causal-desc" xmlns="http://www.w3.org/2000/svg" style="display: block; width: 100%; max-width: 680px; margin: 1.5rem auto; color: var(--fg); font-family: inherit;" fill="currentColor">
 <title id="causal-title">Causal encryption</title>
@@ -152,27 +135,20 @@ The format got stricter along the way. Encrypted content is now chunked with a c
 
 ### Canonical Encoding
 
-The Keyhive team has been hard at work finalizing Keyhive's custom codec, with two goals:
+[Brooke Zelenka] has been finalizing Keyhive's custom codec, with two goals: dropping bincode and serde ([#299][kh-299], [#310][kh-310], [#311][kh-311]), and reaching a stable byte format we can commit to, since Keyhive data is signed, hashed, synced, and stored for the long term.
 
-1. **Remove bincode and serde.** Keyhive now uses its own codecs throughout ([#299][kh-299], [#310][kh-310], [#311][kh-311]).
-2. **Reach a stable encoding we can commit to.** Keyhive data is signed, hashed, synced, and stored for the long term, so its byte format needs to stay put as Keyhive evolves.
-
-Getting the bytes right matters for security too. Certificates are signed and hashed as bytes, and [`keyhive_codec`][keyhive codec] requires that each value has exactly one valid encoding. If a value could be encoded two ways, a peer could send the same certificate under two different hashes, and a revocation naming one would miss the other.
-
-We also gave every key derivation its own context ([#309][kh-309]) and signed application bytes under their own kind ([#296][kh-296]), so a key or signature made for one purpose can't be passed off as another.
-
-All of this is out in [`@keyhive/keyhive` v0.6.0][keyhive npm] and [`keyhive_core` v0.10.0][keyhive crate].
+Getting the bytes right matters for security too. [`keyhive_codec`][keyhive codec] guarantees that each value has exactly one valid encoding, so a peer can't send the same certificate under two different hashes and slip past a revocation that names one of them. Every key derivation and every signed piece of application data also gets its own context now ([#296][kh-296], [#309][kh-309]), so a key or signature made for one purpose can't be passed off as another.
 
 ### No More "World Public" User
 
-The "World Public" user was always a bit of a hack that we knew we wanted to get rid of. Public documents used to be modeled as a well-known member whose secret any replica could hold. We removed it for a few reasons:
+The "World Public" user was always a bit of a hack that we knew we wanted to get rid of. Public documents used to be modeled as a well-known member whose secret any replica could hold. We removed it ([#284][kh-284]) for two reasons:
 
 - **It was special-cased throughout the code.** BeeKEM, `keyhive_core`, and the JS API all had to know about it, and the new approach doesn't need any of that.
 - **It was a denial-of-service vector.** Anyone could act as the "World Public" user and ask a sync server for _every_ public document it held.
 
-Public documents will now be handled outside this layer using `Read` and `Relay` capabilities and writing keys into applications to be more like "application keys" than "world keys" for content that's public.
+Public documents are now handled one layer up, with ordinary `read` and `relay` capabilities: instead of a global "world" key, each app ships its own keys for the content it treats as public.
 
-Here's the pattern for an "app-public" document. The app creates two principals and ships one secret for each of them, so anyone running the app can read the document, and nobody else can:
+Here's the pattern for an "app-public" document. The app creates two principals and ships one key for each of them, so anyone running the app can read the document:
 
 {{# Mermaid source for the diagram below (the build doesn't render Mermaid, so the SVG is hand-made):
 flowchart TD
@@ -206,34 +182,36 @@ flowchart TD
 <rect x="325" y="514" width="210" height="52" rx="8" fill="var(--yellow)" stroke="var(--slate)" stroke-width="1.5"/><text x="430" y="537" text-anchor="middle" font-size="15" font-weight="600" fill="var(--slate)">Ed25519 signing key</text><text x="430" y="555" text-anchor="middle" font-size="12" fill="var(--slate)">to fetch with</text>
 </svg>
 
-Anyone with read access to the document can set this up, not just its owner. They give the _reader_ read access, and the reader passes relay access on to the _fetcher_. The app ships the reader's X25519 secret key, so anyone with the app can decrypt as the reader, but not its signing key, so nobody can use it to change the document or its membership. It also ships the fetcher's Ed25519 signing key, so anyone can sign in to the sync server as the fetcher and pull ciphertext, which on its own they can't read. Put the two together and you get read-only access for that app's users.
+Anyone with read access to the document can set this up, not just its owner. They give the _reader_ read access, and the reader passes relay access on to the _fetcher_. The app ships the reader's X25519 secret key, so anyone with the app can decrypt as the reader, but not its signing key, so nobody can use it to change the document or its membership. It also ships the fetcher's Ed25519 signing key, so anyone with the app can sign in to the sync server as the fetcher and pull ciphertext, which on its own they can't read. Put the two together and you get read-only access for that app's users.
+
+These keys aren't really secret: anyone who downloads the app can extract them. What you get is read-only access that's opt-in and scoped to one app. Unlike the old "World Public" user, the fetcher can only pull the documents that were made public to that app, and sync servers still only ever see ciphertext.
 
 Today this is set up by hand, but we plan to add an API for it.
 
 ### automerge-repo-keyhive
 
-[`automerge-repo-keyhive` v0.8.0-alpha.1][ARK npm] (on the `next` npm tag) moves onto Keyhive 0.6.0, thanks to [John Mumm]. Its hand-rolled encryption is gone, replaced by Keyhive's causal encryption. Earlier in the month, v0.7.0-alpha.1 removed the old "nudge edit" machinery.
+[`automerge-repo-keyhive` v0.8.0-alpha.1][ARK npm] (on the `next` npm tag) moves onto `@keyhive/keyhive` 0.6.0, thanks to [John Mumm]. Its hand-rolled encryption is gone, replaced by Keyhive's causal encryption. Earlier in the month, v0.7.0-alpha.1 removed the old "nudge edit" machinery.
 
-**This is a breaking change:** with the "World Public" user gone, automerge-repo-keyhive no longer has `setPublicAccess` or `getPublicAccess`. Public access is now up to your application. As always with automerge-repo-keyhive, pin an exact version.
+**This is a breaking change:** with the "World Public" user gone, automerge-repo-keyhive no longer has `setPublicAccess` or `getPublicAccess`. Public access is now up to your application (see the app-public pattern above). As always with automerge-repo-keyhive, pin an exact version, since the `latest` npm tag still points at a much older alpha.
 
 ## 🏔️ Subduction
 
 A new batch of [Subduction] releases is out, including [`subduction_core` v0.20.0][Subduction], [`@automerge/subduction` v0.26.0][subduction npm], and `@automerge/automerge-subduction` v0.21.0. Each package is now released and tagged on its own ([#318][sd-318]), which is why the version numbers no longer move together.
 
-- [Alex Good] fixed two Sedimentree sync bugs. Fragment boundaries are kept during minimization ([#325][sd-325]), and they are no longer advertised as held ([#326][sd-326]). In the second bug, a peer could skip sending a commit because it thought the other side already had it.
-- `subduction_keyhive` now tracks `keyhive_core` v0.7.0, thanks to [John Mumm] ([#323][sd-323]).
+- [Alex Good] fixed two Sedimentree sync bugs. Minimization now keeps fragment boundaries ([#325][sd-325]), and boundaries are no longer wrongly advertised as held ([#326][sd-326]). That second bug could make a peer skip sending a commit because it thought the other side already had it.
+- `subduction_keyhive` now tracks `keyhive_core` v0.7.0, thanks to [John Mumm] ([#323][sd-323]). It doesn't include the later Keyhive changes above yet.
 - The Wasm storage API gained `get_head(id)`, and storage errors now carry the backend's original error as their `cause` ([#317][sd-317]).
-- On `main` since that release: a relay now waits for upstream fetches before answering, so downstream peers don't wrongly conclude that a document is unavailable ([#334][sd-334]). Metadata that exceeds the wire format's limits now returns an error instead of panicking ([#348][sd-348]).
+- Later in the month, [Alex Good] made relays wait for upstream fetches before answering, so downstream peers don't wrongly conclude that a document is unavailable ([#334][sd-334]). Metadata that exceeds the wire format's limits now returns an error instead of panicking ([#348][sd-348]).
 
 ## 🌱 Around the Ecosystem
 
 ### Automerge in Go
 
-[Probo], an open source compliance platform, wrote [a pure-Go implementation of Automerge][probo-1757] to add real-time collaboration to its document editor. The PR reports full V2 wire and state interoperability with the Rust and JS implementations, checked by a differential parity and fuzzing suite that runs against both. It also includes an automerge-repo protocol client and a ProseMirror bridge. A [follow-up PR][probo-1758] wired it into the editor, with the official `@automerge/automerge-repo` client in the browser talking to a Go gateway on the server. Many thanks to [gearnode]!
+[Bryan Frimin][gearnode] at [Probo], an open-source compliance platform, wrote [a pure-Go implementation of Automerge][probo-1757] to add real-time collaboration to its document editor. The PR reports full V2 wire and state interoperability with the Rust and JS implementations, checked by a differential parity and fuzzing suite that runs against both. It also includes an automerge-repo protocol client and a ProseMirror bridge. A [follow-up PR][probo-1758] wired it into the editor, with the official `@automerge/automerge-repo` client in the browser talking to a Go gateway on the server.
 
 ### A Repo for Python
 
-[`automerge-py`][automerge-py] gained an async `automerge.repo` API that interoperates with the JavaScript `automerge-repo`. Also new are collaborative text, ephemeral messages, authors and commit metadata, read-only sync, and [per-peer share policies][py-share-policy]. It's on `main` and hasn't been released yet.
+[`automerge-py`][automerge-py] has an async `automerge.repo` API (in its 0.2.0.dev pre-releases) that interoperates with the JavaScript `automerge-repo`. This month [Alex Good] added authors and commit metadata, ephemeral messages, read-only sync, and [per-peer share policies][py-share-policy]. These are on `main` and haven't been released yet.
 
 ### Pushwork
 
@@ -243,10 +221,6 @@ A new batch of [Subduction] releases is out, including [`subduction_core` v0.20.
 # Only you can read or write this repo
 $ pushwork init --keyhive
 INITIALIZED automerge:xtVWLeMLftzvzpw4yA2J4yomix8j
-
-# Anyone with the URL can read, but only you can write
-$ pushwork init --keyhive --public-access read
-INITIALIZED automerge:zPK4aA9f87Msyb33vBBRRrtWFeZY
 
 # Save collaborators' contact cards under names, then list your contacts
 $ pushwork keyhive contacts add alice ./alice-card.json
@@ -272,7 +246,7 @@ $ pushwork keyhive access alice none
 alice's access revoked
 ```
 
-By default the server only gets `relay` access: it stores and forwards your documents, but can't read them.
+By default, the sync server only gets `relay` access: it stores and forwards your documents, but can't read them. This release predates this month's Keyhive changes, so it still runs on automerge-repo-keyhive 0.5 and 0.6 under the hood.
 
 ## 🎤 Presentations
 
@@ -325,19 +299,20 @@ Until next time 👋
 [gearnode]: https://github.com/gearnode
 [I&S email]: mailto:hello@inkandswitch.com
 [John Mumm]: https://github.com/jtfmumm
-[jotb slides]: https://expede.tngl.io/jotb-2026/
 [jotb]: https://www.jonthebeach.com
+[jotb slides]: https://expede.tngl.io/jotb-2026/
+[Keyhive]: https://github.com/inkandswitch/keyhive
 [keyhive codec]: https://github.com/inkandswitch/keyhive/blob/main/keyhive_codec/src/lib.rs
 [keyhive crate]: https://crates.io/crates/keyhive_core
 [keyhive notebook]: https://www.inkandswitch.com/keyhive/notebook/
 [keyhive npm]: https://www.npmjs.com/package/@keyhive/keyhive
-[Keyhive]: https://github.com/inkandswitch/keyhive
 [keyline design]: https://github.com/inkandswitch/keyhive/blob/main/design/keyline/README.md
 [kh-230]: https://github.com/inkandswitch/keyhive/pull/230
 [kh-252]: https://github.com/inkandswitch/keyhive/pull/252
 [kh-256]: https://github.com/inkandswitch/keyhive/pull/256
 [kh-262]: https://github.com/inkandswitch/keyhive/pull/262
 [kh-263]: https://github.com/inkandswitch/keyhive/pull/263
+[kh-284]: https://github.com/inkandswitch/keyhive/pull/284
 [kh-288]: https://github.com/inkandswitch/keyhive/pull/288
 [kh-293]: https://github.com/inkandswitch/keyhive/pull/293
 [kh-295]: https://github.com/inkandswitch/keyhive/pull/295
@@ -355,11 +330,11 @@ Until next time 👋
 [kh-317]: https://github.com/inkandswitch/keyhive/pull/317
 [kh-322]: https://github.com/inkandswitch/keyhive/pull/322
 [kh-323]: https://github.com/inkandswitch/keyhive/pull/323
+[Probo]: https://github.com/getprobo/probo
 [probo-1757]: https://github.com/getprobo/probo/pull/1757
 [probo-1758]: https://github.com/getprobo/probo/pull/1758
-[Probo]: https://github.com/getprobo/probo
-[pushwork npm]: https://www.npmjs.com/package/pushwork
 [Pushwork]: https://github.com/inkandswitch/pushwork
+[pushwork npm]: https://www.npmjs.com/package/pushwork
 [py-share-policy]: https://github.com/automerge/automerge-py/blob/main/docs/share-policy.md
 [repo releases]: https://github.com/automerge/automerge-repo/releases
 [repo-756]: https://github.com/automerge/automerge-repo/pull/756
@@ -374,7 +349,7 @@ Until next time 👋
 [sd-334]: https://github.com/inkandswitch/subduction/pull/334
 [sd-348]: https://github.com/inkandswitch/subduction/pull/348
 [September post]: /blog/2026-september/
-[subduction npm]: https://www.npmjs.com/package/@automerge/subduction
 [Subduction]: https://github.com/inkandswitch/subduction
+[subduction npm]: https://www.npmjs.com/package/@automerge/subduction
 [UCAN]: https://ucan.xyz
 [wahaj18]: https://github.com/Wahaj18
