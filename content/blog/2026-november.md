@@ -1,11 +1,18 @@
 ---
-title: "This Month in Automerge: October '26"
-description: Our Q4 community call, masking changes by author, an experimental automerge-repo 3.0 on Subduction, a big month for Keyhive (Keyline, causal encryption, a canonical codec), Automerge in Go, and Keyhive at J On The Beach.
-date: 2026-10-31
+title: "This Month in Automerge: November '26"
+description: Our Q4 community call, masking changes by author, an alpha of automerge-repo 3.0 on Subduction, a big month for Keyhive (Keyline, causal encryption, a canonical codec), Automerge in Go, and Keyhive at J On The Beach.
+date: 2026-11-09
 template: blog
 ---
 
+_A quick note on naming: starting with this edition, each issue is named for the month it comes out, not the month it covers. This one covers October, picking up right where the [September edition][September post] left off, so nothing was skipped._
+
 As always, the community hangs out in [the Automerge Discord][AM Discord]. Come say hi, and let us know if you'd like something included in next month's edition!
+
+## ✨ Highlights
+
+- [Keyhive] had a big month: a streamlined authority graph (Keyline), causal encryption, and a canonical codec all landed in Keyhive 0.6.
+- [automerge-repo] 3.0, rebuilt on [Subduction], is now out as an alpha.
 
 ## 📺 Community Call
 
@@ -66,11 +73,11 @@ Fintan made this fast too. Masked reads use Automerge's indexes instead of scann
 - The minimum versions of `cbor-x` and `ws` were raised to pick up upstream fixes ([#756][repo-756]).
 - Importing an older copy of a document under the same ID can no longer delete newer stored changes during compaction ([#774][repo-774]).
 
-### automerge-repo v3.0 (Experimental)
+### automerge-repo v3.0 (Alpha)
 
-[Alex Currie-Clark][acurrieclark] spent much of October rebuilding automerge-repo on top of [Subduction]. Instead of plugging network and storage adapters straight into the `Repo`, automerge-repo 3.0 talks to a _Sedimentree backend_ that owns them, and the first one is built on Subduction. The work went out early in the month as [`v3.0.0-experimental.1` and `.2`][repo releases], on npm under the `experimental` tag, and continued on its branch through the rest of October.
+[Alex Currie-Clark][acurrieclark] spent much of October rebuilding automerge-repo on top of [Subduction]. Instead of plugging network and storage adapters straight into the `Repo`, automerge-repo 3.0 talks to a _Sedimentree backend_ that owns them, and the first one is built on Subduction. The work went out early in the month as [`v3.0.0-experimental.1` and `.2`][repo releases], on npm under the `experimental` tag, and continued on its branch through the rest of October. In early November it graduated to a proper alpha: [`v3.0.0-alpha.1`][repo releases] is on npm under the `next` tag.
 
-Highlights:
+What's new:
 
 - **A simpler core.** The old scheduler is gone. Each document now owns its own state, and the `Repo` just maps document IDs to documents.
 - **New APIs.** `Repo.query()` returns an observable you can subscribe to, and `DocHandle.hasHeads` checks whether a document has reached some heads. `DocHandle.changeAt` now returns a `Promise` of the new heads.
@@ -78,7 +85,7 @@ Highlights:
 - **Faster loading.** Each document loads with a single storage read, and many documents load in parallel. New benchmarks cover large imports, long text histories, and documents with many authors.
 - **Clearer failures.** If a write fails, the repo stops and reports it, instead of retrying silently. Edits are now stored as loose commits and compacted later.
 
-This is experimental, not ready for production, and the API will change. If you try it, we'd love to hear how it goes in [the Discord][AM Discord]!
+This is an alpha: it's not ready for production yet, and the API may still change. If you try it, we'd love to hear how it goes in [the Discord][AM Discord]!
 
 ## 🗝️🐝 Keyhive
 
@@ -288,6 +295,7 @@ Until next time 👋
 [am-1630]: https://github.com/automerge/automerge/pull/1630
 [aran]: https://github.com/aran
 [ARK npm]: https://www.npmjs.com/package/@automerge/automerge-repo-keyhive
+[automerge-repo]: https://github.com/automerge/automerge-repo
 [automerge-py]: https://github.com/automerge/automerge-py
 [beekem crate]: https://crates.io/crates/beekem
 [benchmark battery]: https://github.com/automerge/automerge/tree/main/rust/benchmark-battery
