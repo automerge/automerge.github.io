@@ -19,28 +19,27 @@ const dotfiles = /(^|[\/\\])\../
 export function runWatcher(paths: string[], actions: () => any, debounceTime = 100) {
   const runActionsSoon = debounce(debounceTime, actions)
 
-  // Each build deletes /public and hardlinks static assets back into it, which changes the link count of
-  // their sources in /content. Some platforms (eg: Linux inotify) report that as a "change", which would
-  // trigger another build, forever. So we only count a change if the file's mtime actually moved.
+  // Some OSes emit a "change" when we create a hardlink to a file, which can cause an infinite loop.
+  // To avoid that, we track when each file was modified, and only accept a "change" when the file actually changes.
   const mtimes = new Map<string, number>()
-  let ready = false
 
-  Chokidar.watch(paths, { ignored: dotfiles, alwaysStat: true })
+  Chokidar.watch(paths, { ignored: dotfiles, ignoreInitial: true, alwaysStat: true })
     .on("error", () => log(red(`Watching ${JSON.stringify(paths)} failed`)))
-    .on("ready", () => (ready = true))
     .on("all", (event, path, stats) => {
-      if (stats) {
-        const unchanged = event == "change" && mtimes.get(path) == stats.mtimeMs
-        mtimes.set(path, stats.mtimeMs)
-        if (unchanged) {
-          if (Env.verbose) log(magenta(event) + " " + green(path) + " " + magenta("(metadata only, ignoring)"))
-          return
-        }
-      } else if (event == "unlink") mtimes.delete(path)
+      const unchanged = event == "change" && stats && mtimes.get(path) == stats.mtimeMs
 
-      if (!ready) return // Initial scan, just recording mtimes
+      // This log is to help debug the aforementioned infinite loop. When we're satisfied with the fix, we can kill it.
+      if (unchanged && Env.verbose) log(magenta(event) + " " + green(path) + " " + magenta("(unchanged)"))
 
+      // Bail if this file was not changed
+      if (unchanged) return
+
+      // Update our modification time tracking
+      if (stats) mtimes.set(path, stats.mtimeMs)
+
+      // This log is to help see which files trigger an action, which is generally useful to know
       if (Env.verbose) log(magenta(event) + " " + green(path))
+
       runActionsSoon()
     })
 }
